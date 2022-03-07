@@ -17,15 +17,25 @@ package main
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/cmd/deploy"
+	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/version"
+)
+
+var (
+	_globalOptions options.GlobalOptions
 )
 
 func newCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "cloud-cli",
+		Use:     "cloud-cli [OPTIONS] COMMANDS",
 		Short:   "Universal command line interface for API7 Cloud",
 		Version: version.V.String(),
 	}
+	cmd.PersistentFlags().BoolVar(&_globalOptions.Verbose, "verbose", false, "Enable verbose output")
+	cmd.PersistentFlags().BoolVar(&_globalOptions.DryRun, "dry-run", false, "Enable dry run mode")
+
+	cmd.AddCommand(deploy.NewCommand(&_globalOptions.Deploy))
 
 	return cmd
 }

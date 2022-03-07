@@ -12,32 +12,26 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-package version
+
+package deploy
 
 import (
-	"encoding/json"
-	"runtime"
-	"testing"
-	"time"
+	"github.com/spf13/cobra"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/api7/cloud-cli/internal/options"
 )
 
-func TestVersion(t *testing.T) {
-	ver := Version{
-		Major:     "0",
-		Minor:     "1",
-		GitCommit: "2ad4hz",
-		BuildDate: time.Now().String(),
-		GoVersion: runtime.Version(),
-		Compiler:  runtime.Compiler,
-		Platform:  runtime.GOOS + "/" + runtime.GOARCH,
+// NewCommand creates the deploy sub-command object.
+func NewCommand(opts *options.DeployOptions) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deploy [COMMAND] [ARG...]",
+		Short: "Deploy Apache APISIX with being connected to API7 Cloud.",
 	}
-	s := ver.String()
-	var (
-		ver2 Version
-	)
-	err := json.Unmarshal([]byte(s), &ver2)
-	assert.Nil(t, err, "unmarshalling version info")
-	assert.Equal(t, ver, ver2, "checking version")
+
+	cmd.PersistentFlags().StringVar(&opts.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
+	cmd.PersistentFlags().StringVar(&opts.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
+
+	cmd.AddCommand(newDockerCommand(&opts.Docker))
+
+	return cmd
 }
