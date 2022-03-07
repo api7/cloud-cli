@@ -13,36 +13,31 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package output
+package apisix
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/fatih/color"
-
-	"github.com/api7/cloud-cli/internal/options"
+	"github.com/imdario/mergo"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
-// Errorf prints the error message to the console and quit the program.
-func Errorf(format string, args ...interface{}) {
-	color.Red("ERROR: " + fmt.Sprintf(format, args...))
-	os.Exit(-1)
-}
-
-// Warnf prints the warning message to the console.
-func Warnf(format string, args ...interface{}) {
-	color.Yellow("WARNING: " + fmt.Sprintf(format, args...))
-}
-
-// Verbosef prints the verbose message to the console.
-func Verbosef(format string, args ...interface{}) {
-	if options.Global.Verbose {
-		color.Cyan(fmt.Sprintf(format, args...))
+// MergeConfig merge the user customized config with default settings.
+func MergeConfig(config []byte, defaultConfig []byte) (map[string]interface{}, error) {
+	data := make(map[string]interface{})
+	if config != nil {
+		if err := yaml.Unmarshal(config, &data); err != nil {
+			return nil, errors.Wrap(err, "unmarshal config")
+		}
 	}
-}
+	defaultData := make(map[string]interface{})
+	if defaultConfig != nil {
+		if err := yaml.Unmarshal(defaultConfig, &defaultData); err != nil {
+			return nil, errors.Wrap(err, "unmarshal default config")
+		}
+	}
 
-// Infof prints the info message to the console.
-func Infof(format string, args ...interface{}) {
-	color.Cyan(fmt.Sprintf(format, args...))
+	if err := mergo.Merge(&data, defaultData, mergo.WithOverride); err != nil {
+		return nil, err
+	}
+	return data, nil
 }

@@ -17,10 +17,9 @@ package deploy
 
 import (
 	"context"
-	"strings"
-	"time"
-
+	"github.com/api7/cloud-cli/cmd/utils"
 	"github.com/spf13/cobra"
+	"strings"
 
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
@@ -51,10 +50,14 @@ cloud-cli deploy docker \
 
 			if options.Global.DryRun {
 				output.Infof("Running:\n%s\n", docker.String())
+			} else {
+				output.Verbosef("Running:\n%s\n", docker.String())
 			}
 
-			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-			defer cancel()
+			ctx, cancel := context.WithCancel(context.TODO())
+			go utils.WaitForSignal(func() {
+				cancel()
+			})
 
 			stdout, stderr, err := docker.Run(ctx)
 			if stderr != "" {

@@ -13,36 +13,21 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package output
+package utils
 
 import (
-	"fmt"
 	"os"
-
-	"github.com/fatih/color"
-
-	"github.com/api7/cloud-cli/internal/options"
+	"os/signal"
+	"syscall"
 )
 
-// Errorf prints the error message to the console and quit the program.
-func Errorf(format string, args ...interface{}) {
-	color.Red("ERROR: " + fmt.Sprintf(format, args...))
-	os.Exit(-1)
-}
+// WaitForSignal creates a channel and wait until desired signal
+// arriving. It's a block call so be sure you're using it correctly.
+func WaitForSignal(callback func()) {
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 
-// Warnf prints the warning message to the console.
-func Warnf(format string, args ...interface{}) {
-	color.Yellow("WARNING: " + fmt.Sprintf(format, args...))
-}
+	_ = <-sigCh
 
-// Verbosef prints the verbose message to the console.
-func Verbosef(format string, args ...interface{}) {
-	if options.Global.Verbose {
-		color.Cyan(fmt.Sprintf(format, args...))
-	}
-}
-
-// Infof prints the info message to the console.
-func Infof(format string, args ...interface{}) {
-	color.Cyan(fmt.Sprintf(format, args...))
+	callback()
 }

@@ -1,0 +1,18 @@
+apisix:
+  enable_admin: false
+  ssl:
+    ssl_trusted_certificate: /cloud/tls/ca.crt
+  lua_module_hook: cloud
+  extra_lua_path: /opt/{{ .CloudModuleName }}/?.ljbc;
+nginx_config:
+  http:
+    custom_lua_shared_dict:
+      cloud: 1m
+etcd:
+  host:
+    - "https://{{ .CloudDomain }}:443"
+  tls:
+    cert: /cloud/tls/tls.crt
+    key: /cloud/tls/tls.key
+    sni: {{ .CloudDomain }}
+    verify: true
