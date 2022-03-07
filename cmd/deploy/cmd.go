@@ -22,16 +22,16 @@ import (
 )
 
 // NewCommand creates the deploy sub-command object.
-func NewCommand(opts *options.DeployOptions) *cobra.Command {
+func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deploy [COMMAND] [ARG...]",
 		Short: "Deploy Apache APISIX with being connected to API7 Cloud.",
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
-	cmd.PersistentFlags().StringVar(&opts.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
 
-	cmd.AddCommand(newDockerCommand(&opts.Docker))
+	cmd.AddCommand(newDockerCommand())
 
 	return cmd
 }

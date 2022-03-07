@@ -46,3 +46,6 @@ gofmt: ## Format the source code
 lint: ## Apply go lint check
 	@golangci-lint run --timeout 10m ./...
 .PHONY: lint
+
+test: ## Run the unit tests
+	@go test -v ./...

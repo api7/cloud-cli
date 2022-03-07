@@ -14,8 +14,13 @@
 //  limitations under the License.
 package options
 
-// GlobalOptions contains options in the global scope.
-type GlobalOptions struct {
+var (
+	// Global contains all options.
+	Global Options
+)
+
+// Options contains all options.
+type Options struct {
 	// Verbose controls if the output should be elaborate.
 	Verbose bool
 	// DryRun controls if all the actions should be simulated instead of executed.
