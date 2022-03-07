@@ -48,7 +48,10 @@ cloud-cli deploy docker \
 			for _, args := range opts.DockerRunArgs {
 				docker.AppendArgs(strings.Split(args, "=")...)
 			}
-			output.Verbosef("Running:\n%s", docker.String())
+
+			if options.Global.DryRun {
+				output.Infof("Running:\n%s\n", docker.String())
+			}
 
 			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 			defer cancel()
