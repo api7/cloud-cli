@@ -20,11 +20,8 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-)
 
-var (
-	// VerboseMode controls whether the output should be verbose.
-	VerboseMode bool
+	"github.com/api7/cloud-cli/internal/options"
 )
 
 // Errorf prints the error message to the console and quit the program.
@@ -33,9 +30,21 @@ func Errorf(format string, args ...interface{}) {
 	os.Exit(-1)
 }
 
+// Warnf prints the warning message to the console.
+func Warnf(format string, args ...interface{}) {
+	color.Yellow("WARNING: " + fmt.Sprintf(format, args...))
+}
+
 // Verbosef prints the verbose message to the console.
 func Verbosef(format string, args ...interface{}) {
-	if VerboseMode {
+	if options.Global.Verbose {
 		color.Green(fmt.Sprintf(format, args...))
+	}
+}
+
+// Infof prints the info message to the console.
+func Infof(format string, args ...interface{}) {
+	if options.Global.Verbose {
+		color.Cyan(fmt.Sprintf(format, args...))
 	}
 }
