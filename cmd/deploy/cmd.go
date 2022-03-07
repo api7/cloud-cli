@@ -16,8 +16,9 @@
 package deploy
 
 import (
-	"github.com/api7/cloud-cli/internal/options"
 	"github.com/spf13/cobra"
+
+	"github.com/api7/cloud-cli/internal/options"
 )
 
 // NewCommand creates the deploy sub-command object.
