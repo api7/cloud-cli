@@ -12,32 +12,30 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-package version
+
+package output
 
 import (
-	"encoding/json"
-	"runtime"
-	"testing"
-	"time"
+	"fmt"
+	"os"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/fatih/color"
 )
 
-func TestVersion(t *testing.T) {
-	ver := Version{
-		Major:     "0",
-		Minor:     "1",
-		GitCommit: "2ad4hz",
-		BuildDate: time.Now().String(),
-		GoVersion: runtime.Version(),
-		Compiler:  runtime.Compiler,
-		Platform:  runtime.GOOS + "/" + runtime.GOARCH,
+var (
+	// VerboseMode controls whether the output should be verbose.
+	VerboseMode bool
+)
+
+// Errorf prints the error message to the console and quit the program.
+func Errorf(format string, args ...interface{}) {
+	color.Red("ERROR: " + fmt.Sprintf(format, args...))
+	os.Exit(-1)
+}
+
+// Verbosef prints the verbose message to the console.
+func Verbosef(format string, args ...interface{}) {
+	if VerboseMode {
+		color.Green(fmt.Sprintf(format, args...))
 	}
-	s := ver.String()
-	var (
-		ver2 Version
-	)
-	err := json.Unmarshal([]byte(s), &ver2)
-	assert.Nil(t, err, "unmarshalling version info")
-	assert.Equal(t, ver, ver2, "checking version")
 }
