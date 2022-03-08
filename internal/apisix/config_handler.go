@@ -19,6 +19,7 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+	"io/ioutil"
 )
 
 // MergeConfig merge the user customized config with default settings.
@@ -40,4 +41,22 @@ func MergeConfig(config []byte, defaultConfig []byte) (map[string]interface{}, e
 		return nil, err
 	}
 	return data, nil
+}
+
+// SaveConfig saves the config to the temporary file and return its name.
+func SaveConfig(config map[string]interface{}) (string, error) {
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return "", errors.Wrap(err, "marshal config")
+	}
+	tempFile, err := ioutil.TempFile("", "apisix-config-*.yaml")
+	if err != nil {
+		return "", err
+	}
+	defer tempFile.Close()
+
+	if _, err := tempFile.Write(data); err != nil {
+		return "", err
+	}
+	return tempFile.Name(), nil
 }

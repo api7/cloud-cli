@@ -17,6 +17,7 @@ package apisix
 
 import (
 	"encoding/json"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -88,7 +89,41 @@ apisix:
 					},
 				},
 			},
-			errorReason: "",
+		},
+		{
+			name:   "empty config",
+			config: nil,
+			essential: []byte(`
+apisix:
+  enable_admin: false
+  ssl:
+    ssl_trusted_certificate: /path/to/ca2.crt
+`),
+			result: map[string]interface{}{
+				"apisix": map[string]interface{}{
+					"enable_admin": false,
+					"ssl": map[string]interface{}{
+						"ssl_trusted_certificate": "/path/to/ca2.crt",
+					},
+				},
+			},
+		},
+		{
+			name: "empty default config",
+			config: []byte(`
+apisix:
+  enable_admin: false
+  ssl:
+    ssl_trusted_certificate: /path/to/ca2.crt
+`),
+			result: map[string]interface{}{
+				"apisix": map[string]interface{}{
+					"enable_admin": false,
+					"ssl": map[string]interface{}{
+						"ssl_trusted_certificate": "/path/to/ca2.crt",
+					},
+				},
+			},
 		},
 	}
 	for _, tc := range testCases {
@@ -103,6 +138,44 @@ apisix:
 				json1, _ := json.Marshal(tc.result)
 				json2, _ := json.Marshal(result)
 				assert.JSONEq(t, string(json1), string(json2), "check result")
+			}
+		})
+	}
+}
+
+func TestSaveConfig(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name            string
+		config          map[string]interface{}
+		filenamePattern string
+		errorReason     string
+	}{
+		{
+			name: "success",
+			config: map[string]interface{}{
+				"apisix": map[string]interface{}{
+					"enable_admin": false,
+					"ssl": map[string]interface{}{
+						"ssl_trusted_certificate": "/path/to/ca2.crt",
+					},
+				},
+			},
+			filenamePattern: `apisix-config-\d+\.yaml`,
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			filename, err := SaveConfig(tc.config)
+			if tc.errorReason != "" {
+				assert.NotNil(t, err, "check if err is not nil")
+				assert.Equal(t, tc.errorReason, err.Error(), "check error")
+			} else {
+				assert.Nil(t, err, "check if err is nil")
+				assert.Regexp(t, regexp.MustCompile(tc.filenamePattern), filename, "check filename")
 			}
 		})
 	}

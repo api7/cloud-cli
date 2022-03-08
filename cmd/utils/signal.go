@@ -27,7 +27,7 @@ func WaitForSignal(callback func()) {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 
-	_ = <-sigCh
+	<-sigCh
 
 	callback()
 }
