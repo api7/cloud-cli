@@ -49,3 +49,11 @@ lint: ## Apply go lint check
 
 test: ## Run the unit tests
 	@go test -v ./...
+
+.PHONY: install-tools
+install-tools: ## Install necessary tools
+	@bash -c 'go install github.com/golang/mock/mockgen@v1.6.0'
+
+.PHONY: codegen
+codegen: install-tools ## Run code generation
+	./scripts/mockgen.sh
