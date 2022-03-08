@@ -21,6 +21,7 @@ import (
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -52,7 +53,7 @@ func TestConfigureCommand(t *testing.T) {
 			// expire at 2100-01-01T00:00:00Z
 			token:           "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjQxMDI0NDQ4MDAsImp0aSI6InVzZXJfaWQifQ.cPY9qlkzlya6PLLCmTfr611nzcaETO2vrBATr45QkpmDHPFctv_zmxgkBiWlvJNMHcgCua7vwXgO-uPfdqDFsDJryI3lDj3w3CHhq85ZGUU9HFBOXVX9NKdBw3eDn4WyHVTDfSNpLNrLSr1xBuvBQs0jTYSUHk2RHHeSfViOrcq91EKfEzFXX8lOikXKbHVs0bYHryrjJeCheW_Z5shIimfgMqLZIIA8F7INPpAeCppkicUkStBixiCO0YGRZAdQcmI3QTBttIwd-mnBc8SQqwMfwFc9DCpwvdcdyZ6B8tRwpZuPJM1u8k2XuH17wUfeCLgkaHgczcAsWQm3T5Ldew",
 			successExpected: true,
-			outputExpected:  "your access token will expire at 2100-01-01T08:00:00+08:00",
+			outputExpected:  fmt.Sprintf("your access token will expire at %s", time.Unix(4102444800, 0).Format(time.RFC3339)),
 		},
 	}
 	for _, tt := range tests {
