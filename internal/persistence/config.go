@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package config
+package persistence
 
 import (
 	"fmt"
@@ -24,57 +24,57 @@ import (
 )
 
 var (
-	configFileLocation string
+	credentialFileLocation string
 )
 
 func init() {
-	configFileLocation = filepath.Join(os.Getenv("HOME"), ".api7cloud/config")
+	credentialFileLocation = filepath.Join(os.Getenv("HOME"), ".api7cloud/credentials")
 }
 
-// Save config to file for persistence
-func Save(config *Config) error {
-	data, err := yaml.Marshal(config)
+// SaveCredential to file for persistence
+func SaveCredential(credential *Credential) error {
+	data, err := yaml.Marshal(credential)
 	if err != nil {
 		panic(err)
 	}
 
-	dir := filepath.Dir(configFileLocation)
+	dir := filepath.Dir(credentialFileLocation)
 	if _, err = os.Stat(dir); err != nil {
 		err = os.MkdirAll(dir, 0750)
 		if err != nil {
-			return fmt.Errorf("failed to create config directory in $HOME/.api7cloud: %s", err)
+			return fmt.Errorf("failed to create config directory in %s: %s", dir, err)
 		}
 	}
 
-	file, err := os.Create(configFileLocation)
+	file, err := os.Create(credentialFileLocation)
 	if err != nil {
-		return fmt.Errorf("failed create file in $HOME/.api7cloud/config for credential: %s", err)
+		return fmt.Errorf("failed create file in %s for credential: %s", credentialFileLocation, err)
 	}
 
 	write, err := file.Write(data)
 	if err != nil {
-		return fmt.Errorf("failed write credential to %s, %s", configFileLocation, err)
+		return fmt.Errorf("failed write credential to %s, %s", credentialFileLocation, err)
 	}
 	if write != len(data) {
-		return fmt.Errorf("failed write credential to %s", configFileLocation)
+		return fmt.Errorf("failed write credential to %s", credentialFileLocation)
 	}
 
 	return nil
 }
 
-// Load config from file
-func Load() (*Config, error) {
-	file, err := os.Open(configFileLocation)
+// LoadCredential from file
+func LoadCredential() (*Credential, error) {
+	file, err := os.Open(credentialFileLocation)
 	if err != nil {
 		return nil, err
 	}
 
-	var config Config
+	var credential Credential
 	decoder := yaml.NewDecoder(file)
-	err = decoder.Decode(&config)
+	err = decoder.Decode(&credential)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode config file, %s", err)
+		return nil, fmt.Errorf("failed to decode credential, %s", err)
 	}
 
-	return &config, nil
+	return &credential, nil
 }

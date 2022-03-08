@@ -25,7 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/api7/cloud-cli/internal/config"
+	"github.com/api7/cloud-cli/internal/persistence"
 )
 
 func TestConfigureCommand(t *testing.T) {
@@ -79,7 +79,7 @@ func TestConfigureCommand(t *testing.T) {
 					assert.Contains(t, string(output), tt.outputExpected)
 				}
 
-				cfg, err := config.Load()
+				cfg, err := persistence.LoadCredential()
 				assert.NoError(t, err, "checking load config error")
 				assert.Equal(t, tt.token, cfg.User.AccessToken, "checking token")
 			} else {

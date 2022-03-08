@@ -13,14 +13,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package config
+package persistence
 
 // User is credential for authentication.
 type User struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
 }
 
-// Config is the top-level configuration for the cloud cli.
-type Config struct {
+// Credential is the top-level credential for the cloud cli.
+type Credential struct {
 	User User `json:"user" yaml:"user"`
 }

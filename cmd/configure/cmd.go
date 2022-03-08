@@ -24,8 +24,8 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/spf13/cobra"
 
-	"github.com/api7/cloud-cli/internal/config"
 	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/persistence"
 )
 
 // NewCommand creates the `configure` sub-command object.
@@ -68,8 +68,8 @@ func NewCommand() *cobra.Command {
 				output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
 			}
 
-			if err := config.Save(&config.Config{
-				User: config.User{
+			if err := persistence.SaveCredential(&persistence.Credential{
+				User: persistence.User{
 					AccessToken: accessToken,
 				},
 			}); err != nil {

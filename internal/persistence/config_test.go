@@ -13,7 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package config
+package persistence
 
 import (
 	"fmt"
@@ -26,56 +26,56 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSave(t *testing.T) {
+func TestSaveCredential(t *testing.T) {
 	id := uuid.NewString()
-	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
-	err := Save(&Config{
+	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
+	err := SaveCredential(&Credential{
 		User: User{AccessToken: "test-0"},
 	})
 	assert.NoError(t, err, "save to file in not exist dir should be success")
 
-	config, err := Load()
+	credential, err := LoadCredential()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-0", config.User.AccessToken, "access token should be test-0")
+	assert.Equal(t, "test-0", credential.User.AccessToken, "access token should be test-0")
 
 	id = uuid.NewString()
 	err = os.MkdirAll(fmt.Sprintf("/tmp/%s", id), fs.ModePerm)
 	assert.NoError(t, err, "create dir should be success")
 
-	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
-	err = Save(&Config{
+	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
+	err = SaveCredential(&Credential{
 		User: User{AccessToken: "test-1"},
 	})
 	assert.NoError(t, err, "save to file in exist dir should be success")
 
-	config, err = Load()
+	credential, err = LoadCredential()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-1", config.User.AccessToken, "access token should be test-1")
+	assert.Equal(t, "test-1", credential.User.AccessToken, "access token should be test-1")
 
-	err = Save(&Config{
+	err = SaveCredential(&Credential{
 		User: User{AccessToken: "test-2"},
 	})
-	assert.NoError(t, err, "overwrite config file should be success")
+	assert.NoError(t, err, "overwrite credential file should be success")
 
-	config, err = Load()
+	credential, err = LoadCredential()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-2", config.User.AccessToken, "access token should be test-2")
+	assert.Equal(t, "test-2", credential.User.AccessToken, "access token should be test-2")
 }
 
 func TestLoad(t *testing.T) {
 	id := uuid.NewString()
-	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
+	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
 
-	_, err := Load()
+	_, err := LoadCredential()
 	assert.Contains(t, err.Error(), "no such file or directory", "load from file should be failed")
 
-	dir := filepath.Dir(configFileLocation)
+	dir := filepath.Dir(credentialFileLocation)
 	err = os.MkdirAll(dir, 0750)
 	assert.NoError(t, err, "create dir should be success")
 
-	err = os.WriteFile(configFileLocation, []byte("invalid config"), fs.ModePerm)
-	assert.NoError(t, err, "write config file should be success")
+	err = os.WriteFile(credentialFileLocation, []byte("invalid credential"), fs.ModePerm)
+	assert.NoError(t, err, "write credential file should be success")
 
-	_, err = Load()
-	assert.Contains(t, err.Error(), "failed to decode config file", "load from file should be failed")
+	_, err = LoadCredential()
+	assert.Contains(t, err.Error(), "failed to decode credential", "load from file should be failed")
 }
