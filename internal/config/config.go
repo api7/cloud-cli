@@ -66,7 +66,7 @@ func Save(config *Config) error {
 func Load() (*Config, error) {
 	file, err := os.Open(configFileLocation)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open config file, %s", err)
+		return nil, err
 	}
 
 	var config Config

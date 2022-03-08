@@ -67,7 +67,7 @@ func TestLoad(t *testing.T) {
 	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
 
 	_, err := Load()
-	assert.Contains(t, err.Error(), "failed to open config file", "load from file should be failed")
+	assert.Contains(t, err.Error(), "no such file or directory", "load from file should be failed")
 
 	dir := filepath.Dir(configFileLocation)
 	err = os.MkdirAll(dir, 0750)
