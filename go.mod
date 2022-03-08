@@ -4,9 +4,12 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
+	github.com/golang-jwt/jwt/v4 v4.3.0
+	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.7.0
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
 
 require (
@@ -20,5 +23,4 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
