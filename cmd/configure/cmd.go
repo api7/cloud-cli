@@ -65,9 +65,8 @@ func NewCommand() *cobra.Command {
 				if expireAt < time.Now().Unix() {
 					output.Errorf("access token expired")
 				}
+				output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
 			}
-
-			output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
 
 			if err := config.Save(&config.Config{
 				User: config.User{
