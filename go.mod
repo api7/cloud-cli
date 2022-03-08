@@ -3,8 +3,8 @@ module github.com/api7/cloud-cli
 go 1.17
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.13.0
+	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v1.3.0
