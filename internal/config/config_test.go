@@ -30,13 +30,13 @@ func TestSave(t *testing.T) {
 	id := uuid.NewString()
 	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
 	err := Save(&Config{
-		User: User{AccessKey: "test-0"},
+		User: User{AccessToken: "test-0"},
 	})
 	assert.NoError(t, err, "save to file in not exist dir should be success")
 
 	config, err := Load()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-0", config.User.AccessKey, "access key should be test-0")
+	assert.Equal(t, "test-0", config.User.AccessToken, "access token should be test-0")
 
 	id = uuid.NewString()
 	err = os.MkdirAll(fmt.Sprintf("/tmp/%s", id), fs.ModePerm)
@@ -44,22 +44,22 @@ func TestSave(t *testing.T) {
 
 	configFileLocation = fmt.Sprintf("/tmp/%s/config", id)
 	err = Save(&Config{
-		User: User{AccessKey: "test-1"},
+		User: User{AccessToken: "test-1"},
 	})
 	assert.NoError(t, err, "save to file in exist dir should be success")
 
 	config, err = Load()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-1", config.User.AccessKey, "access key should be test-1")
+	assert.Equal(t, "test-1", config.User.AccessToken, "access token should be test-1")
 
 	err = Save(&Config{
-		User: User{AccessKey: "test-2"},
+		User: User{AccessToken: "test-2"},
 	})
 	assert.NoError(t, err, "overwrite config file should be success")
 
 	config, err = Load()
 	assert.NoError(t, err, "load from file should be success")
-	assert.Equal(t, "test-2", config.User.AccessKey, "access key should be test-2")
+	assert.Equal(t, "test-2", config.User.AccessToken, "access token should be test-2")
 }
 
 func TestLoad(t *testing.T) {

@@ -34,25 +34,25 @@ func NewCommand() *cobra.Command {
 		Use:   "configure",
 		Short: "Configure the credential for accessing API7 Cloud.",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("API7 Cloud Access Key: ")
-			var accessKey string
+			fmt.Printf("API7 Cloud Access Token: ")
+			var accessToken string
 
 			scanner := bufio.NewScanner(os.Stdin)
 			if scanner.Scan() {
-				accessKey = scanner.Text()
+				accessToken = scanner.Text()
 			}
 			if err := scanner.Err(); err != nil {
 				output.Errorf("reading standard input: %s", err)
 			}
 
-			token, err := jwt.Parse(accessKey, nil)
+			token, err := jwt.Parse(accessToken, nil)
 			if err != nil {
 				if e, ok := err.(*jwt.ValidationError); ok {
 					if e.Errors != jwt.ValidationErrorUnverifiable {
-						output.Errorf("invalid access key: %s", err)
+						output.Errorf("invalid access token: %s", err)
 					}
 				} else {
-					output.Errorf("access key parse error: %s", err)
+					output.Errorf("access token parse error: %s", err)
 				}
 			}
 			claim, ok := token.Claims.(jwt.MapClaims)
@@ -63,15 +63,15 @@ func NewCommand() *cobra.Command {
 			expireAt := int64(claim["exp"].(float64))
 			if expireAt != -1 {
 				if expireAt < time.Now().Unix() {
-					output.Errorf("access key expired")
+					output.Errorf("access token expired")
 				}
 			}
 
-			output.Warnf("your access key will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
+			output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
 
 			if err := config.Save(&config.Config{
 				User: config.User{
-					AccessKey: accessKey,
+					AccessToken: accessToken,
 				},
 			}); err != nil {
 				output.Errorf(err.Error())

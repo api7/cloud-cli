@@ -17,7 +17,7 @@ package config
 
 // User is credential for authentication.
 type User struct {
-	AccessKey string `json:"access_key" yaml:"access_key"`
+	AccessToken string `json:"access_token" yaml:"access_token"`
 }
 
 // Config is the top-level configuration for the cloud cli.
