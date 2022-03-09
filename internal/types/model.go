@@ -33,11 +33,9 @@ type Status struct {
 // the response is invalid, ErrorReason could be filled to show the error
 // details and in such a case, Status is not codes.OK but a specific error
 // code to show the kind.
-// swagger:model responseWrapper
 type ResponseWrapper struct {
 	// Payload carries the original data.
 	// discriminator: true
-	// swagger:ignore
 	Payload interface{} `json:"payload,omitempty"`
 	// Status shows the operation status for current request.
 	Status Status `json:"status"`
@@ -48,7 +46,6 @@ type ResponseWrapper struct {
 }
 
 // User is the user in cloud-console
-// swagger:model
 type User struct {
 	ID         string    `json:"id"`
 	FirstName  string    `json:"first_name"`
@@ -99,7 +96,6 @@ type ControlPlane struct {
 }
 
 // GetOrganizationControlPlanesResponsePayload contains list control planes request
-// swagger:model payload
 type GetOrganizationControlPlanesResponsePayload struct {
 	// Count is total count of control planes
 	Count uint64 `json:"count" uri:"count"`

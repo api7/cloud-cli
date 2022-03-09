@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	cloudApiServerEnv     = "CLOUD_API_SERVER"
+	api7CloudAddr         = "API&_CLOUD_ADDR"
 	DefaultCloudApiServer = "https://console.api7.cloud"
 )
 
@@ -47,7 +47,7 @@ type api struct {
 
 // New returns a new API7 Cloud API Client
 func New(accessToken string) (API, error) {
-	apiServer := os.Getenv(cloudApiServerEnv)
+	apiServer := os.Getenv(api7CloudAddr)
 	if apiServer == "" {
 		apiServer = DefaultCloudApiServer
 	}

@@ -117,7 +117,7 @@ func TestMe(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(cloudApiServerEnv, server.URL)
+			err := os.Setenv(api7CloudAddr, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
 			api, err := New("test-token")
@@ -203,7 +203,7 @@ func TestListControlPlanes(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(cloudApiServerEnv, server.URL)
+			err := os.Setenv(api7CloudAddr, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
 			api, err := New("test-token")
