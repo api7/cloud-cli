@@ -57,7 +57,7 @@ func (a *api) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
 	var bundle types.TLSBundle
 
 	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificates", cpID),
+		Path: fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificate", cpID),
 	}, &bundle); err != nil {
 		return nil, err
 	}
