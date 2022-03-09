@@ -25,9 +25,27 @@ import (
 	"github.com/api7/cloud-cli/internal/types"
 )
 
+var (
+	defaultClient API
+)
+
+// InitDefaultClient initializes the default client with the given credentials
+func InitDefaultClient(accessToken string) (err error) {
+	defaultClient, err = newClient(accessToken)
+	return
+}
+
+// Client return default client to access API7 Cloud API
+func Client() API {
+	if defaultClient == nil {
+		panic("default client is not initialized")
+	}
+	return defaultClient
+}
+
 const (
 	api7CloudAddr        = "API&_CLOUD_ADDR"
-	DefaultApi7CloudAddr = "https://console.api7.cloud"
+	defaultApi7CloudAddr = "https://console.api7.cloud"
 )
 
 // API warp API7 Cloud REST API
@@ -45,11 +63,11 @@ type api struct {
 	httpClient  *http.Client
 }
 
-// New returns a new API7 Cloud API Client
-func New(accessToken string) (API, error) {
+// newClient returns a new API7 Cloud API Client
+func newClient(accessToken string) (API, error) {
 	cloudAddr := os.Getenv(api7CloudAddr)
 	if cloudAddr == "" {
-		cloudAddr = DefaultApi7CloudAddr
+		cloudAddr = defaultApi7CloudAddr
 	}
 
 	u, err := url.Parse(cloudAddr)

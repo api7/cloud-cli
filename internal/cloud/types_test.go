@@ -71,7 +71,7 @@ func TestNew(t *testing.T) {
 				assert.NoError(t, err, "unset cloud api server env")
 			}
 
-			a, err := New("access-token")
+			a, err := newClient("access-token")
 			if tt.wantErr {
 				assert.Error(t, err, "checking error")
 				assert.Equal(t, tt.errorReason, err.Error(), "checking error reason")
