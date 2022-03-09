@@ -73,7 +73,7 @@ func TestConfigureCommand(t *testing.T) {
 			successExpected: true,
 			outputExpected: []string{
 				fmt.Sprintf("your access token will expire at %s", time.Unix(4102444800, 0).Format(time.RFC3339)),
-				fmt.Sprintf("demo@api7.cloud"),
+				"demo@api7.cloud",
 			},
 			mockFn: func(api *cloud.MockAPI) {
 				api.EXPECT().Me().Return(&types.User{

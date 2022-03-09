@@ -30,11 +30,15 @@ import (
 )
 
 func TestPersistentPreRunFunc(t *testing.T) {
+	t.Skip(`Test logic is duplicated with the one in docker_test.go,
+We'll try to test the credential logic separately
+`)
 
 	tests := []struct {
 		name            string
 		token           string
 		env             string
+		mockCloud       func(t *testing.T)
 		successExpected bool
 		outputExpected  string
 	}{
