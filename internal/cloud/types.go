@@ -22,6 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
@@ -47,7 +48,6 @@ func Client() API {
 }
 
 const (
-	api7CloudAddr        = "API7_CLOUD_ADDR"
 	defaultApi7CloudAddr = "https://console.api7.cloud"
 )
 
@@ -68,7 +68,7 @@ type api struct {
 
 // newClient returns a new API7 Cloud API Client
 func newClient(accessToken string) (API, error) {
-	cloudAddr := os.Getenv(api7CloudAddr)
+	cloudAddr := os.Getenv(consts.Api7CloudAddrEnv)
 	if cloudAddr == "" {
 		cloudAddr = defaultApi7CloudAddr
 	}

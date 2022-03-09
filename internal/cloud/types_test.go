@@ -20,6 +20,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/api7/cloud-cli/internal/consts"
 )
 
 func TestNew(t *testing.T) {
@@ -64,10 +66,10 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.apiServer != "" {
-				err := os.Setenv(api7CloudAddr, tt.apiServer)
+				err := os.Setenv(consts.Api7CloudAddrEnv, tt.apiServer)
 				assert.NoError(t, err, "set cloud api server env")
 			} else {
-				err := os.Unsetenv(api7CloudAddr)
+				err := os.Unsetenv(consts.Api7CloudAddrEnv)
 				assert.NoError(t, err, "unset cloud api server env")
 			}
 
