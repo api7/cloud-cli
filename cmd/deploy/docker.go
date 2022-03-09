@@ -17,14 +17,16 @@ package deploy
 
 import (
 	"context"
+	"io/ioutil"
 	"strings"
-	"time"
 
-	"github.com/spf13/cobra"
-
+	"github.com/api7/cloud-cli/cmd/utils"
+	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
+
+	"github.com/spf13/cobra"
 )
 
 func newDockerCommand() *cobra.Command {
@@ -37,24 +39,58 @@ cloud-cli deploy docker \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var docker *commands.Cmd
+			var (
+				docker *commands.Cmd
+				data   []byte
+				err    error
+			)
 			opts := options.Global.Deploy.Docker
 			if opts.DockerCLIPath != "" {
 				docker = commands.New(opts.DockerCLIPath, options.Global.DryRun)
 			} else {
 				docker = commands.New("docker", options.Global.DryRun)
 			}
-			docker.AppendArgs("run", opts.APISIXImage)
+			docker.AppendArgs("run")
 			for _, args := range opts.DockerRunArgs {
 				docker.AppendArgs(strings.Split(args, "=")...)
 			}
 
+			if options.Global.Deploy.APISIXConfigFile != "" {
+				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
+				if err != nil {
+					output.Errorf("invalid --apisix-config-file option: %s", err)
+					return
+				}
+			}
+			// TODO fetch the essential configurations from API7 Cloud.
+			mergedConfig, err := apisix.MergeConfig(data, nil)
+			if err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+			if len(mergedConfig) > 0 {
+				configFile, err := apisix.SaveConfig(mergedConfig)
+				if err != nil {
+					output.Errorf(err.Error())
+					return
+				}
+				docker.AppendArgs("--mount", "type=bind,source="+configFile+",target=/usr/local/apisix/conf/config.yaml,readonly")
+			}
+			// TODO support customization of the HTTP and HTTPS ports.
+			docker.AppendArgs("-p", "9080:9080")
+			docker.AppendArgs("-p", "9443:9443")
+			docker.AppendArgs(opts.APISIXImage)
+
 			if options.Global.DryRun {
 				output.Infof("Running:\n%s\n", docker.String())
+			} else {
+				output.Verbosef("Running:\n%s\n", docker.String())
 			}
 
-			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-			defer cancel()
+			ctx, cancel := context.WithCancel(context.TODO())
+			go utils.WaitForSignal(func() {
+				cancel()
+			})
 
 			stdout, stderr, err := docker.Run(ctx)
 			if stderr != "" {
@@ -65,6 +101,7 @@ cloud-cli deploy docker \
 			}
 			if err != nil {
 				output.Errorf(err.Error())
+				return
 			}
 		},
 	}
