@@ -77,11 +77,11 @@ func TestPersistentPreRunFunc(t *testing.T) {
 				return
 			}
 
+			// remove exist credential created by other cases
+			err := os.RemoveAll(filepath.Join(os.Getenv("HOME"), ".api7cloud/credentials"))
+			assert.NoError(t, err, "remove credential file")
+
 			if tt.token != "" {
-				defer func() {
-					err := os.RemoveAll(filepath.Join(os.Getenv("HOME"), ".api7cloud/credentials"))
-					assert.NoError(t, err, "remove credential file")
-				}()
 				err := persistence.SaveCredential(&persistence.Credential{User: persistence.User{AccessToken: tt.token}})
 				assert.NoError(t, err, "save credential")
 			}
