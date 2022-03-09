@@ -17,13 +17,15 @@ package cloud
 
 import (
 	"fmt"
-	"github.com/api7/cloud-cli/internal/options"
-	"github.com/api7/cloud-cli/internal/types"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestMe(t *testing.T) {

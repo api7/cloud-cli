@@ -18,7 +18,6 @@ package cloud
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/api7/cloud-cli/internal/output"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -26,6 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
