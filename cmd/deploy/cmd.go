@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -32,14 +33,16 @@ func NewCommand() *cobra.Command {
 		Use:   "deploy [COMMAND] [ARG...]",
 		Short: "Deploy Apache APISIX with being connected to API7 Cloud.",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			accessToken := os.Getenv("API7_CLOUD_ACCESS_TOKEN")
+			accessToken := os.Getenv(consts.Api7CloudAccessTokenEnv)
 			if accessToken == "" {
 				credential, err := persistence.LoadCredential()
 				if err != nil {
-					output.Errorf("Failed to load credential: %s,\nPlease run `cloud-cli configure` firstly and access token can be created from https://console.api7.cloud", err)
+					output.Errorf("Failed to load credential: %s,\nPlease run 'cloud-cli configure' first, access token can be created from https://console.api7.cloud", err)
 				}
 				accessToken = credential.User.AccessToken
 			}
+
+			output.Verbosef("Loaded access token: %s", accessToken)
 
 			if err := cloud.InitDefaultClient(accessToken); err != nil {
 				output.Errorf("Failed to init api7 cloud client: %s", err)
