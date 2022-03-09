@@ -117,7 +117,7 @@ func TestMe(t *testing.T) {
 			result, err := api.Me()
 
 			if tt.wantErr {
-				assert.Equal(t, err.Error(), tt.errReason, "checking error reason")
+				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")
 			} else {
 				assert.NoError(t, err, "checking error")
 				assert.Equal(t, tt.want, result, "checking result")
@@ -201,7 +201,7 @@ func TestListControlPlans(t *testing.T) {
 			result, err := api.ListControlPlanes(tt.orgID)
 
 			if tt.wantErr {
-				assert.Equal(t, err.Error(), tt.errReason, "checking error reason")
+				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")
 			} else {
 				assert.NoError(t, err, "checking error")
 				assert.Len(t, result, 1, "checking control planes count")

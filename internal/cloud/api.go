@@ -80,7 +80,7 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	if err != nil {
 		return nil, err
 	}
-	output.Verbosef("%s", requestDump)
+	output.Verbosef("Sending request:\n%s", requestDump)
 
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.accessToken))
 
@@ -94,7 +94,7 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	output.Verbosef("%s", responseDump)
+	output.Verbosef("Receiving response:\n%s", responseDump)
 
 	if resp.StatusCode != http.StatusOK {
 		if resp.StatusCode >= http.StatusInternalServerError {
@@ -102,13 +102,13 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 		}
 
 		if resp.StatusCode == http.StatusNotFound {
-			return errors.New("Resource not found, please check your parameters")
+			return errors.New("Resource not found")
 		}
 
 		var rw types.ResponseWrapper
 		err := json.NewDecoder(resp.Body).Decode(&rw)
 		if err != nil {
-			return errors.New("Got a malformed response from server")
+			return errors.Wrap(err, "Got a malformed response from server")
 		}
 		return errors.New(rw.ErrorReason)
 	}
@@ -117,18 +117,18 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 	dec.UseNumber()
 	err = dec.Decode(&rw)
 	if err != nil {
-		return errors.New("Got a malformed response from server")
+		return errors.Wrap(err, "Got a malformed response from server")
 	}
 
 	if v != nil {
 		data, err := json.Marshal(rw.Payload)
 		if err != nil {
-			return errors.New("Got a malformed response from server")
+			return errors.Wrap(err, "Got a malformed response from server")
 		}
 
 		err = json.Unmarshal(data, v)
 		if err != nil {
-			return errors.New("Got a malformed response from server")
+			return errors.Wrap(err, "Got a malformed response from server")
 		}
 	}
 	return nil
