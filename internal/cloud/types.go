@@ -26,8 +26,8 @@ import (
 )
 
 const (
-	api7CloudAddr         = "API&_CLOUD_ADDR"
-	DefaultCloudApiServer = "https://console.api7.cloud"
+	api7CloudAddr        = "API&_CLOUD_ADDR"
+	DefaultApi7CloudAddr = "https://console.api7.cloud"
 )
 
 // API warp API7 Cloud REST API
@@ -47,12 +47,12 @@ type api struct {
 
 // New returns a new API7 Cloud API Client
 func New(accessToken string) (API, error) {
-	apiServer := os.Getenv(api7CloudAddr)
-	if apiServer == "" {
-		apiServer = DefaultCloudApiServer
+	cloudAddr := os.Getenv(api7CloudAddr)
+	if cloudAddr == "" {
+		cloudAddr = DefaultApi7CloudAddr
 	}
 
-	u, err := url.Parse(apiServer)
+	u, err := url.Parse(cloudAddr)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse API7 Cloud server URL")
 	}
