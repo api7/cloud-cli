@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,6 +43,13 @@ func TestMe(t *testing.T) {
 			want:      nil,
 			wantErr:   true,
 			errReason: "Server internal error, please try again later",
+		},
+		{
+			name:      "http not found",
+			code:      http.StatusNotFound,
+			want:      nil,
+			wantErr:   true,
+			errReason: "Resource not found",
 		},
 		{
 			name:      "malformed json",
@@ -110,10 +117,12 @@ func TestMe(t *testing.T) {
 
 			defer server.Close()
 
-			u, err := url.Parse(server.URL)
-			assert.NoError(t, err, "parse mock server url")
+			err := os.Setenv(cloudApiServerEnv, server.URL)
+			assert.NoError(t, err, "checking env setup")
 
-			api := api{u.Host, u.Scheme, "test-token", server.Client()}
+			api, err := New("test-token")
+			assert.NoError(t, err, "checking new cloud api client")
+
 			result, err := api.Me()
 
 			if tt.wantErr {
@@ -126,7 +135,7 @@ func TestMe(t *testing.T) {
 	}
 }
 
-func TestListControlPlans(t *testing.T) {
+func TestListControlPlanes(t *testing.T) {
 	tests := []struct {
 		name      string
 		orgID     string
@@ -194,10 +203,12 @@ func TestListControlPlans(t *testing.T) {
 
 			defer server.Close()
 
-			u, err := url.Parse(server.URL)
-			assert.NoError(t, err, "parse mock server url")
+			err := os.Setenv(cloudApiServerEnv, server.URL)
+			assert.NoError(t, err, "checking env setup")
 
-			api := api{u.Host, u.Scheme, "test-token", server.Client()}
+			api, err := New("test-token")
+			assert.NoError(t, err, "checking new cloud api client")
+
 			result, err := api.ListControlPlanes(tt.orgID)
 
 			if tt.wantErr {

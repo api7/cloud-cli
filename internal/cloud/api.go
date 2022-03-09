@@ -69,7 +69,7 @@ func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	url.Scheme = a.scheme
-	url.Host = a.apiServer
+	url.Host = a.host
 
 	request, err := http.NewRequest(method, url.String(), body)
 	if err != nil {
@@ -110,7 +110,7 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 		if err != nil {
 			return errors.Wrap(err, "Got a malformed response from server")
 		}
-		return errors.New(rw.ErrorReason)
+		return errors.New(fmt.Sprintf("Error Code:%d, Error Reason: %s", rw.Status.Code, rw.ErrorReason))
 	}
 	var rw types.ResponseWrapper
 	dec := json.NewDecoder(resp.Body)

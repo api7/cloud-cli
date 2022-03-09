@@ -17,14 +17,17 @@ package cloud
 
 import (
 	"net/http"
+	"net/url"
 	"os"
+
+	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/types"
 )
 
 const (
-	DefaultCloudApiServer       = "console.api7.cloud"
-	DefaultCloudApiServerScheme = "https"
+	cloudApiServerEnv     = "CLOUD_API_SERVER"
+	DefaultCloudApiServer = "https://console.api7.cloud"
 )
 
 // API warp API7 Cloud REST API
@@ -36,27 +39,32 @@ type API interface {
 }
 
 type api struct {
-	apiServer   string
+	host        string
 	scheme      string
 	accessToken string
 	httpClient  *http.Client
 }
 
-func New(accessToken string) API {
-	apiServer := os.Getenv("CLOUD_API_SERVER")
+// New returns a new API7 Cloud API Client
+func New(accessToken string) (API, error) {
+	apiServer := os.Getenv(cloudApiServerEnv)
 	if apiServer == "" {
 		apiServer = DefaultCloudApiServer
 	}
 
-	scheme := os.Getenv("CLOUD_API_SERVER_SCHEME")
-	if scheme == "" {
-		scheme = DefaultCloudApiServerScheme
+	u, err := url.Parse(apiServer)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse API7 Cloud server URL")
+	}
+
+	if u.Host == "" || u.Scheme == "" {
+		return nil, errors.New("invalid API7 Cloud server URL")
 	}
 
 	return &api{
-		apiServer:   apiServer,
-		scheme:      scheme,
+		host:        u.Host,
+		scheme:      u.Scheme,
 		accessToken: accessToken,
 		httpClient:  &http.Client{},
-	}
+	}, nil
 }
