@@ -26,25 +26,28 @@ import (
 )
 
 var (
-	defaultClient API
+	DefaultClient API
 )
 
 // InitDefaultClient initializes the default client with the given credentials
 func InitDefaultClient(accessToken string) (err error) {
-	defaultClient, err = newClient(accessToken)
+	if DefaultClient != nil {
+		return nil
+	}
+	DefaultClient, err = newClient(accessToken)
 	return
 }
 
 // Client return default client to access API7 Cloud API
 func Client() API {
-	if defaultClient == nil {
+	if DefaultClient == nil {
 		panic("default client is not initialized")
 	}
-	return defaultClient
+	return DefaultClient
 }
 
 const (
-	api7CloudAddr        = "API&_CLOUD_ADDR"
+	api7CloudAddr        = "API7_CLOUD_ADDR"
 	defaultApi7CloudAddr = "https://console.api7.cloud"
 )
 
