@@ -32,6 +32,7 @@ func NewCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
 
 	cmd.AddCommand(newDockerCommand())
+	cmd.AddCommand(newBareCommand())
 
 	return cmd
 }

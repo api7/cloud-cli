@@ -38,6 +38,8 @@ type DeployOptions struct {
 	APISIXConfigFile string
 	// Docker contains the options for the deploy docker command.
 	Docker DockerDeployOptions
+	// Bare contains the options for the bare metal deployment command.
+	Bare BareDeployOptions
 }
 
 // DockerDeployOptions contains options for the deploy docker command.
@@ -48,4 +50,12 @@ type DockerDeployOptions struct {
 	DockerRunArgs []string
 	// DockerCLIPath is the filepath of the docker command.
 	DockerCLIPath string
+}
+
+// BareDeployOptions contains options for the bare metal deployment command.
+type BareDeployOptions struct {
+	// APISIXVersion specifies the APISIX version to deploy.
+	APISIXVersion string
+	// APISIXConfig specifies to customize APISIX config.yaml.
+	APISIXConfig string
 }
