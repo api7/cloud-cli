@@ -64,7 +64,6 @@ func TestConfigureCommand(t *testing.T) {
 			},
 			mockFn: func(api *cloud.MockAPI) {
 				api.EXPECT().Me().Return(nil, errors.New("mock error"))
-
 			},
 		},
 		{
