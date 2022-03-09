@@ -48,7 +48,7 @@ lint: ## Apply go lint check
 .PHONY: lint
 
 test: ## Run the unit tests
-	@go test -v ./...
+	@go test -p 1 -v ./...
 
 .PHONY: install-tools
 install-tools: ## Install necessary tools
