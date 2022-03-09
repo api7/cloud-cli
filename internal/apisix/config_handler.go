@@ -20,6 +20,7 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
 )
 
 // MergeConfig merge the user customized config with default settings.
