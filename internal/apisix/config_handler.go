@@ -16,10 +16,10 @@
 package apisix
 
 import (
+	"io/ioutil"
+
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
-	"io/ioutil"
 )
 
 // MergeConfig merge the user customized config with default settings.
