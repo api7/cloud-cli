@@ -23,6 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 )
 
@@ -60,7 +61,7 @@ func TestDockerDeployCommand(t *testing.T) {
 			}
 
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=%s", t.Name()))
-			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
 
 			output, err := cmd.CombinedOutput()
 			assert.NoError(t, err, "check if the command executed successfully")

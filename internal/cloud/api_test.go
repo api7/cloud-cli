@@ -120,7 +120,7 @@ func TestMe(t *testing.T) {
 			err := os.Setenv(api7CloudAddr, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
-			api, err := New("test-token")
+			api, err := newClient("test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.Me()
@@ -206,7 +206,7 @@ func TestListControlPlanes(t *testing.T) {
 			err := os.Setenv(api7CloudAddr, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
-			api, err := New("test-token")
+			api, err := newClient("test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.ListControlPlanes(tt.orgID)

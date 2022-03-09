@@ -16,9 +16,15 @@
 package deploy
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/persistence"
 )
 
 // NewCommand creates the deploy sub-command object.
@@ -26,6 +32,22 @@ func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deploy [COMMAND] [ARG...]",
 		Short: "Deploy Apache APISIX with being connected to API7 Cloud.",
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			accessToken := os.Getenv(consts.Api7CloudAccessTokenEnv)
+			if accessToken == "" {
+				credential, err := persistence.LoadCredential()
+				if err != nil {
+					output.Errorf("Failed to load credential: %s,\nPlease run 'cloud-cli configure' first, access token can be created from https://console.api7.cloud", err)
+				}
+				accessToken = credential.User.AccessToken
+			}
+
+			output.Verbosef("Loaded access token: %s", accessToken)
+
+			if err := cloud.InitDefaultClient(accessToken); err != nil {
+				output.Errorf("Failed to init api7 cloud client: %s", err)
+			}
+		},
 	}
 
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
