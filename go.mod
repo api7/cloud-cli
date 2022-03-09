@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/fatih/color v1.13.0
+	github.com/golang/mock v1.6.0
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/google/uuid v1.3.0
 	github.com/pkg/errors v0.8.1
