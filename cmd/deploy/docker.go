@@ -20,11 +20,11 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/api7/cloud-cli/cmd/utils"
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/utils"
 
 	"github.com/spf13/cobra"
 )

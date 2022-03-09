@@ -109,3 +109,11 @@ type ControlPlaneSummary struct {
 	// OrgName is the org name of the control plane
 	OrgName string `json:"org_name" yaml:"org_name"`
 }
+
+// TLSBundle contains a pair of certificate, private key,
+// and the issuing certificate.
+type TLSBundle struct {
+	Certificate   string `json:"certificate" yaml:"certificate"`
+	PrivateKey    string `json:"private_key" yaml:"private_key"`
+	CACertificate string `json:"ca_certificate" yaml:"ca_certificate"`
+}

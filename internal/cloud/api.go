@@ -53,6 +53,17 @@ func (a *api) ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, err
 	return response.List, nil
 }
 
+func (a *api) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
+	var bundle types.TLSBundle
+
+	if err := a.makeGetRequest(&url.URL{
+		Path: fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificates", cpID),
+	}, &bundle); err != nil {
+		return nil, err
+	}
+	return &bundle, nil
+}
+
 func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
 	req, err := a.newRequest("GET", u, nil)
 	if err != nil {
