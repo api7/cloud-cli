@@ -24,6 +24,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -75,6 +76,18 @@ func NewCommand() *cobra.Command {
 			}); err != nil {
 				output.Errorf(err.Error())
 			}
+
+			err = cloud.InitDefaultClient(accessToken)
+			if err != nil {
+				output.Errorf("failed to initialize api7 cloud client: %s", err)
+			}
+
+			me, err := cloud.Client().Me()
+			if err != nil {
+				output.Errorf("failed to request api7 cloud: %s", err)
+			}
+
+			output.Infof("successfully configured api7 cloud access token, your account is %s", me.Email)
 		},
 	}
 
