@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/cmd/configure"
 	"github.com/api7/cloud-cli/cmd/deploy"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/version"
@@ -34,6 +35,7 @@ func newCommand() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&options.Global.DryRun, "dry-run", false, "Enable dry run mode")
 
 	cmd.AddCommand(deploy.NewCommand())
+	cmd.AddCommand(configure.NewCommand())
 
 	return cmd
 }
