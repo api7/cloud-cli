@@ -48,6 +48,7 @@ lint: ## Apply go lint check
 .PHONY: lint
 
 test: ## Run the unit tests
+	# go test run cases in different package parallel by default, but cloud cli config file is referenced by multi test cases, so we need to run them in sequence
 	@go test -p 1 -v ./...
 
 .PHONY: install-tools
