@@ -90,7 +90,7 @@ We'll try to test the credential logic separately
 				assert.NoError(t, err, "save credential")
 			}
 
-			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=%s", t.Name()))
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
 			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", tt.env)
 
 			output, err := cmd.CombinedOutput()

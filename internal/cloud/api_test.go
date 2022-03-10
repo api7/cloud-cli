@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/types"
 )
@@ -117,7 +118,7 @@ func TestMe(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(api7CloudAddr, server.URL)
+			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
 			api, err := newClient("test-token")
@@ -203,7 +204,7 @@ func TestListControlPlanes(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(api7CloudAddr, server.URL)
+			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
 			api, err := newClient("test-token")

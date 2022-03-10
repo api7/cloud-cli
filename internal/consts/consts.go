@@ -16,5 +16,6 @@
 package consts
 
 const (
+	Api7CloudAddrEnv        = "API7_CLOUD_ADDR"
 	Api7CloudAccessTokenEnv = "API7_CLOUD_ACCESS_TOKEN"
 )
