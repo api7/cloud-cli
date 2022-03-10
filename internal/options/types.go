@@ -56,6 +56,4 @@ type DockerDeployOptions struct {
 type BareDeployOptions struct {
 	// APISIXVersion specifies the APISIX version to deploy.
 	APISIXVersion string
-	// APISIXConfig specifies to customize APISIX config.yaml.
-	APISIXConfig string
 }
