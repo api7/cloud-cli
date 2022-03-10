@@ -17,6 +17,7 @@ package deploy
 
 import (
 	"context"
+	"github.com/api7/cloud-cli/internal/consts"
 	"io/ioutil"
 	"strings"
 
@@ -35,6 +36,7 @@ func newDockerCommand() *cobra.Command {
 		Short: "Deploy Apache APISIX to the Docker container",
 		Example: `
 cloud-cli deploy docker \
+		--name apisix-0 \
 		--apisix-image apisix/apisix:2.11.0 \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
@@ -79,6 +81,12 @@ cloud-cli deploy docker \
 			// TODO support customization of the HTTP and HTTPS ports.
 			docker.AppendArgs("-p", "9080:9080")
 			docker.AppendArgs("-p", "9443:9443")
+			if options.Global.Deploy.Name != "" {
+				docker.AppendArgs("--name", options.Global.Deploy.Name)
+			} else {
+				docker.AppendArgs("--name", consts.DefaultDeploymentName)
+			}
+
 			docker.AppendArgs(opts.APISIXImage)
 
 			if options.Global.DryRun {
