@@ -60,7 +60,7 @@ func TestDockerDeployCommand(t *testing.T) {
 				return
 			}
 
-			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=%s", t.Name()))
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
 			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
 
 			output, err := cmd.CombinedOutput()

@@ -62,11 +62,13 @@ func NewCommand() *cobra.Command {
 			}
 
 			expireAt := int64(claim["exp"].(float64))
-			if expireAt != -1 {
+			if expireAt > 0 {
 				if expireAt < time.Now().Unix() {
 					output.Errorf("access token expired")
 				}
 				output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
+			} else {
+				output.Warnf("You are using a token that has no expiration time, please note the security risk")
 			}
 
 			if err := persistence.SaveCredential(&persistence.Credential{

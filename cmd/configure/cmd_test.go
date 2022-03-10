@@ -82,6 +82,22 @@ func TestConfigureCommand(t *testing.T) {
 
 			},
 		},
+		{
+			name: "success never expire token",
+			// never expire token
+			token:           "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi0xLCJqdGkiOiJ1c2VyX2lkIn0.Jf6YGTi-SD6mc8y_VZ4dJ4PiV1wfBBvUXAggWWQPr-0ZRc8hHyTLhxrKag8qsbByKBCFWO9jfPYMUrDnIgWzhKMg6s60dScYXGN1eaqmajBJFLKlHCGFSPojbJAVhah3KZjLzJDFRj_xqm0Z-AL7V4eSP0Uz4Ax7Qqu-Ubzpb4WQcLgiALURD_f47eiakMMMrIQ-ZstF2Qw4zKaWiZv-YIUhjiHRCsN2nJ2RONAU5sclqy4AlXqgOYrm_OzkN9uBH0by7QNpK2lrSTrtNBrVOg8SX-vTihEEPP4Ao_x41zwcIp_67_2YQ8uaWc_CJBjwsO6wompIu5lbn-7ghWf5-A",
+			successExpected: true,
+			outputExpected: []string{
+				fmt.Sprintf("You are using a token that has no expiration time, please note the security risk"),
+				fmt.Sprintf("demo@api7.cloud"),
+			},
+			mockFn: func(api *cloud.MockAPI) {
+				api.EXPECT().Me().Return(&types.User{
+					Email: "demo@api7.cloud",
+				}, nil)
+
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -99,7 +115,7 @@ func TestConfigureCommand(t *testing.T) {
 				return
 			}
 
-			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=%s", t.Name()))
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
 			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 			cmd.Stdin = strings.NewReader(tt.token + "\n")
 
