@@ -13,36 +13,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package output
+package consts
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/fatih/color"
-
-	"github.com/api7/cloud-cli/internal/options"
+const (
+	Api7CloudAddrEnv        = "API7_CLOUD_ADDR"
+	Api7CloudAccessTokenEnv = "API7_CLOUD_ACCESS_TOKEN"
 )
-
-// Errorf prints the error message to the console and quit the program.
-func Errorf(format string, args ...interface{}) {
-	color.Red("ERROR: " + fmt.Sprintf(format, args...))
-	os.Exit(-1)
-}
-
-// Warnf prints the warning message to the console.
-func Warnf(format string, args ...interface{}) {
-	color.Yellow("WARNING: " + fmt.Sprintf(format, args...))
-}
-
-// Verbosef prints the verbose message to the console.
-func Verbosef(format string, args ...interface{}) {
-	if options.Global.Verbose {
-		color.Cyan(fmt.Sprintf(format, args...))
-	}
-}
-
-// Infof prints the info message to the console.
-func Infof(format string, args ...interface{}) {
-	color.Cyan(fmt.Sprintf(format, args...))
-}

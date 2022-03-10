@@ -13,36 +13,30 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-package output
+package utils
 
 import (
-	"fmt"
-	"os"
+	"crypto/x509"
+	"encoding/pem"
+	"time"
 
-	"github.com/fatih/color"
-
-	"github.com/api7/cloud-cli/internal/options"
+	"github.com/pkg/errors"
 )
 
-// Errorf prints the error message to the console and quit the program.
-func Errorf(format string, args ...interface{}) {
-	color.Red("ERROR: " + fmt.Sprintf(format, args...))
-	os.Exit(-1)
-}
-
-// Warnf prints the warning message to the console.
-func Warnf(format string, args ...interface{}) {
-	color.Yellow("WARNING: " + fmt.Sprintf(format, args...))
-}
-
-// Verbosef prints the verbose message to the console.
-func Verbosef(format string, args ...interface{}) {
-	if options.Global.Verbose {
-		color.Cyan(fmt.Sprintf(format, args...))
+// CheckIfCertificateIsExpired checks whether the certificate is expired or not.
+// Note this function accepts the certificate as a byte array (in PEM format).
+func CheckIfCertificateIsExpired(data []byte) (bool, error) {
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return false, errors.New("failed to decode certificate from PEM")
 	}
-}
 
-// Infof prints the info message to the console.
-func Infof(format string, args ...interface{}) {
-	color.Cyan(fmt.Sprintf(format, args...))
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return false, errors.Wrap(err, "failed to parse certificate")
+	}
+	if cert.NotAfter.Before(time.Now()) {
+		return true, nil
+	}
+	return false, nil
 }

@@ -1,0 +1,2 @@
+apisix:
+  enable_admin: false

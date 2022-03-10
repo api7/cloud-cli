@@ -24,6 +24,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -61,11 +62,13 @@ func NewCommand() *cobra.Command {
 			}
 
 			expireAt := int64(claim["exp"].(float64))
-			if expireAt != -1 {
+			if expireAt > 0 {
 				if expireAt < time.Now().Unix() {
 					output.Errorf("access token expired")
 				}
 				output.Warnf("your access token will expire at %s", time.Unix(expireAt, 0).Format(time.RFC3339))
+			} else {
+				output.Warnf("You are using a token that has no expiration time, please note the security risk")
 			}
 
 			if err := persistence.SaveCredential(&persistence.Credential{
@@ -75,6 +78,18 @@ func NewCommand() *cobra.Command {
 			}); err != nil {
 				output.Errorf(err.Error())
 			}
+
+			err = cloud.InitDefaultClient(accessToken)
+			if err != nil {
+				output.Errorf("failed to initialize api7 cloud client: %s", err)
+			}
+
+			me, err := cloud.Client().Me()
+			if err != nil {
+				output.Errorf("failed to request api7 cloud: %s", err)
+			}
+
+			output.Infof("successfully configured api7 cloud access token, your account is %s", me.Email)
 		},
 	}
 
