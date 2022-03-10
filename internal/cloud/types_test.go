@@ -25,10 +25,6 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	type args struct {
-		accessToken string
-		apiServer   string
-	}
 	tests := []struct {
 		name        string
 		apiServer   string

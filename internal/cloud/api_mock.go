@@ -34,6 +34,21 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 	return m.recorder
 }
 
+// GetTLSBundle mocks base method.
+func (m *MockAPI) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTLSBundle", cpID)
+	ret0, _ := ret[0].(*types.TLSBundle)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTLSBundle indicates an expected call of GetTLSBundle.
+func (mr *MockAPIMockRecorder) GetTLSBundle(cpID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), cpID)
+}
+
 // ListControlPlanes mocks base method.
 func (m *MockAPI) ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error) {
 	m.ctrl.T.Helper()

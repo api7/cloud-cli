@@ -222,3 +222,75 @@ func TestListControlPlanes(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTLSBundle(t *testing.T) {
+	tests := []struct {
+		name      string
+		cpID      string
+		code      int
+		body      string
+		want      *types.TLSBundle
+		wantErr   bool
+		errReason string
+	}{
+		{
+			name: "success",
+			code: http.StatusOK,
+			cpID: "1",
+			want: &types.TLSBundle{
+				Certificate:   "1",
+				PrivateKey:    "1",
+				CACertificate: "1",
+			},
+			body: `
+				{
+					"code": 0,
+					"payload": {
+						"certificate": "1",
+						"private_key": "1",
+						"ca_certificate": "1"
+					}
+				}
+			`,
+		},
+		{
+			name:      "internal server error",
+			code:      http.StatusInternalServerError,
+			cpID:      "1",
+			errReason: "Server internal error, please try again later",
+			wantErr:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificate", tt.cpID))
+				assert.Equal(t, req.Header.Get("Authorization"), "Bearer test-token")
+
+				rw.WriteHeader(tt.code)
+				if tt.body != "" {
+					write, err := rw.Write([]byte(tt.body))
+					assert.NoError(t, err, "send mock response")
+					assert.Equal(t, len(tt.body), write, "write mock response")
+				}
+			}))
+
+			defer server.Close()
+
+			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
+			assert.NoError(t, err, "checking env setup")
+
+			api, err := newClient("test-token")
+			assert.NoError(t, err, "checking new cloud api client")
+
+			bundle, err := api.GetTLSBundle(tt.cpID)
+
+			if tt.wantErr {
+				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")
+			} else {
+				assert.NoError(t, err, "checking error")
+				assert.Equal(t, tt.want, bundle, "check the tls bundle")
+			}
+		})
+	}
+}
