@@ -17,12 +17,12 @@ package deploy
 
 import (
 	"context"
-	"github.com/api7/cloud-cli/internal/consts"
 	"io/ioutil"
 	"strings"
 
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/utils"
