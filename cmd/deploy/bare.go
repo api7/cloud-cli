@@ -28,12 +28,12 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 )
 
-var _rpmPackageFilePath = filepath.Join(os.Getenv("HOME"), ".api7-cloud/rpm")
+var _rpmPackageFilePath = filepath.Join(os.Getenv("HOME"), ".api7cloud/rpm")
 
 func newBareCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bare [ARGS...]",
-		Short: "Deploy Apache APISIX to the Linux(CentOS 7)",
+		Short: "Deploy Apache APISIX on the Linux(CentOS 7)",
 		Example: `
 cloud-cli deploy bare \
 		--apisix-version 2.11.0 \
@@ -56,16 +56,7 @@ cloud-cli deploy bare \
 				output.Infof("Running:\n%s\n", bare.String())
 			}
 
-			stdout, stderr, err := bare.Run(ctx)
-			if stderr != "" {
-				output.Warnf(stderr)
-			}
-			if stdout != "" {
-				output.Verbosef(stdout)
-			}
-			if err != nil {
-				output.Errorf(err.Error())
-			}
+			execute(ctx, bare)
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.11.0", "Specifies the APISIX version, default value is 2.11.0")
@@ -78,52 +69,33 @@ func download(context context.Context, rpmFilePath, version string) {
 	// install the repositories of OpenResty
 	cmd := commands.New("yum", true)
 	cmd.AppendArgs("install", "-y", "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm")
-	stdout, stderr, err := cmd.Run(context)
-	if stderr != "" {
-		output.Warnf(stderr)
-	}
-	if stdout != "" {
-		output.Verbosef(stdout)
-	}
-	if err != nil {
-		output.Errorf(err.Error())
-	}
+	execute(context, cmd)
 
 	// install the repositories of Apache APISIX.
 	cmd = commands.New("yum-config-manager", true)
 	cmd.AppendArgs("--add-repo", "https://repos.apiseven.com/packages/centos/apache-apisix.repo")
-	stdout, stderr, err = cmd.Run(context)
-	if stderr != "" {
-		output.Warnf(stderr)
-	}
-	if stdout != "" {
-		output.Verbosef(stdout)
-	}
-	if err != nil {
-		output.Errorf(err.Error())
-	}
+	execute(context, cmd)
 
 	// download apisix rpm
 	cmd = commands.New("yum", true)
 	cmd.AppendArgs("install", "-y", "--downloadonly")
 	cmd.AppendArgs("--downloaddir=" + rpmFilePath)
 	cmd.AppendArgs("apisix-" + version)
-	stdout, stderr, err = cmd.Run(context)
-	if stderr != "" {
-		output.Warnf(stderr)
-	}
-	if stdout != "" {
-		output.Verbosef(stdout)
-	}
-	if err != nil {
-		output.Errorf(err.Error())
-	}
+	execute(context, cmd)
 }
 
 func install(context context.Context, path string) {
-	md := commands.New("yum", options.Global.DryRun)
-	md.AppendArgs("install", "-y", path+"/*.rpm")
-	stdout, stderr, err := md.Run(context)
+	cmd := commands.New("yum", options.Global.DryRun)
+	cmd.AppendArgs("install", "-y", path+"/*.rpm")
+	execute(context, cmd)
+}
+
+func execute(context context.Context, cmd *commands.Cmd) {
+	if options.Global.DryRun {
+		output.Infof("Running:\n%s\n", cmd.String())
+	}
+
+	stdout, stderr, err := cmd.Run(context)
 	if stderr != "" {
 		output.Warnf(stderr)
 	}
