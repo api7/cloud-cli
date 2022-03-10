@@ -19,12 +19,13 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/api7/cloud-cli/internal/cloud"
 )
 
 var (

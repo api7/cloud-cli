@@ -20,12 +20,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/consts"
