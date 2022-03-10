@@ -48,10 +48,6 @@ func NewCommand() *cobra.Command {
 				output.Errorf("Failed to init api7 cloud client: %s", err)
 				return
 			}
-			if err := persistence.PrepareCertificate(); err != nil {
-				output.Errorf("Failed to prepare certificate: %s", err)
-				return
-			}
 		},
 	}
 

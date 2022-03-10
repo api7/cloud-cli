@@ -24,12 +24,16 @@ import (
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/utils"
 
 	"github.com/spf13/cobra"
 )
 
 func newDockerCommand() *cobra.Command {
+	var (
+		cloudLuaModuleDir string
+	)
 	cmd := &cobra.Command{
 		Use:   "docker [ARGS...]",
 		Short: "Deploy Apache APISIX to the Docker container",
@@ -38,6 +42,21 @@ cloud-cli deploy docker \
 		--apisix-image apisix/apisix:2.11.0 \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			var (
+				err error
+			)
+			if err := persistence.PrepareCertificate(); err != nil {
+				output.Errorf("Failed to prepare certificate: %s", err)
+				return
+			}
+			cloudLuaModuleDir, err = persistence.SaveCloudLuaModule()
+			if err != nil {
+				output.Errorf("Failed to save cloud lua module: %s", err)
+				return
+			}
+			output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
 				docker *commands.Cmd
@@ -76,6 +95,8 @@ cloud-cli deploy docker \
 				}
 				docker.AppendArgs("--mount", "type=bind,source="+configFile+",target=/usr/local/apisix/conf/config.yaml,readonly")
 			}
+			docker.AppendArgs("--mount", "type=bind,source="+cloudLuaModuleDir+",target=/cloud_lua_module,readonly")
+
 			// TODO support customization of the HTTP and HTTPS ports.
 			docker.AppendArgs("-p", "9080:9080")
 			docker.AppendArgs("-p", "9443:9443")

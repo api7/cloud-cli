@@ -60,7 +60,7 @@ func TestConfigureCommand(t *testing.T) {
 			successExpected: false,
 			outputExpected: []string{
 				fmt.Sprintf("your access token will expire at %s", time.Unix(4102444800, 0).Format(time.RFC3339)),
-				fmt.Sprintf("mock error"),
+				"mock error",
 			},
 			mockFn: func(api *cloud.MockAPI) {
 				api.EXPECT().Me().Return(nil, errors.New("mock error"))
@@ -88,8 +88,8 @@ func TestConfigureCommand(t *testing.T) {
 			token:           "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi0xLCJqdGkiOiJ1c2VyX2lkIn0.Jf6YGTi-SD6mc8y_VZ4dJ4PiV1wfBBvUXAggWWQPr-0ZRc8hHyTLhxrKag8qsbByKBCFWO9jfPYMUrDnIgWzhKMg6s60dScYXGN1eaqmajBJFLKlHCGFSPojbJAVhah3KZjLzJDFRj_xqm0Z-AL7V4eSP0Uz4Ax7Qqu-Ubzpb4WQcLgiALURD_f47eiakMMMrIQ-ZstF2Qw4zKaWiZv-YIUhjiHRCsN2nJ2RONAU5sclqy4AlXqgOYrm_OzkN9uBH0by7QNpK2lrSTrtNBrVOg8SX-vTihEEPP4Ao_x41zwcIp_67_2YQ8uaWc_CJBjwsO6wompIu5lbn-7ghWf5-A",
 			successExpected: true,
 			outputExpected: []string{
-				fmt.Sprintf("You are using a token that has no expiration time, please note the security risk"),
-				fmt.Sprintf("demo@api7.cloud"),
+				"You are using a token that has no expiration time, please note the security risk",
+				"demo@api7.cloud",
 			},
 			mockFn: func(api *cloud.MockAPI) {
 				api.EXPECT().Me().Return(&types.User{

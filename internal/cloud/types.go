@@ -48,7 +48,8 @@ func Client() API {
 }
 
 const (
-	defaultApi7CloudAddr = "https://console.api7.cloud"
+	defaultApi7CloudAddr         = "https://console.api7.cloud"
+	defaultApi7CloudLuaModuleURL = "https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz"
 )
 
 // API warp API7 Cloud REST API
@@ -59,13 +60,16 @@ type API interface {
 	ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error)
 	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the control plane with the given ID
 	GetTLSBundle(cpID string) (*types.TLSBundle, error)
+	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)
+	GetCloudLuaModule() ([]byte, error)
 }
 
 type api struct {
-	host        string
-	scheme      string
-	accessToken string
-	httpClient  *http.Client
+	host              string
+	scheme            string
+	accessToken       string
+	httpClient        *http.Client
+	cloudLuaModuleURL *url.URL
 }
 
 // newClient returns a new API7 Cloud API Client
@@ -84,10 +88,23 @@ func newClient(accessToken string) (API, error) {
 		return nil, errors.New("invalid API7 Cloud server URL")
 	}
 
+	rawCloudModuleURL := os.Getenv(consts.Api7CloudLuaModuleURL)
+	if rawCloudModuleURL == "" {
+		rawCloudModuleURL = defaultApi7CloudLuaModuleURL
+	}
+	cloudModuleURL, err := url.Parse(rawCloudModuleURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse API7 Cloud Lua module URL")
+	}
+	if cloudModuleURL.Host == "" || cloudModuleURL.Scheme == "" {
+		return nil, errors.New("invalid API7 Cloud Lua Module URL")
+	}
+
 	return &api{
-		host:        u.Host,
-		scheme:      u.Scheme,
-		accessToken: accessToken,
-		httpClient:  &http.Client{},
+		host:              u.Host,
+		scheme:            u.Scheme,
+		cloudLuaModuleURL: cloudModuleURL,
+		accessToken:       accessToken,
+		httpClient:        &http.Client{},
 	}, nil
 }
