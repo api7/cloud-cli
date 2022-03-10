@@ -21,12 +21,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/types"
-
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestPrepareCertificate(t *testing.T) {
