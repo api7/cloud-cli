@@ -277,7 +277,7 @@ func TestGetTLSBundle(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(api7CloudAddr, server.URL)
+			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
 			assert.NoError(t, err, "checking env setup")
 
 			api, err := newClient("test-token")
