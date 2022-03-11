@@ -19,11 +19,12 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 )
