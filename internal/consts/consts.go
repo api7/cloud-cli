@@ -31,3 +31,8 @@ const (
 	// CloudLuaModuleDir specifies the directory where the cloud module is stored.
 	CloudLuaModuleDir = "cloud_module_dir"
 )
+
+const (
+	// DefaultDeploymentName is the default name for the cloud-cli deploy operation.
+	DefaultDeploymentName = "apisix"
+)

@@ -31,6 +31,11 @@ type Options struct {
 
 // DeployOptions contains options for the deploy command.
 type DeployOptions struct {
+	// Name is an identifier of this deployment.
+	// It'll be container name if deploy on Docker;
+	// It'll be the Helm release name if deploy on Kubernetes;
+	// It'll be noop if deploy on Bare metal.
+	Name string
 	// APISIXInstanceID specifies the ID of the APISIX instance to deploy.
 	// When this field is empty, the instance ID will be generated automatically.
 	APISIXInstanceID string `validate:"min=1 max=128"`
