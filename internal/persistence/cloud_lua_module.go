@@ -50,9 +50,8 @@ func SaveCloudLuaModule() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create gzip reader")
 	}
-	var (
-		entryDir string
-	)
+
+	entryDir := api7CloudHomeDir
 	reader := tar.NewReader(tempReader)
 	for {
 		hdr, err := reader.Next()
