@@ -48,13 +48,10 @@ func NewCommand() *cobra.Command {
 				output.Errorf("Failed to init api7 cloud client: %s", err)
 				return
 			}
-			if err := persistence.PrepareCertificate(); err != nil {
-				output.Errorf("Failed to prepare certificate: %s", err)
-				return
-			}
 		},
 	}
 
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Name, "name", "apisix", "The identifier of this deployment, it would be the container name (on Docker), the helm release (on Kubernetes) and it's useless if APISIX is deployed on bare metal")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
 
