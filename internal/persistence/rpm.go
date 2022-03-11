@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -60,9 +59,8 @@ func checkIfAPISIXAvailable(ctx context.Context, version string) error {
 		return nil
 	}
 	if !strings.Contains(stdout, version) {
-		return errors.New(fmt.Sprintf("other vesrion of Apache APISIX already installed"))
+		return errors.New("other vesrion of Apache APISIX already installed")
 	} else {
 		return os.ErrExist
 	}
-	return nil
 }

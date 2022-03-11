@@ -30,12 +30,30 @@ import (
 )
 
 func newBareCommand() *cobra.Command {
+	var (
+		cloudLuaModuleDir string
+	)
 	cmd := &cobra.Command{
 		Use:   "bare [ARGS...]",
 		Short: "Deploy Apache APISIX on bare metal (only CentOS 7) ",
 		Example: `
 cloud-cli deploy bare \
 		--apisix-version 2.11.0`,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			var (
+				err error
+			)
+			if err := persistence.PrepareCertificate(); err != nil {
+				output.Errorf("Failed to prepare certificate: %s", err)
+				return
+			}
+			cloudLuaModuleDir, err = persistence.SaveCloudLuaModule()
+			if err != nil {
+				output.Errorf("Failed to save cloud lua module: %s", err)
+				return
+			}
+			output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
 			defer cancel()
