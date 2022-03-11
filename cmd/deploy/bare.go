@@ -18,8 +18,6 @@ package deploy
 import (
 	"context"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -28,31 +26,35 @@ import (
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/persistence"
 )
-
-var _rpmPackageFilePath = filepath.Join(os.Getenv("HOME"), ".api7cloud/rpm")
 
 func newBareCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bare [ARGS...]",
-		Short: "Deploy Apache APISIX on the Linux(CentOS 7)",
+		Short: "Deploy Apache APISIX on bare metal (only CentOS 7) ",
 		Example: `
 cloud-cli deploy bare \
 		--apisix-version 2.11.0`,
 		Run: func(cmd *cobra.Command, args []string) {
-			opts := options.Global.Deploy.Bare
-
-			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
 			defer cancel()
 
-			path := filepath.Join(_rpmPackageFilePath, opts.APISIXVersion)
-			_ = os.Mkdir(path, 750)
-			download(ctx, path, opts.APISIXVersion)
+			opts := options.Global.Deploy.Bare
+			path, err := persistence.DownloadRPM(ctx, opts.APISIXVersion)
+			if err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+			if path != "" {
+				installer := commands.New("yum", options.Global.DryRun)
+				installer.AppendArgs("install", "-y", path+"/*.rpm")
+				if err := installer.Execute(ctx); err != nil {
+					return
+				}
+			}
 
-			installer := commands.New("yum", options.Global.DryRun)
-			installer.AppendArgs("install", "-y", path+"/*.rpm")
-			execute(ctx, installer)
-
+			var configFile string
 			if options.Global.Deploy.APISIXConfigFile != "" {
 				data, err := ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
 				if err != nil {
@@ -65,59 +67,26 @@ cloud-cli deploy bare \
 					return
 				}
 				if len(mergedConfig) > 0 {
-					configFile, err := apisix.SaveConfig(mergedConfig)
+					configFile, err = apisix.SaveConfig(mergedConfig)
 					if err != nil {
 						output.Errorf(err.Error())
 						return
 					}
-					cmd := commands.New("cp", options.Global.DryRun)
-					cmd.AppendArgs("-f", configFile, "/usr/local/apisix/conf/config.yaml")
-					execute(ctx, cmd)
 				}
 			}
 
 			bare := commands.New("apisix", options.Global.DryRun)
 			bare.AppendArgs("start")
-			execute(ctx, bare)
+
+			if configFile != "" {
+				bare.AppendArgs("-c", configFile)
+			}
+			if err = bare.Execute(ctx); err != nil {
+				panic(err)
+			}
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.11.0", "Specifies the APISIX version, default value is 2.11.0")
 
 	return cmd
-}
-
-func download(context context.Context, rpmFilePath, version string) {
-	// install the repositories of OpenResty
-	cmd := commands.New("yum", options.Global.DryRun)
-	cmd.AppendArgs("install", "-y", "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm")
-	execute(context, cmd)
-
-	// install the repositories of Apache APISIX.
-	cmd = commands.New("yum-config-manager", options.Global.DryRun)
-	cmd.AppendArgs("--add-repo", "https://repos.apiseven.com/packages/centos/apache-apisix.repo")
-	execute(context, cmd)
-
-	// download apisix rpm
-	cmd = commands.New("yum", options.Global.DryRun)
-	cmd.AppendArgs("install", "-y", "--downloadonly")
-	cmd.AppendArgs("--downloaddir=" + rpmFilePath)
-	cmd.AppendArgs("apisix-" + version)
-	execute(context, cmd)
-}
-
-func execute(context context.Context, cmd *commands.Cmd) {
-	if options.Global.DryRun {
-		output.Infof(cmd.String())
-	}
-
-	stdout, stderr, err := cmd.Run(context)
-	if stderr != "" {
-		output.Warnf(stderr)
-	}
-	if stdout != "" {
-		output.Verbosef(stdout)
-	}
-	if err != nil {
-		output.Errorf(err.Error())
-	}
 }

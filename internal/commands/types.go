@@ -23,6 +23,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/api7/cloud-cli/internal/output"
 )
 
 // Cmd wraps the os/exec.Cmd object.
@@ -76,4 +78,22 @@ func (c *Cmd) Run(ctx context.Context) (string, string, error) {
 		return c.stdout.String(), c.stderr.String(), errors.Wrap(err, c.name)
 	}
 	return c.stdout.String(), c.stderr.String(), nil
+}
+
+func (c *Cmd) Execute(ctx context.Context) error {
+	if c.dryrun {
+		output.Infof(c.String())
+	}
+
+	stdout, stderr, err := c.Run(ctx)
+	if stderr != "" {
+		output.Warnf(stderr)
+	}
+	if stdout != "" {
+		output.Verbosef(stdout)
+	}
+	if err != nil {
+		output.Errorf(err.Error())
+	}
+	return err
 }

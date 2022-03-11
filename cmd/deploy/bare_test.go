@@ -44,8 +44,8 @@ func TestBareMetalDeployCommand(t *testing.T) {
 			args: []string{"bare", "--apisix-version", "2.11.0"},
 			cmdPattern: fmt.Sprintf(`yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
 yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
-yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm/2\.11\.0 apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/2.11.0/\*.rpm
+yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
+yum install -y %s/\.api7cloud/rpm/\*.rpm
 apisix start
 PASS
 `, os.Getenv("HOME"), os.Getenv("HOME")),
@@ -83,10 +83,9 @@ PASS
 			args: []string{"bare", "--apisix-version", "2.11.0", "--apisix-config", "./testdata/apisix.yaml"},
 			cmdPattern: fmt.Sprintf(`yum install -y https://repos\.apiseven\.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
 yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
-yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm/2\.11\.0 apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/2.11.0/\*.rpm
-cp -f .*/apisix-config-\w+\.yaml /usr/local/apisix/conf/config\.yaml
-apisix start
+yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
+yum install -y %s/\.api7cloud/rpm/\*.rpm
+apisix start -c .*/apisix-config-\w+\.yaml
 PASS
 `, os.Getenv("HOME"), os.Getenv("HOME")),
 			mockCloud: func(t *testing.T) {
