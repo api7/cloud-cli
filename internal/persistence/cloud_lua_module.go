@@ -29,17 +29,6 @@ import (
 	"github.com/api7/cloud-cli/internal/cloud"
 )
 
-var (
-	api7CloudHomeDir string
-)
-
-func init() {
-	api7CloudHomeDir = filepath.Join(os.Getenv("HOME"), ".api7cloud")
-	if err := os.MkdirAll(api7CloudHomeDir, 0755); err != nil {
-		panic(err)
-	}
-}
-
 // SaveCloudLuaModule downloads the cloud lua module and unzip and untar it,
 // finally it'll be saved to the filesystem and the directory will be returned.
 func SaveCloudLuaModule() (string, error) {
@@ -52,7 +41,7 @@ func SaveCloudLuaModule() (string, error) {
 		return "", errors.Wrap(err, "failed to create gzip reader")
 	}
 
-	entryDir := api7CloudHomeDir
+	entryDir := HomeDir
 	reader := tar.NewReader(tempReader)
 	for {
 		hdr, err := reader.Next()
@@ -63,7 +52,7 @@ func SaveCloudLuaModule() (string, error) {
 			return "", errors.Wrap(err, "failed to read tar")
 		}
 		if hdr.FileInfo().IsDir() {
-			dir := filepath.Join(api7CloudHomeDir, hdr.Name)
+			dir := filepath.Join(HomeDir, hdr.Name)
 			if entryDir == "" {
 				entryDir = dir
 			}
@@ -71,7 +60,7 @@ func SaveCloudLuaModule() (string, error) {
 				return "", errors.Wrap(err, "failed to create dir")
 			}
 		} else {
-			filename := filepath.Join(api7CloudHomeDir, hdr.Name)
+			filename := filepath.Join(HomeDir, hdr.Name)
 			buffer := make([]byte, 0, hdr.Size)
 			if _, err := reader.Read(buffer); err != nil {
 				return "", errors.Wrap(err, "failed to read tar")

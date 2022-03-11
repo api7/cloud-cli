@@ -20,6 +20,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -27,13 +29,11 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/utils"
-
-	"github.com/spf13/cobra"
 )
 
 func newDockerCommand() *cobra.Command {
 	var (
-		cloudLuaModuleDir string
+		ctx deployContext
 	)
 	cmd := &cobra.Command{
 		Use:   "docker [ARGS...]",
@@ -45,19 +45,11 @@ cloud-cli deploy docker \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			var (
-				err error
-			)
-			if err := persistence.PrepareCertificate(); err != nil {
-				output.Errorf("Failed to prepare certificate: %s", err)
+			persistence.Init()
+			if err := deployPreRunForDocker(&ctx); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
-			cloudLuaModuleDir, err = persistence.SaveCloudLuaModule()
-			if err != nil {
-				output.Errorf("Failed to save cloud lua module: %s", err)
-				return
-			}
-			output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
@@ -83,8 +75,7 @@ cloud-cli deploy docker \
 					return
 				}
 			}
-			// TODO fetch the essential configurations from API7 Cloud.
-			mergedConfig, err := apisix.MergeConfig(data, nil)
+			mergedConfig, err := apisix.MergeConfig(data, ctx.essentialConfig)
 			if err != nil {
 				output.Errorf(err.Error())
 				return
@@ -97,7 +88,8 @@ cloud-cli deploy docker \
 				}
 				docker.AppendArgs("--mount", "type=bind,source="+configFile+",target=/usr/local/apisix/conf/config.yaml,readonly")
 			}
-			docker.AppendArgs("--mount", "type=bind,source="+cloudLuaModuleDir+",target=/cloud_lua_module,readonly")
+			docker.AppendArgs("--mount", "type=bind,source="+ctx.cloudLuaModuleDir+",target=/cloud_lua_module,readonly")
+			docker.AppendArgs("--mount", "type=bind,source="+ctx.tlsDir+",target=/cloud/tls,readonly")
 
 			// TODO support customization of the HTTP and HTTPS ports.
 			docker.AppendArgs("-p", "9080:9080")

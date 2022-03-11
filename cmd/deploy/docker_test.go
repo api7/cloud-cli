@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"github.com/api7/cloud-cli/internal/persistence"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -49,22 +50,11 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
@@ -92,6 +82,8 @@ func TestDockerDeployCommand(t *testing.T) {
 				assert.NoError(t, err, "close gzip writer")
 
 				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+
+				api.EXPECT().GetDockerJoinConfig(gomock.Any()).Return([]byte(""), nil)
 				cloud.DefaultClient = api
 			},
 		},
@@ -102,22 +94,11 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
@@ -146,6 +127,7 @@ func TestDockerDeployCommand(t *testing.T) {
 				assert.NoError(t, err, "close gzip writer")
 
 				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				api.EXPECT().GetDockerJoinConfig(gomock.Any()).Return([]byte(""), nil)
 				cloud.DefaultClient = api
 			},
 		},
@@ -154,10 +136,14 @@ func TestDockerDeployCommand(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
+			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
+			certFilename := filepath.Join(persistence.HomeDir, "tls", "tls.crt")
+			certKeyFilename := filepath.Join(persistence.HomeDir, "tls", "tls.key")
+			certCAFilename := filepath.Join(persistence.HomeDir, "tls", "ca.crt")
+			os.Remove(certFilename)
+			os.Remove(certKeyFilename)
+			os.Remove(certCAFilename)
 			defer func() {
-				certFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.crt")
-				certKeyFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.key")
-				certCAFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "ca.crt")
 				os.Remove(certFilename)
 				os.Remove(certKeyFilename)
 				os.Remove(certCAFilename)

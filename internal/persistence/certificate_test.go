@@ -52,71 +52,11 @@ func TestPrepareCertificate(t *testing.T) {
 			},
 		},
 		{
-			name:        "empty cert but cloud me api failed (mock error)",
-			errorReason: "failed to access user information: mock error",
-			mockFn: func(t *testing.T) {
-				ctrl := gomock.NewController(t)
-				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(nil, errors.New("mock error"))
-				cloud.DefaultClient = mockClient
-			},
-		},
-		{
-			name:        "empty cert but orgs are empty",
-			errorReason: "incomplete user information, no organization",
-			mockFn: func(t *testing.T) {
-				ctrl := gomock.NewController(t)
-				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(&types.User{
-					OrgIDs: nil,
-				}, nil)
-				cloud.DefaultClient = mockClient
-			},
-		},
-		{
-			name:        "empty cert but cloud list control planes API failed (mock error)",
-			errorReason: "failed to list control planes: mock error",
-			mockFn: func(t *testing.T) {
-				ctrl := gomock.NewController(t)
-				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(&types.User{
-					OrgIDs: []string{"org1"},
-				}, nil)
-				mockClient.EXPECT().ListControlPlanes(gomock.Any()).Return(nil, errors.New("mock error"))
-				cloud.DefaultClient = mockClient
-			},
-		},
-		{
-			name:        "empty cert but no control plane available",
-			errorReason: "no control plane available",
-			mockFn: func(t *testing.T) {
-				ctrl := gomock.NewController(t)
-				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(&types.User{
-					OrgIDs: []string{"org1"},
-				}, nil)
-				mockClient.EXPECT().ListControlPlanes(gomock.Any()).Return(nil, nil)
-				cloud.DefaultClient = mockClient
-			},
-		},
-		{
 			name:        "empty cert but get tls bundle failed (mock error)",
 			errorReason: "download tls bundle: mock error",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(&types.User{
-					OrgIDs: []string{"org1"},
-				}, nil)
-				mockClient.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "cp1",
-							},
-						},
-					},
-				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
 			},
@@ -126,18 +66,6 @@ func TestPrepareCertificate(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().Me().Return(&types.User{
-					OrgIDs: []string{"org1"},
-				}, nil)
-				mockClient.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "cp1",
-							},
-						},
-					},
-				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
@@ -154,9 +82,9 @@ func TestPrepareCertificate(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.preparedCert != "" {
-				certFilename := filepath.Join(tlsDir, "tls.crt")
-				certKeyFilename := filepath.Join(tlsDir, "tls.key")
-				certCAFilename := filepath.Join(tlsDir, "ca.crt")
+				certFilename := filepath.Join(TLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(TLSDir, "tls.key")
+				certCAFilename := filepath.Join(TLSDir, "ca.crt")
 
 				err := ioutil.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
 				assert.Nil(t, err, "check if cert is saved")
@@ -173,12 +101,12 @@ func TestPrepareCertificate(t *testing.T) {
 
 			tc.mockFn(t)
 
-			err := PrepareCertificate()
+			err := PrepareCertificate("1")
 			if tc.errorReason == "" {
 				assert.Nil(t, err, "check if err is nil")
-				certFilename := filepath.Join(tlsDir, "tls.crt")
-				certKeyFilename := filepath.Join(tlsDir, "tls.key")
-				certCAFilename := filepath.Join(tlsDir, "ca.crt")
+				certFilename := filepath.Join(TLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(TLSDir, "tls.key")
+				certCAFilename := filepath.Join(TLSDir, "ca.crt")
 				defer os.Remove(certFilename)
 				defer os.Remove(certKeyFilename)
 				defer os.Remove(certCAFilename)

@@ -27,21 +27,10 @@ import (
 	"github.com/api7/cloud-cli/internal/utils"
 )
 
-var (
-	tlsDir string
-)
-
-func init() {
-	tlsDir = filepath.Join(os.Getenv("HOME"), ".api7cloud/tls")
-	if err := os.MkdirAll(tlsDir, 0700); err != nil {
-		panic(err)
-	}
-}
-
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
-func PrepareCertificate() error {
-	certFilename := filepath.Join(tlsDir, "tls.crt")
+func PrepareCertificate(cpID string) error {
+	certFilename := filepath.Join(TLSDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {
 		return errors.Wrap(err, "check certificate availability")
 	} else if available {
@@ -50,23 +39,8 @@ func PrepareCertificate() error {
 
 	output.Verbosef("Downloading tls bundle from API7 Cloud")
 
-	user, err := cloud.DefaultClient.Me()
-	if err != nil {
-		return errors.Wrap(err, "failed to access user information")
-	}
-	if len(user.OrgIDs) == 0 {
-		return errors.New("incomplete user information, no organization")
-	}
-	controlPlanes, err := cloud.DefaultClient.ListControlPlanes(user.OrgIDs[0])
-	if err != nil {
-		return errors.Wrap(err, "failed to list control planes")
-	}
-	if len(controlPlanes) == 0 {
-		return errors.New("no control plane available")
-	}
-
 	// Currently, only one control plane is supported for an organization.
-	bundle, err := cloud.DefaultClient.GetTLSBundle(controlPlanes[0].ID)
+	bundle, err := cloud.DefaultClient.GetTLSBundle(cpID)
 	if err != nil {
 		return errors.Wrap(err, "download tls bundle")
 	}
@@ -76,13 +50,13 @@ func PrepareCertificate() error {
 		return errors.Wrap(err, "save certificate")
 	}
 
-	certKeyFilename := filepath.Join(tlsDir, "tls.key")
+	certKeyFilename := filepath.Join(TLSDir, "tls.key")
 	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0600)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
 	}
 
-	certCAFilename := filepath.Join(tlsDir, "ca.crt")
+	certCAFilename := filepath.Join(TLSDir, "ca.crt")
 	err = ioutil.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0600)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")
