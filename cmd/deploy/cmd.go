@@ -55,6 +55,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Name, "name", "apisix", "The identifier of this deployment, it would be the container name (on Docker), the helm release (on Kubernetes) and it's useless if APISIX is deployed on bare metal")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")
 

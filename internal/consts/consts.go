@@ -19,3 +19,8 @@ const (
 	Api7CloudAddrEnv        = "API7_CLOUD_ADDR"
 	Api7CloudAccessTokenEnv = "API7_CLOUD_ACCESS_TOKEN"
 )
+
+const (
+	// DefaultDeploymentName is the default name for the cloud-cli deploy operation.
+	DefaultDeploymentName = "apisix"
+)
