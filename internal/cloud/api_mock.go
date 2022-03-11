@@ -34,6 +34,21 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 	return m.recorder
 }
 
+// GetCloudLuaModule mocks base method.
+func (m *MockAPI) GetCloudLuaModule() ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCloudLuaModule")
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCloudLuaModule indicates an expected call of GetCloudLuaModule.
+func (mr *MockAPIMockRecorder) GetCloudLuaModule() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCloudLuaModule", reflect.TypeOf((*MockAPI)(nil).GetCloudLuaModule))
+}
+
 // GetTLSBundle mocks base method.
 func (m *MockAPI) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
 	m.ctrl.T.Helper()

@@ -294,3 +294,53 @@ func TestGetTLSBundle(t *testing.T) {
 		})
 	}
 }
+
+func TestGetCloudLuaModule(t *testing.T) {
+	testCases := []struct {
+		name        string
+		errorReason string
+		code        int
+		body        string
+	}{
+		{
+			name:        "bad code 400",
+			errorReason: "unexpected response code: 400, message",
+			code:        http.StatusBadRequest,
+		},
+		{
+			name: "success",
+			code: http.StatusOK,
+			body: "the lua module",
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(tc.code)
+				if tc.body != "" {
+					write, err := rw.Write([]byte(tc.body))
+					assert.NoError(t, err, "send mock response")
+					assert.Equal(t, len(tc.body), write, "write mock response")
+				}
+			}))
+
+			defer server.Close()
+
+			err := os.Setenv(consts.Api7CloudLuaModuleURL, server.URL+"/")
+			assert.NoError(t, err, "checking env setup")
+
+			api, err := newClient("test-token")
+			assert.NoError(t, err, "checking new cloud api client")
+
+			data, err := api.GetCloudLuaModule()
+
+			if tc.errorReason != "" {
+				assert.Contains(t, err.Error(), tc.errorReason, "checking error reason")
+			} else {
+				assert.NoError(t, err, "checking error")
+				assert.Equal(t, tc.body, string(data), "check the tls bundle")
+			}
+		})
+	}
+}

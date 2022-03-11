@@ -16,6 +16,9 @@
 package deploy
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"fmt"
 	"os"
 	"os/exec"
@@ -42,7 +45,7 @@ func TestDockerDeployCommand(t *testing.T) {
 		{
 			name:       "test deploy docker command",
 			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--docker-run-arg", "--detach"},
-			cmdPattern: `docker run --detach -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -68,14 +71,34 @@ func TestDockerDeployCommand(t *testing.T) {
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
+				buffer := bytes.NewBuffer(nil)
+				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
+				assert.NoError(t, err, "create gzip writer")
+				tarWriter := tar.NewWriter(gzipWriter)
+				body := "hello world"
+				hdr := &tar.Header{
+					Name: "foo.txt",
+					Size: int64(len(body)),
+				}
+				err = tarWriter.WriteHeader(hdr)
+				assert.NoError(t, err, "write tar header")
+				_, err = tarWriter.Write([]byte(body))
+				assert.NoError(t, err, "write tar body")
+				err = tarWriter.Flush()
+				assert.NoError(t, err, "flush tar body")
+				err = tarWriter.Close()
+				assert.NoError(t, err, "close tar writer")
+				err = gzipWriter.Close()
+				assert.NoError(t, err, "close gzip writer")
 
+				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
 				cloud.DefaultClient = api
 			},
 		},
 		{
 			name:       "test deploy docker command with apisix config",
 			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--docker-run-arg", "--detach", "--apisix-config", "./testdata/apisix.yaml"},
-			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -102,8 +125,28 @@ func TestDockerDeployCommand(t *testing.T) {
 					CACertificate: "1",
 				}, nil)
 
-				cloud.DefaultClient = api
+				buffer := bytes.NewBuffer(nil)
+				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
+				assert.NoError(t, err, "create gzip writer")
+				tarWriter := tar.NewWriter(gzipWriter)
+				body := "hello world"
+				hdr := &tar.Header{
+					Name: "foo.txt",
+					Size: int64(len(body)),
+				}
+				err = tarWriter.WriteHeader(hdr)
+				assert.NoError(t, err, "write tar header")
+				_, err = tarWriter.Write([]byte(body))
+				assert.NoError(t, err, "write tar body")
+				err = tarWriter.Flush()
+				assert.NoError(t, err, "flush tar body")
+				err = tarWriter.Close()
+				assert.NoError(t, err, "close tar writer")
+				err = gzipWriter.Close()
+				assert.NoError(t, err, "close gzip writer")
 
+				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				cloud.DefaultClient = api
 			},
 		},
 	}

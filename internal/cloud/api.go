@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -64,8 +65,28 @@ func (a *api) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
 	return &bundle, nil
 }
 
+func (a *api) GetCloudLuaModule() ([]byte, error) {
+	req, err := a.newRequest(http.MethodGet, a.cloudLuaModuleURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := a.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read response body")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.Errorf("unexpected response code: %d, message: %s", resp.StatusCode, string(data))
+	}
+	return data, nil
+}
+
 func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
-	req, err := a.newRequest("GET", u, nil)
+	req, err := a.newRequest(http.MethodGet, u, nil)
 	if err != nil {
 		return err
 	}
@@ -79,8 +100,13 @@ func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
-	url.Scheme = a.scheme
-	url.Host = a.host
+	// Respect users' settings if host and scheme are not empty.
+	if url.Host == "" {
+		url.Host = a.host
+	}
+	if url.Scheme == "" {
+		url.Scheme = a.scheme
+	}
 
 	request, err := http.NewRequest(method, url.String(), body)
 	if err != nil {
