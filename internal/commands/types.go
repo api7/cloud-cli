@@ -83,6 +83,7 @@ func (c *Cmd) Run(ctx context.Context) (string, string, error) {
 func (c *Cmd) Execute(ctx context.Context) error {
 	if c.dryrun {
 		output.Infof(c.String())
+		return nil
 	}
 
 	stdout, stderr, err := c.Run(ctx)

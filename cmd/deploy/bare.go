@@ -100,7 +100,7 @@ cloud-cli deploy bare \
 				bare.AppendArgs("-c", configFile)
 			}
 			if err = bare.Execute(ctx); err != nil {
-				panic(err)
+				return
 			}
 		},
 	}
