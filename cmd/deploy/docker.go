@@ -96,8 +96,10 @@ cloud-cli deploy docker \
 			docker.AppendArgs("-p", "9443:9443")
 			if options.Global.Deploy.Name != "" {
 				docker.AppendArgs("--name", options.Global.Deploy.Name)
+				docker.AppendArgs("--hostname", options.Global.Deploy.Name)
 			} else {
 				docker.AppendArgs("--name", consts.DefaultDeploymentName)
+				docker.AppendArgs("--hostname", consts.DefaultDeploymentName)
 			}
 
 			docker.AppendArgs(opts.APISIXImage)
