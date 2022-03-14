@@ -40,18 +40,23 @@ func SaveCloudLuaModule() (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create gzip reader")
 	}
+	defer tempReader.Close()
 
-	entryDir := HomeDir
+	var entryDir string
+
 	reader := tar.NewReader(tempReader)
 	for {
 		hdr, err := reader.Next()
 		if err != nil {
 			if err == io.EOF {
+				if entryDir == "" {
+					entryDir = HomeDir
+				}
 				return entryDir, nil
 			}
 			return "", errors.Wrap(err, "failed to read tar")
 		}
-		if hdr.FileInfo().IsDir() {
+		if hdr.Typeflag == tar.TypeDir {
 			dir := filepath.Join(HomeDir, hdr.Name)
 			if entryDir == "" {
 				entryDir = dir
@@ -59,13 +64,13 @@ func SaveCloudLuaModule() (string, error) {
 			if err := os.MkdirAll(dir, 0755); err != nil {
 				return "", errors.Wrap(err, "failed to create dir")
 			}
-		} else {
+		} else if hdr.Typeflag == tar.TypeReg {
 			filename := filepath.Join(HomeDir, hdr.Name)
-			buffer := make([]byte, 0, hdr.Size)
-			if _, err := reader.Read(buffer); err != nil {
+			buffer, err := ioutil.ReadAll(reader)
+			if err != nil {
 				return "", errors.Wrap(err, "failed to read tar")
 			}
-			if err := ioutil.WriteFile(filename, buffer, 0600); err != nil {
+			if err := ioutil.WriteFile(filename, buffer, 0644); err != nil {
 				return "", errors.Wrap(err, "failed to save file")
 			}
 		}

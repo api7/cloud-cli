@@ -54,6 +54,10 @@ func SaveConfig(config map[string]interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// Assign permission for other users so that processes inside container can read it.
+	if err := tempFile.Chmod(0644); err != nil {
+		return "", err
+	}
 	defer tempFile.Close()
 
 	if _, err := tempFile.Write(data); err != nil {

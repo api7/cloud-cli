@@ -45,19 +45,19 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "download tls bundle")
 	}
 
-	err = ioutil.WriteFile(certFilename, []byte(bundle.Certificate), 0600)
+	err = ioutil.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save certificate")
 	}
 
 	certKeyFilename := filepath.Join(TLSDir, "tls.key")
-	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0600)
+	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
 	}
 
 	certCAFilename := filepath.Join(TLSDir, "ca.crt")
-	err = ioutil.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0600)
+	err = ioutil.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")
 	}

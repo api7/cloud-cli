@@ -40,7 +40,7 @@ var (
 // Init initializes the persistence context.
 func Init() {
 	TLSDir = filepath.Join(HomeDir, "tls")
-	if os.MkdirAll(TLSDir, 0700) != nil {
+	if os.MkdirAll(TLSDir, 0755) != nil {
 		panic("failed to create tls directory")
 	}
 }

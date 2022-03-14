@@ -109,6 +109,10 @@ func newClient(accessToken string) (API, error) {
 		scheme:            u.Scheme,
 		cloudLuaModuleURL: cloudModuleURL,
 		accessToken:       accessToken,
-		httpClient:        &http.Client{},
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyFromEnvironment,
+			},
+		},
 	}, nil
 }
