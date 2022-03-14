@@ -10,12 +10,14 @@ import (
 
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/output"
 )
 
 var _OpenRestyRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
 var _APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix.repo"
 
 // DownloadRPM installs related repositories and download RPM package of Apache APISIX with dependencies
+// return empty string when apisix is installed
 func DownloadRPM(ctx context.Context, version string) (string, error) {
 	path := filepath.Join(os.Getenv("HOME"), ".api7cloud/rpm")
 	if err := os.MkdirAll(path, 0700); err != nil {
@@ -29,38 +31,53 @@ func DownloadRPM(ctx context.Context, version string) (string, error) {
 		return "", err
 	}
 
-	cmd := commands.New("yum", options.Global.DryRun)
-	cmd.AppendArgs("install", "-y", _OpenRestyRepoURL)
-	if err := cmd.Execute(ctx); err != nil {
-		return "", errors.Wrap(err, "failed to install repositories of OpenResty")
-	}
+	if existed := checkIfReposExisted(ctx); !existed {
+		cmd := commands.New("yum", options.Global.DryRun)
+		cmd.AppendArgs("install", "-y", _OpenRestyRepoURL)
+		if err := cmd.Execute(ctx); err != nil {
+			return "", errors.Wrap(err, "failed to install repositories of OpenResty")
+		}
 
-	cmd = commands.New("yum-config-manager", options.Global.DryRun)
-	cmd.AppendArgs("--add-repo", _APISIXRepoURL)
-	if err := cmd.Execute(ctx); err != nil {
-		return "", errors.Wrap(err, "failed to install repositories of Apache APISIX")
-	}
+		cmd = commands.New("yum-config-manager", options.Global.DryRun)
+		cmd.AppendArgs("--add-repo", _APISIXRepoURL)
+		if err := cmd.Execute(ctx); err != nil {
+			return "", errors.Wrap(err, "failed to install repositories of Apache APISIX")
+		}
 
-	cmd = commands.New("yum", options.Global.DryRun)
-	cmd.AppendArgs("install", "-y", "--downloadonly")
-	cmd.AppendArgs("--downloaddir=" + path)
-	cmd.AppendArgs("apisix-" + version)
-	if err := cmd.Execute(ctx); err != nil {
-		return "", errors.Wrap(err, "failed to download Apache APISIX")
+		cmd = commands.New("yum", options.Global.DryRun)
+		cmd.AppendArgs("install", "-y", "--downloadonly")
+		cmd.AppendArgs("--downloaddir=" + path)
+		cmd.AppendArgs("apisix-" + version)
+		if err := cmd.Execute(ctx); err != nil {
+			return "", errors.Wrap(err, "failed to download Apache APISIX")
+		}
 	}
 	return path, nil
 }
 
 func checkIfAPISIXAvailable(ctx context.Context, version string) error {
-	cmd := commands.New("apisix", false).
-		AppendArgs("version")
-	_, stdout, err := cmd.Run(ctx)
+	cmd := commands.New("apisix", false).AppendArgs("version")
+	stdout, _, err := cmd.Run(ctx)
 	if err != nil {
 		return nil
 	}
 	if !strings.Contains(stdout, version) {
-		return errors.New("other vesrion of Apache APISIX already installed")
+		return errors.New("other version of Apache APISIX already installed")
 	} else {
 		return os.ErrExist
 	}
+}
+
+func checkIfReposExisted(ctx context.Context) bool {
+	cmd := commands.New("yum", false).AppendArgs("list", "apisix")
+	stdout, stderr, err := cmd.Run(ctx)
+	if err != nil {
+		output.Errorf(err.Error())
+		return false
+	}
+	if stderr != "" {
+		output.Verbosef(stderr)
+		return false
+	}
+	return strings.Contains(stdout, "apisix.*")
 }

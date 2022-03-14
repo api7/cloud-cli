@@ -18,6 +18,8 @@ package deploy
 import (
 	"context"
 	"io/ioutil"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -65,8 +67,25 @@ cloud-cli deploy bare \
 				return
 			}
 			if path != "" {
+				// find out the apisix rpm package name
+				dir, err := ioutil.ReadDir(path)
+				if err != nil {
+					output.Errorf(err.Error())
+					return
+				}
+				var name string
+				for _, f := range dir {
+					if strings.HasPrefix(f.Name(), "apisix-") {
+						name = f.Name()
+						break
+					}
+				}
+				if name == "" {
+					output.Errorf("Failed to download Apache APISIX RPM package.")
+					return
+				}
 				installer := commands.New("yum", options.Global.DryRun)
-				installer.AppendArgs("install", "-y", path+"/*.rpm")
+				installer.AppendArgs("install", "-y", filepath.Join(path, name))
 				if err := installer.Execute(ctx); err != nil {
 					return
 				}
