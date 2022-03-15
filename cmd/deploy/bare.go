@@ -44,7 +44,7 @@ cloud-cli deploy bare \
 				output.Errorf(err.Error())
 				return
 			}
-			if err := deployPreRunForDocker(&ctx); err != nil {
+			if err := deployPreRunForBare(&ctx); err != nil {
 				output.Errorf(err.Error())
 				return
 			}

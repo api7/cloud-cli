@@ -12,7 +12,6 @@ import (
 
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/api7/cloud-cli/internal/output"
 )
 
 var _OpenRestyRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
@@ -97,14 +96,9 @@ func checkIfReposExisted(ctx context.Context) bool {
 		return false
 	}
 	cmd := commands.New("yum", false).AppendArgs("list", "apisix")
-	stdout, stderr, err := cmd.Run(ctx)
-	if err != nil {
-		output.Errorf(err.Error())
-		return false
-	}
+	stdout, stderr, _ := cmd.Run(ctx)
 	if stderr != "" {
-		output.Verbosef(stderr)
-		return false
+		return !strings.Contains(stderr, "apisix")
 	}
-	return strings.Contains(stdout, "apisix.*")
+	return strings.Contains(stdout, "apisix")
 }

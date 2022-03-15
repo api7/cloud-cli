@@ -125,7 +125,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud/cloud_lua_module"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
 				essentialConfig: []byte(`apisix:
   enable_admin: false
   ssl:
@@ -268,13 +268,13 @@ func TestDeployPreRunForBare(t *testing.T) {
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud/cloud_lua_module"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
 				essentialConfig: []byte(`apisix:
   enable_admin: false
   ssl:
     ssl_trusted_certificate: .*/tls/ca\.crt
   lua_module_hook: cloud
-  extra_lua_path: .*/.api7cloud/cloud_lua_module/\?\.ljbc;
+  extra_lua_path: .*/.api7cloud/\?\.ljbc;
 nginx_config:
   http:
     custom_lua_shared_dict:

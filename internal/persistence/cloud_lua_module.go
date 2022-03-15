@@ -45,7 +45,6 @@ func SaveCloudLuaModule() (string, error) {
 	var entryDir string
 
 	reader := tar.NewReader(tempReader)
-	HomeDir := filepath.Join(HomeDir, "cloud_lua_module")
 	_ = os.MkdirAll(HomeDir, 0755)
 	for {
 		hdr, err := reader.Next()
