@@ -14,8 +14,8 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 )
 
-var _OpenRestyRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
-var _APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix.repo"
+var _openRestyRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
+var _apisixRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix.repo"
 
 // DownloadRPM installs related repositories and download RPM package of Apache APISIX with dependencies
 // return empty string when apisix is installed
@@ -34,13 +34,13 @@ func DownloadRPM(ctx context.Context, version string) (file string, err error) {
 
 	if existed := checkIfReposExisted(ctx); !existed {
 		cmd := commands.New("yum", options.Global.DryRun)
-		cmd.AppendArgs("install", "-y", _OpenRestyRepoURL)
+		cmd.AppendArgs("install", "-y", _openRestyRepoURL)
 		if err := cmd.Execute(ctx); err != nil {
 			return "", errors.Wrap(err, "failed to install repositories of OpenResty")
 		}
 
 		cmd = commands.New("yum-config-manager", options.Global.DryRun)
-		cmd.AppendArgs("--add-repo", _APISIXRepoURL)
+		cmd.AppendArgs("--add-repo", _apisixRepoURL)
 		if err := cmd.Execute(ctx); err != nil {
 			return "", errors.Wrap(err, "failed to install repositories of Apache APISIX")
 		}
