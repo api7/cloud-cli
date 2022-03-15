@@ -63,8 +63,12 @@ type KubernetesDeployOptions struct {
 	NameSpace string
 	// APISIXImage is the name of the APISIX image to deploy.
 	APISIXImage string `validate:"image"`
-	// SecretName is the kubernetes secret name
-	SecretName string
+	// APISIXImageRepo is the APISIXImage name
+	APISIXImageRepo string
+	// APISIXImageTag is the APISIXImage tag
+	APISIXImageTag string
+	// ReplicaCount is the pod replica count
+	ReplicaCount uint
 	// HelmInstallArgs contains a series of arguments to pass to the helm install command.
 	HelmInstallArgs []string
 	// KubectlCLIPath is the filepath of the kubectl command.

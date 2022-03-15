@@ -17,26 +17,31 @@ package deploy
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
-	"context"
 	"html/template"
 	"path/filepath"
+	"strings"
+	"time"
 
+	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/api7/cloud-cli/internal/utils"
-	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
 	//go:embed apisix.yaml
 	essentialConfig string
+	//go:embed apisix_chart_values.yaml
+	helmEssentialConfig string
 
-	essentialConfigTemplate = template.Must(template.New("essential config").Parse(essentialConfig))
+	essentialConfigTemplate     = template.Must(template.New("essential config").Parse(essentialConfig))
+	helmEssentialConfigTemplate = template.Must(template.New("helm essential config").Parse(helmEssentialConfig))
 )
 
 type deployContext struct {
@@ -44,8 +49,16 @@ type deployContext struct {
 	tlsDir            string
 	essentialConfig   []byte
 	// ControlPlane is the current control plane.
-	ControlPlane *types.ControlPlane
+	ControlPlane   *types.ControlPlane
+	KubernetesOpts options.KubernetesDeployOptions
 }
+
+type kubernetesKind string
+
+var (
+	configMap kubernetesKind = "configMap"
+	secret    kubernetesKind = "secret"
+)
 
 func deployPreRunForDocker(ctx *deployContext) error {
 	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
@@ -76,6 +89,16 @@ func deployPreRunForDocker(ctx *deployContext) error {
 }
 
 func deployPreRunForKubernetes(ctx *deployContext) error {
+	opts := options.Global.Deploy.Kubernetes
+	image := strings.Split(opts.APISIXImage, ":")
+	opts.APISIXImageRepo = image[0]
+	if len(image) > 1 {
+		opts.APISIXImageTag = image[1]
+	} else {
+		opts.APISIXImageTag = "latest"
+	}
+	ctx.KubernetesOpts = opts
+
 	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
 	if err != nil {
 		return fmt.Errorf("Failed to get default control plane: %v", err.Error())
@@ -84,43 +107,60 @@ func deployPreRunForKubernetes(ctx *deployContext) error {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
 	ctx.tlsDir = persistence.TLSDir
+	if err = createSecretOrConfigMapOnK8s(ctx, secret); err != nil {
+		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
+	}
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
 		return fmt.Errorf("Failed to save cloud lua module: %s", err.Error())
 	}
 	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
-
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
+	if err = createSecretOrConfigMapOnK8s(ctx, configMap); err != nil {
+		return fmt.Errorf("Failed to create configMap on kubernetes: %s", err.Error())
+	}
+
 	ctx.ControlPlane = cp
 
 	buf := bytes.NewBuffer(nil)
-	if err = essentialConfigTemplate.Execute(buf, ctx); err != nil {
-		return fmt.Errorf("Failed to execute essential config template: %s", err.Error())
+	if err = helmEssentialConfigTemplate.Execute(buf, ctx); err != nil {
+		return fmt.Errorf("Failed to execute helm essential config template: %s", err.Error())
 	}
 
 	ctx.essentialConfig = buf.Bytes()
 	return nil
 }
 
-func createSecretOnK8s(ctx *deployContext) error {
+func createSecretOrConfigMapOnK8s(ctx *deployContext, kind kubernetesKind) error {
 	var (
 		kubectl *commands.Cmd
-		err    error
+		err     error
 	)
 
 	opts := options.Global.Deploy.Kubernetes
-	if opts.KubectlCLIPath != "" {
-		kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
-	} else {
-		kubectl = commands.New("kubectl", options.Global.DryRun)
+	if opts.KubectlCLIPath == "" {
+		opts.KubectlCLIPath = "kubectl"
+	}
+	kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
+
+	switch kind {
+	case secret:
+		kubectl.AppendArgs("create", "secret", "generic", "cloud-ssl")
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.crt=%s", filepath.Join(ctx.tlsDir, "tls.crt")))
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.key=%s", filepath.Join(ctx.tlsDir, "tls.key")))
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=ca.crt=%s", filepath.Join(ctx.tlsDir, "ca.crt")))
+	case configMap:
+		kubectl.AppendArgs("create", "configmap")
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=cloud.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud.ljbc")))
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=cloud-agent.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-agent.ljbc")))
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-metrics.ljbc")))
+		kubectl.AppendArgs(fmt.Sprintf("--form-file=cloud-utils.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-utils.ljbc")))
+	default:
+		return fmt.Errorf("invaild kind:%s", kind)
 	}
 
-	kubectl.AppendArgs("create","secret","generic",opts.SecretName)
-	kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.crt=%s",filepath.Join(ctx.tlsDir, "tls.crt")))
-	kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.key=%s",filepath.Join(ctx.tlsDir, "tls.key")))
-	kubectl.AppendArgs(fmt.Sprintf("--form-file=ca.crt=%s",filepath.Join(ctx.tlsDir, "ca.crt")))
-	kubectl.AppendArgs("--namespace",opts.NameSpace)
+	kubectl.AppendArgs("--namespace", opts.NameSpace)
 
 	if options.Global.DryRun {
 		output.Infof("Running:\n%s\n", kubectl.String())
@@ -128,7 +168,7 @@ func createSecretOnK8s(ctx *deployContext) error {
 		output.Verbosef("Running:\n%s\n", kubectl.String())
 	}
 
-	newCtx, cancel := context.WithCancel(context.TODO())
+	newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*3)
 	defer cancel()
 	go utils.WaitForSignal(func() {
 		cancel()
@@ -142,7 +182,7 @@ func createSecretOnK8s(ctx *deployContext) error {
 		output.Verbosef(stdout)
 	}
 	if err != nil {
-		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
+		return err
 	}
 
 	return nil
