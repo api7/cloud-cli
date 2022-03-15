@@ -31,6 +31,7 @@ import (
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
@@ -45,26 +46,15 @@ func TestDockerDeployCommand(t *testing.T) {
 		{
 			name:       "test deploy docker command",
 			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--docker-run-arg", "--detach"},
-			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.11.0-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
@@ -92,32 +82,22 @@ func TestDockerDeployCommand(t *testing.T) {
 				assert.NoError(t, err, "close gzip writer")
 
 				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+
 				cloud.DefaultClient = api
 			},
 		},
 		{
 			name:       "test deploy docker command with apisix config",
 			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--docker-run-arg", "--detach", "--apisix-config", "./testdata/apisix.yaml"},
-			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly -p 9080:9080 -p 9443:9443 --name apisix apache/apisix:2.11.0-centos`,
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.11.0-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
@@ -154,10 +134,11 @@ func TestDockerDeployCommand(t *testing.T) {
 		tc := tc
 
 		t.Run(tc.name, func(t *testing.T) {
+			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
+			certFilename := filepath.Join(persistence.HomeDir, "tls", "tls.crt")
+			certKeyFilename := filepath.Join(persistence.HomeDir, "tls", "tls.key")
+			certCAFilename := filepath.Join(persistence.HomeDir, "tls", "ca.crt")
 			defer func() {
-				certFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.crt")
-				certKeyFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.key")
-				certCAFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "ca.crt")
 				os.Remove(certFilename)
 				os.Remove(certKeyFilename)
 				os.Remove(certCAFilename)

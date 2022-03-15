@@ -49,6 +49,36 @@ func (mr *MockAPIMockRecorder) GetCloudLuaModule() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCloudLuaModule", reflect.TypeOf((*MockAPI)(nil).GetCloudLuaModule))
 }
 
+// GetDefaultControlPlane mocks base method.
+func (m *MockAPI) GetDefaultControlPlane() (*types.ControlPlane, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDefaultControlPlane")
+	ret0, _ := ret[0].(*types.ControlPlane)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultControlPlane indicates an expected call of GetDefaultControlPlane.
+func (mr *MockAPIMockRecorder) GetDefaultControlPlane() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultControlPlane", reflect.TypeOf((*MockAPI)(nil).GetDefaultControlPlane))
+}
+
+// GetDockerJoinConfig mocks base method.
+func (m *MockAPI) GetDockerJoinConfig(cpID string) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDockerJoinConfig", cpID)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDockerJoinConfig indicates an expected call of GetDockerJoinConfig.
+func (mr *MockAPIMockRecorder) GetDockerJoinConfig(cpID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDockerJoinConfig", reflect.TypeOf((*MockAPI)(nil).GetDockerJoinConfig), cpID)
+}
+
 // GetTLSBundle mocks base method.
 func (m *MockAPI) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
 	m.ctrl.T.Helper()
