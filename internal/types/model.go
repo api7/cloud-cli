@@ -105,7 +105,7 @@ type GetOrganizationControlPlanesResponsePayload struct {
 
 // GetJoinConfigResponsePayload contains APISIX join (API7 Cloud) config.
 type GetJoinConfigResponsePayload struct {
-	// JoinConfig is the join config
+	// Configuration is the join config
 	Configuration string `json:"configuration"`
 }
 
