@@ -28,12 +28,12 @@ import (
 )
 
 var (
-	tlsDir string
+	TlsDir string
 )
 
 func init() {
-	tlsDir = filepath.Join(os.Getenv("HOME"), ".api7cloud/tls")
-	if err := os.MkdirAll(tlsDir, 0700); err != nil {
+	TlsDir = filepath.Join(os.Getenv("HOME"), ".api7cloud/tls")
+	if err := os.MkdirAll(TlsDir, 0700); err != nil {
 		panic(err)
 	}
 }
@@ -41,7 +41,7 @@ func init() {
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
 func PrepareCertificate() error {
-	certFilename := filepath.Join(tlsDir, "tls.crt")
+	certFilename := filepath.Join(TlsDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {
 		return errors.Wrap(err, "check certificate availability")
 	} else if available {
@@ -76,13 +76,13 @@ func PrepareCertificate() error {
 		return errors.Wrap(err, "save certificate")
 	}
 
-	certKeyFilename := filepath.Join(tlsDir, "tls.key")
+	certKeyFilename := filepath.Join(TlsDir, "tls.key")
 	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0600)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
 	}
 
-	certCAFilename := filepath.Join(tlsDir, "ca.crt")
+	certCAFilename := filepath.Join(TlsDir, "ca.crt")
 	err = ioutil.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0600)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")

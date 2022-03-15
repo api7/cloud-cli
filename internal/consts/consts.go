@@ -30,4 +30,6 @@ const (
 const (
 	// DefaultDeploymentName is the default name for the cloud-cli deploy operation.
 	DefaultDeploymentName = "apisix"
+	// DefaultHelmChartsUrl is the default url for helm charts
+	DefaultHelmChartsUrl = "https://charts.apiseven.com"
 )
