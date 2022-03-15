@@ -85,6 +85,37 @@ func (a *api) GetCloudLuaModule() ([]byte, error) {
 	return data, nil
 }
 
+func (a *api) GetDockerJoinConfig(cpID string) ([]byte, error) {
+	var response types.GetJoinConfigResponsePayload
+
+	if err := a.makeGetRequest(&url.URL{
+		Path:     fmt.Sprintf("/api/v1/controlplanes/%s/join", cpID),
+		RawQuery: "type=docker",
+	}, &response); err != nil {
+		return nil, err
+	}
+	return []byte(response.Configuration), nil
+}
+
+func (a *api) GetDefaultControlPlane() (*types.ControlPlane, error) {
+	user, err := a.Me()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to access user information")
+	}
+
+	if len(user.OrgIDs) == 0 {
+		return nil, errors.New("incomplete user information, no organization")
+	}
+	controlPlanes, err := a.ListControlPlanes(user.OrgIDs[0])
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list control planes")
+	}
+	if len(controlPlanes) == 0 {
+		return nil, errors.New("no control plane available")
+	}
+	return &controlPlanes[0].ControlPlane, nil
+}
+
 func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
 	req, err := a.newRequest(http.MethodGet, u, nil)
 	if err != nil {

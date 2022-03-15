@@ -15,6 +15,12 @@
 
 package persistence
 
+import (
+	"github.com/pkg/errors"
+	"os"
+	"path/filepath"
+)
+
 // User is credential for authentication.
 type User struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
@@ -23,4 +29,20 @@ type User struct {
 // Credential is the top-level credential for the cloud cli.
 type Credential struct {
 	User User `json:"user" yaml:"user"`
+}
+
+var (
+	// HomeDir is the home directory of the api7 cloud.
+	HomeDir = filepath.Join(os.Getenv("HOME"), ".api7cloud")
+	// TLSDir is the directory to store TLS certificates.
+	TLSDir string
+)
+
+// Init initializes the persistence context.
+func Init() error {
+	TLSDir = filepath.Join(HomeDir, "tls")
+	if err := os.MkdirAll(TLSDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create tls directory")
+	}
+	return nil
 }
