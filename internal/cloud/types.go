@@ -62,6 +62,10 @@ type API interface {
 	GetTLSBundle(cpID string) (*types.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)
 	GetCloudLuaModule() ([]byte, error)
+	// GetDockerJoinConfig gets the essential configuration from API7 Cloud for deploy APISIX on Docker.
+	GetDockerJoinConfig(cpID string) ([]byte, error)
+	// GetDefaultControlPlane returns the default control plane for the current organization.
+	GetDefaultControlPlane() (*types.ControlPlane, error)
 }
 
 type api struct {
@@ -105,6 +109,10 @@ func newClient(accessToken string) (API, error) {
 		scheme:            u.Scheme,
 		cloudLuaModuleURL: cloudModuleURL,
 		accessToken:       accessToken,
-		httpClient:        &http.Client{},
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyFromEnvironment,
+			},
+		},
 	}, nil
 }
