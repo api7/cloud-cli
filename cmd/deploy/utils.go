@@ -19,8 +19,13 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"context"
 	"html/template"
+	"path/filepath"
 
+	"github.com/api7/cloud-cli/internal/commands"
+	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/utils"
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -67,5 +72,78 @@ func deployPreRunForDocker(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
+	return nil
+}
+
+func deployPreRunForKubernetes(ctx *deployContext) error {
+	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
+	if err != nil {
+		return fmt.Errorf("Failed to get default control plane: %v", err.Error())
+	}
+	if err = persistence.PrepareCertificate(cp.ID); err != nil {
+		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
+	}
+	ctx.tlsDir = persistence.TLSDir
+
+	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
+	if err != nil {
+		return fmt.Errorf("Failed to save cloud lua module: %s", err.Error())
+	}
+	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
+
+	ctx.cloudLuaModuleDir = cloudLuaModuleDir
+	ctx.ControlPlane = cp
+
+	buf := bytes.NewBuffer(nil)
+	if err = essentialConfigTemplate.Execute(buf, ctx); err != nil {
+		return fmt.Errorf("Failed to execute essential config template: %s", err.Error())
+	}
+
+	ctx.essentialConfig = buf.Bytes()
+	return nil
+}
+
+func createSecretOnK8s(ctx *deployContext) error {
+	var (
+		kubectl *commands.Cmd
+		err    error
+	)
+
+	opts := options.Global.Deploy.Kubernetes
+	if opts.KubectlCLIPath != "" {
+		kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
+	} else {
+		kubectl = commands.New("kubectl", options.Global.DryRun)
+	}
+
+	kubectl.AppendArgs("create","secret","generic",opts.SecretName)
+	kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.crt=%s",filepath.Join(ctx.tlsDir, "tls.crt")))
+	kubectl.AppendArgs(fmt.Sprintf("--form-file=tls.key=%s",filepath.Join(ctx.tlsDir, "tls.key")))
+	kubectl.AppendArgs(fmt.Sprintf("--form-file=ca.crt=%s",filepath.Join(ctx.tlsDir, "ca.crt")))
+	kubectl.AppendArgs("--namespace",opts.NameSpace)
+
+	if options.Global.DryRun {
+		output.Infof("Running:\n%s\n", kubectl.String())
+	} else {
+		output.Verbosef("Running:\n%s\n", kubectl.String())
+	}
+
+	newCtx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+	go utils.WaitForSignal(func() {
+		cancel()
+	})
+
+	stdout, stderr, err := kubectl.Run(newCtx)
+	if stderr != "" {
+		output.Warnf(stderr)
+	}
+	if stdout != "" {
+		output.Verbosef(stdout)
+	}
+	if err != nil {
+		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
+	}
+
 	return nil
 }

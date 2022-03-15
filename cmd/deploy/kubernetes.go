@@ -25,7 +25,7 @@ import (
 
 func newKubernetesCommand()  *cobra.Command {
 	var (
-		cloudLuaModuleDir string
+		ctx deployContext
 	)
 	cmd := &cobra.Command{
 		Use:   "kubernetes [ARGS...]",
@@ -39,18 +39,14 @@ cloud-cli deploy kubernetes \
 		--helm-install-arg --output=table \
 		--helm-install-arg --description=this is a description`,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			var err error
-
-			if err = persistence.PrepareCertificate(); err != nil {
-				output.Errorf("Failed to prepare certificate: %s", err)
+			if err := persistence.Init(); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
-			cloudLuaModuleDir, err = persistence.SaveCloudLuaModule()
-			if err != nil {
-				output.Errorf("Failed to save cloud lua module: %s", err)
+			if err := deployPreRunForDocker(&ctx); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
-			output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 
