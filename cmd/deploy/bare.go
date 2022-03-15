@@ -18,8 +18,6 @@ package deploy
 import (
 	"context"
 	"io/ioutil"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -33,7 +31,7 @@ import (
 
 func newBareCommand() *cobra.Command {
 	var (
-		cloudLuaModuleDir string
+		ctx deployContext
 	)
 	cmd := &cobra.Command{
 		Use:   "bare [ARGS...]",
@@ -42,73 +40,53 @@ func newBareCommand() *cobra.Command {
 cloud-cli deploy bare \
 		--apisix-version 2.11.0`,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			var (
-				err error
-			)
-			if err := persistence.PrepareCertificate(); err != nil {
-				output.Errorf("Failed to prepare certificate: %s", err)
+			if err := persistence.Init(); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
-			cloudLuaModuleDir, err = persistence.SaveCloudLuaModule()
-			if err != nil {
-				output.Errorf("Failed to save cloud lua module: %s", err)
+			if err := deployPreRunForDocker(&ctx); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
-			output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
+			context, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
 			defer cancel()
 
 			opts := options.Global.Deploy.Bare
-			path, err := persistence.DownloadRPM(ctx, opts.APISIXVersion)
+			path, err := persistence.DownloadRPM(context, opts.APISIXVersion)
 			if err != nil {
 				output.Errorf(err.Error())
 				return
 			}
 			if path != "" {
-				// find out the apisix rpm package name
-				dir, err := ioutil.ReadDir(path)
-				if err != nil {
-					output.Errorf(err.Error())
-					return
-				}
-				var name string
-				for _, f := range dir {
-					if strings.HasPrefix(f.Name(), "apisix-") {
-						name = f.Name()
-						break
-					}
-				}
-				if name == "" {
-					output.Errorf("Failed to download Apache APISIX RPM package.")
-					return
-				}
 				installer := commands.New("yum", options.Global.DryRun)
-				installer.AppendArgs("install", "-y", filepath.Join(path, name))
-				if err := installer.Execute(ctx); err != nil {
+				installer.AppendArgs("install", "-y", path)
+				if err := installer.Execute(context); err != nil {
 					return
 				}
 			}
 
-			var configFile string
+			var data []byte
 			if options.Global.Deploy.APISIXConfigFile != "" {
-				data, err := ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
+				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
 				if err != nil {
 					output.Errorf("invalid --apisix-config-file option: %s", err)
 					return
 				}
-				mergedConfig, err := apisix.MergeConfig(data, nil)
+			}
+			mergedConfig, err := apisix.MergeConfig(data, ctx.essentialConfig)
+			if err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
+			var configFile string
+			if len(mergedConfig) > 0 {
+				configFile, err = apisix.SaveConfig(mergedConfig)
 				if err != nil {
 					output.Errorf(err.Error())
 					return
-				}
-				if len(mergedConfig) > 0 {
-					configFile, err = apisix.SaveConfig(mergedConfig)
-					if err != nil {
-						output.Errorf(err.Error())
-						return
-					}
 				}
 			}
 
@@ -118,7 +96,7 @@ cloud-cli deploy bare \
 			if configFile != "" {
 				bare.AppendArgs("-c", configFile)
 			}
-			if err = bare.Execute(ctx); err != nil {
+			if err = bare.Execute(context); err != nil {
 				return
 			}
 		},

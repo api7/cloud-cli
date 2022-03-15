@@ -48,29 +48,18 @@ func TestBareMetalDeployCommand(t *testing.T) {
 			cmdPattern: fmt.Sprintf(`yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
 yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
 yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/\*.rpm
-apisix start
+yum install -y %s/\.api7cloud/rpm/.*.rpm
+apisix start -c .*/apisix-config-\d+\.yaml
 PASS
 `, os.Getenv("HOME"), os.Getenv("HOME")),
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
@@ -98,6 +87,7 @@ PASS
 				assert.NoError(t, err, "close gzip writer")
 
 				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+
 				cloud.DefaultClient = api
 			},
 		},
@@ -107,35 +97,25 @@ PASS
 			cmdPattern: fmt.Sprintf(`yum install -y https://repos\.apiseven\.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
 yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
 yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/\*.rpm
-apisix start -c .*/apisix-config-\w+\.yaml
+yum install -y %s/\.api7cloud/rpm/.*.rpm
+apisix start -c .*/apisix-config-\d+\.yaml
 PASS
 `, os.Getenv("HOME"), os.Getenv("HOME")),
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().Me().Return(&types.User{
-					ID:        "12345",
-					FirstName: "Bob",
-					LastName:  "Alice",
-					Email:     "test@api7.ci",
-					OrgIDs:    []string{"org1"},
-				}, nil)
-				api.EXPECT().ListControlPlanes(gomock.Any()).Return([]*types.ControlPlaneSummary{
-					{
-						ControlPlane: types.ControlPlane{
-							TypeMeta: types.TypeMeta{
-								ID: "12345",
-							},
-							OrganizationID: "org1",
-						},
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
 					},
+					OrganizationID: "org1",
 				}, nil)
 				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
+
 				buffer := bytes.NewBuffer(nil)
 				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
 				assert.NoError(t, err, "create gzip writer")
