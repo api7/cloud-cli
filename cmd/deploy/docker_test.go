@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
-	"github.com/api7/cloud-cli/internal/persistence"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -32,6 +31,7 @@ import (
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
@@ -138,9 +138,6 @@ func TestDockerDeployCommand(t *testing.T) {
 			certFilename := filepath.Join(persistence.HomeDir, "tls", "tls.crt")
 			certKeyFilename := filepath.Join(persistence.HomeDir, "tls", "tls.key")
 			certCAFilename := filepath.Join(persistence.HomeDir, "tls", "ca.crt")
-			os.Remove(certFilename)
-			os.Remove(certKeyFilename)
-			os.Remove(certCAFilename)
 			defer func() {
 				os.Remove(certFilename)
 				os.Remove(certKeyFilename)

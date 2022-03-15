@@ -45,7 +45,10 @@ cloud-cli deploy docker \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
 		PreRun: func(cmd *cobra.Command, args []string) {
-			persistence.Init()
+			if err := persistence.Init(); err != nil {
+				output.Errorf(err.Error())
+				return
+			}
 			if err := deployPreRunForDocker(&ctx); err != nil {
 				output.Errorf(err.Error())
 				return

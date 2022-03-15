@@ -19,11 +19,12 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
+	"html/template"
+
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
-	"html/template"
 )
 
 var (
@@ -56,11 +57,6 @@ func deployPreRunForDocker(ctx *deployContext) error {
 		return fmt.Errorf("Failed to save cloud lua module: %s", err)
 	}
 	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
-
-	//essentialConfig, err := cloud.DefaultClient.GetDockerJoinConfig(cp.ID)
-	//if err != nil {
-	//	return fmt.Errorf("Failed to get docker join config: %s", err)
-	//}
 
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
 	ctx.ControlPlane = cp

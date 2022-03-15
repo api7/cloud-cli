@@ -152,7 +152,9 @@ etcd:
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
-			persistence.Init()
+			if err := persistence.Init(); err != nil {
+				panic(err)
+			}
 
 			defer func() {
 				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.crt"))
