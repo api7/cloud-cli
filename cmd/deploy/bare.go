@@ -36,6 +36,7 @@ import (
 
 //go:embed manifest/install.sh
 var _installScript string
+var installer = template.Must(template.New("install script").Parse(_installScript))
 
 var APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
 
@@ -98,7 +99,6 @@ cloud-cli deploy bare \
 				}
 			}
 
-			installer := template.Must(template.New("install script").Parse(_installScript))
 			buf := bytes.NewBuffer(nil)
 			err = installer.Execute(buf, &installContext{
 				APISIXRepoURL: APISIXRepoURL,
@@ -131,6 +131,7 @@ cloud-cli deploy bare \
 			bare.AppendArgs(installerFile)
 
 			if err = bare.Execute(context); err != nil {
+				output.Errorf(err.Error())
 				return
 			}
 		},
