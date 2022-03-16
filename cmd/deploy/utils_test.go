@@ -19,7 +19,6 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"github.com/api7/cloud-cli/internal/commands"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
