@@ -16,40 +16,37 @@
 package commands
 
 import (
-	"bytes"
 	"context"
+	"os"
+	"os/exec"
+	"strings"
+
+	"github.com/pkg/errors"
 )
 
-type Cmd interface {
-	// AppendArgs appends a couple of args to the Cmd.
-	AppendArgs(args ...string)
-	// String prints the command.
-	String() string
-	// Run launches the command and return the stdout, stderr.
-	Run(ctx context.Context) (string, string, error)
+// AppendArgs appends a couple of args to the Cmd object.
+func (c *cmd) AppendArgs(args ...string) {
+	c.args = append(c.args, args...)
 }
 
-// Cmd wraps the os/exec.Cmd object.
-type cmd struct {
-	name   string
-	args   []string
-	stdout *bytes.Buffer
-	stderr *bytes.Buffer
-
-	dryrun bool
+// String prints the command.
+func (c *cmd) String() string {
+	return c.name + " " + strings.Join(c.args, " ")
 }
 
-// New creates a Cmd object.
-func New(name string, dryrun bool) Cmd {
-	if dryrun {
-		return &cmd{
-			name:   name,
-			dryrun: true,
-		}
+// Run launches the command and return the stdout, stderr.
+func (c *cmd) Run(ctx context.Context) (string, string, error) {
+	if c.dryrun {
+		return "", "", nil
 	}
-	return &cmd{
-		name:   name,
-		stdout: bytes.NewBuffer(nil),
-		stderr: bytes.NewBuffer(nil),
+	cmd := exec.CommandContext(ctx, c.name, c.args...)
+	cmd.Env = os.Environ()
+	cmd.Stdout = c.stdout
+	cmd.Stderr = c.stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return c.stdout.String(), c.stderr.String(), errors.Wrap(err, c.name)
 	}
+	return c.stdout.String(), c.stderr.String(), nil
 }

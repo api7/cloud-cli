@@ -56,7 +56,7 @@ cloud-cli deploy docker \
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
-				docker *commands.Cmd
+				docker commands.Cmd
 				data   []byte
 				err    error
 			)
