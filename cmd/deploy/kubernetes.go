@@ -36,7 +36,7 @@ cloud-cli deploy kubernetes \
 		--namespace apisix \
 		--apisix-image apisix/apisix:2.11.0 \
 		--helm-install-arg --output=table \
-		--helm-install-arg --description=this is a description`,
+		--helm-install-arg --wait`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
