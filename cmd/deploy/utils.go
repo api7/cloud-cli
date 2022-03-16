@@ -184,7 +184,7 @@ func createOnKubernetes(ctx *deployContext, k kind) error {
 	stdout, stderr, err := kubectl.Run(newCtx)
 	if stderr != "" {
 		output.Warnf(stderr)
-		// if stderr contains AlreadyExists flag, we don't think it's a error
+		// if stderr contains AlreadyExists flag, we don't think it's an error
 		if strings.Contains(stderr, "AlreadyExists") {
 			err = nil
 		}
