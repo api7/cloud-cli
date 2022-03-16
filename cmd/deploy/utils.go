@@ -49,7 +49,7 @@ type kind string
 var (
 	configMap kind = "configMap"
 	secret    kind = "secret"
-	nameSpace kind = "nameSpace"
+	namespace kind = "namespace"
 )
 
 type deployContext struct {
