@@ -36,7 +36,7 @@ import (
 
 //go:embed manifest/install.sh
 var _installScript string
-var installer = template.Must(template.New("install script").Parse(_installScript))
+var installer *template.Template
 
 var APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
 
@@ -45,6 +45,10 @@ type installContext struct {
 	TLSDir        string
 	ConfigFile    string
 	Version       string
+}
+
+func init() {
+	installer = template.Must(template.New("install script").Parse(_installScript))
 }
 
 func newBareCommand() *cobra.Command {
