@@ -43,9 +43,9 @@ type deployContext struct {
 }
 
 type config struct {
-	CloudLuaModuleDir string
-	TLSDir            string
-	Domain            string
+	CloudLuaModuleDir  string
+	TLSDir             string
+	ControlPlaneDomain string
 }
 
 func deployPreRunForDocker(ctx *deployContext) error {
@@ -56,9 +56,9 @@ func deployPreRunForDocker(ctx *deployContext) error {
 
 	buf := bytes.NewBuffer(nil)
 	if err := essentialConfigTemplate.Execute(buf, &config{
-		CloudLuaModuleDir: "/cloud_lua_module",
-		TLSDir:            "/cloud/tls",
-		Domain:            ctx.ControlPlane.Domain,
+		CloudLuaModuleDir:  "/cloud_lua_module",
+		TLSDir:             "/cloud/tls",
+		ControlPlaneDomain: ctx.ControlPlane.Domain,
 	}); err != nil {
 		return fmt.Errorf("Failed to execute essential config template: %s", err)
 	}
@@ -75,9 +75,9 @@ func deployPreRunForBare(ctx *deployContext) error {
 
 	buf := bytes.NewBuffer(nil)
 	if err := essentialConfigTemplate.Execute(buf, &config{
-		CloudLuaModuleDir: ctx.cloudLuaModuleDir,
-		TLSDir:            ctx.tlsDir,
-		Domain:            ctx.ControlPlane.Domain,
+		CloudLuaModuleDir:  ctx.cloudLuaModuleDir,
+		TLSDir:             "/usr/local/apisix/certs",
+		ControlPlaneDomain: ctx.ControlPlane.Domain,
 	}); err != nil {
 		return fmt.Errorf("Failed to execute essential config template: %s", err)
 	}
