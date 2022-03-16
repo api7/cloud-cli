@@ -17,21 +17,39 @@ package deploy
 
 import (
 	"bytes"
+	"context"
 	_ "embed"
 	"fmt"
 	"html/template"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/commands"
+	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
 	//go:embed apisix.yaml
 	essentialConfig string
+	//go:embed apisix_chart_values.yaml
+	helmEssentialConfig string
 
-	essentialConfigTemplate = template.Must(template.New("essential config").Parse(essentialConfig))
+	essentialConfigTemplate     = template.Must(template.New("essential config").Parse(essentialConfig))
+	helmEssentialConfigTemplate = template.Must(template.New("helm essential config").Parse(helmEssentialConfig))
+)
+
+type kind string
+
+var (
+	configMap kind = "configMap"
+	secret    kind = "secret"
+	nameSpace kind = "nameSpace"
 )
 
 type deployContext struct {
@@ -39,7 +57,8 @@ type deployContext struct {
 	tlsDir            string
 	essentialConfig   []byte
 	// ControlPlane is the current control plane.
-	ControlPlane *types.ControlPlane
+	ControlPlane   *types.ControlPlane
+	KubernetesOpts *options.KubernetesDeployOptions
 }
 
 func deployPreRunForDocker(ctx *deployContext) error {
@@ -67,5 +86,111 @@ func deployPreRunForDocker(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
+	return nil
+}
+
+func deployPreRunForKubernetes(ctx *deployContext) error {
+	opts := &options.Global.Deploy.Kubernetes
+	image := strings.Split(opts.APISIXImage, ":")
+	opts.APISIXImageRepo = image[0]
+	if len(image) > 1 {
+		opts.APISIXImageTag = image[1]
+	} else {
+		opts.APISIXImageTag = "latest"
+	}
+	ctx.KubernetesOpts = opts
+
+	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
+	if err != nil {
+		return fmt.Errorf("Failed to get default control plane: %v", err.Error())
+	}
+	if err = persistence.PrepareCertificate(cp.ID); err != nil {
+		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
+	}
+	ctx.tlsDir = persistence.TLSDir
+
+	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
+	if err != nil {
+		return fmt.Errorf("Failed to save cloud lua module: %s", err.Error())
+	}
+	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
+	ctx.cloudLuaModuleDir = cloudLuaModuleDir
+
+	ctx.ControlPlane = cp
+	buf := bytes.NewBuffer(nil)
+	if err = helmEssentialConfigTemplate.Execute(buf, ctx); err != nil {
+		return fmt.Errorf("Failed to execute helm essential config template: %s", err.Error())
+	}
+	ctx.essentialConfig = buf.Bytes()
+
+	if err = createOnKubernetes(ctx, nameSpace); err != nil {
+		return fmt.Errorf("Failed to create namespace on kubernetes: %s", err.Error())
+	}
+	if err = createOnKubernetes(ctx, secret); err != nil {
+		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
+	}
+	if err = createOnKubernetes(ctx, configMap); err != nil {
+		return fmt.Errorf("Failed to create configmap on kubernetes: %s", err.Error())
+	}
+
+	return nil
+}
+
+// createOnKubernetes create namespace, secret or configmap on Kubernetes
+func createOnKubernetes(ctx *deployContext, k kind) error {
+	var (
+		kubectl *commands.Cmd
+		err     error
+	)
+
+	opts := ctx.KubernetesOpts
+	if opts.KubectlCLIPath == "" {
+		opts.KubectlCLIPath = "kubectl"
+	}
+	kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
+
+	switch k {
+	case secret:
+		kubectl.AppendArgs("create", "secret", "generic", "cloud-ssl")
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.crt=%s", filepath.Join(ctx.tlsDir, "tls.crt")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.key=%s", filepath.Join(ctx.tlsDir, "tls.key")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("ca.crt=%s", filepath.Join(ctx.tlsDir, "ca.crt")))
+		kubectl.AppendArgs("--namespace", opts.NameSpace)
+	case configMap:
+		kubectl.AppendArgs("create", "configmap", "cloud-module")
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud.ljbc")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-agent.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-agent.ljbc")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-metrics.ljbc")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-utils.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-utils.ljbc")))
+		kubectl.AppendArgs("--namespace", opts.NameSpace)
+	case nameSpace:
+		kubectl.AppendArgs("create", "ns", opts.NameSpace)
+	default:
+		return fmt.Errorf("invaild kind: %s", k)
+	}
+
+	if options.Global.DryRun {
+		output.Infof("Running:\n%s\n", kubectl.String())
+	} else {
+		output.Verbosef("Running:\n%s\n", kubectl.String())
+	}
+
+	newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*1)
+	defer cancel()
+	go utils.WaitForSignal(func() {
+		cancel()
+	})
+
+	stdout, stderr, err := kubectl.Run(newCtx)
+	if stderr != "" {
+		output.Warnf(stderr)
+	}
+	if stdout != "" {
+		output.Verbosef(stdout)
+	}
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
