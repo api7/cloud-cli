@@ -407,7 +407,7 @@ etcd:
 
 			err := deployPreRunForKubernetes(ctx)
 			if tc.errorReason != "" {
-				assert.Equal(t, tc.errorReason, err.Error(), "check error")
+				assert.Contains(t, err.Error(), tc.errorReason, "check error")
 			} else {
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Equal(t, tc.filledContext.essentialConfig, ctx.essentialConfig, "check essential config")
