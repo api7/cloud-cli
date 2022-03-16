@@ -43,15 +43,9 @@ func TestBareMetalDeployCommand(t *testing.T) {
 		mockCloud  func(t *testing.T)
 	}{
 		{
-			name: "test deploy bare metal command",
-			args: []string{"bare", "--apisix-version", "2.11.0"},
-			cmdPattern: fmt.Sprintf(`yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
-yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
-yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/.*.rpm
-apisix start -c .*/apisix-config-\d+\.yaml
-PASS
-`, os.Getenv("HOME"), os.Getenv("HOME")),
+			name:       "test deploy bare metal command",
+			args:       []string{"bare", "--apisix-version", "2.11.0"},
+			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -88,55 +82,6 @@ PASS
 
 				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
 
-				cloud.DefaultClient = api
-			},
-		},
-		{
-			name: "test deploy bare metal command with apisix config",
-			args: []string{"bare", "--apisix-version", "2.11.0", "--apisix-config", "./testdata/apisix.yaml"},
-			cmdPattern: fmt.Sprintf(`yum install -y https://repos\.apiseven\.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
-yum-config-manager --add-repo https://repos\.apiseven\.com/packages/centos/apache-apisix\.repo
-yum install -y --downloadonly --downloaddir=%s/\.api7cloud/rpm apisix-2\.11\.0
-yum install -y %s/\.api7cloud/rpm/.*.rpm
-apisix start -c .*/apisix-config-\d+\.yaml
-PASS
-`, os.Getenv("HOME"), os.Getenv("HOME")),
-			mockCloud: func(t *testing.T) {
-				ctrl := gomock.NewController(t)
-				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
-					},
-					OrganizationID: "org1",
-				}, nil)
-				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
-					Certificate:   "1",
-					PrivateKey:    "1",
-					CACertificate: "1",
-				}, nil)
-
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
-
-				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
 				cloud.DefaultClient = api
 			},
 		},

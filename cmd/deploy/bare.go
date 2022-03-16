@@ -16,8 +16,13 @@
 package deploy
 
 import (
+	"bytes"
 	"context"
+	_ "embed"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"text/template"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -28,6 +33,18 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
+
+//go:embed manifest/install.sh
+var _installScript string
+
+var APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
+
+type installContext struct {
+	APISIXRepoURL string
+	TLSDir        string
+	ConfigFile    string
+	Version       string
+}
 
 func newBareCommand() *cobra.Command {
 	var (
@@ -53,21 +70,12 @@ cloud-cli deploy bare \
 			context, cancel := context.WithTimeout(context.TODO(), 5*time.Minute)
 			defer cancel()
 
+			var (
+				err  error
+				data []byte
+			)
 			opts := options.Global.Deploy.Bare
-			path, err := persistence.DownloadRPM(context, opts.APISIXVersion)
-			if err != nil {
-				output.Errorf(err.Error())
-				return
-			}
-			if path != "" {
-				installer := commands.New("yum", options.Global.DryRun)
-				installer.AppendArgs("install", "-y", path)
-				if err := installer.Execute(context); err != nil {
-					return
-				}
-			}
 
-			var data []byte
 			if options.Global.Deploy.APISIXConfigFile != "" {
 				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
 				if err != nil {
@@ -90,12 +98,38 @@ cloud-cli deploy bare \
 				}
 			}
 
-			bare := commands.New("apisix", options.Global.DryRun)
-			bare.AppendArgs("start")
-
-			if configFile != "" {
-				bare.AppendArgs("-c", configFile)
+			installer := template.Must(template.New("install script").Parse(_installScript))
+			buf := bytes.NewBuffer(nil)
+			err = installer.Execute(buf, &installContext{
+				APISIXRepoURL: APISIXRepoURL,
+				TLSDir:        ctx.tlsDir,
+				ConfigFile:    configFile,
+				Version:       opts.APISIXVersion,
+			})
+			if err != nil {
+				output.Errorf(err.Error())
+				return
 			}
+			installerPath := filepath.Join(persistence.HomeDir, "scripts")
+			err = os.Mkdir(installerPath, 0755)
+			if err != nil {
+				if !os.IsExist(err) {
+					output.Errorf(err.Error())
+					return
+				}
+			}
+
+			installerFile := filepath.Join(installerPath, "install.sh")
+			err = os.WriteFile(installerFile, buf.Bytes(), 0755)
+			if err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
+			bare := commands.New("/usr/bin/bash", options.Global.DryRun)
+			bare.AppendArgs("-C")
+			bare.AppendArgs(installerFile)
+
 			if err = bare.Execute(context); err != nil {
 				return
 			}
