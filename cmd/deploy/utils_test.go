@@ -272,7 +272,7 @@ func TestDeployPreRunForBare(t *testing.T) {
 				essentialConfig: []byte(`apisix:
   enable_admin: false
   ssl:
-    ssl_trusted_certificate: .*/tls/ca\.crt
+    ssl_trusted_certificate: /usr/local/apisix/certs/ca\.crt
   lua_module_hook: cloud
   extra_lua_path: .*/.api7cloud/\?\.ljbc;
 nginx_config:
@@ -283,8 +283,8 @@ etcd:
   host:
     - "https://foo.com:443"
   tls:
-    cert: .*/.api7cloud/tls/tls.crt
-    key: .*/.api7cloud/tls/tls.key
+    cert: /usr/local/apisix/certs/tls.crt
+    key: /usr/local/apisix/certs/tls.key
     sni: foo.com
     verify: true
 `),

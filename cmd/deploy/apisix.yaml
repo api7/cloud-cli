@@ -10,9 +10,9 @@ nginx_config:
       cloud: 1m
 etcd:
   host:
-    - "https://{{ .Domain }}:443"
+    - "https://{{ .ControlPlaneDomain }}:443"
   tls:
     cert: {{ .TLSDir }}/tls.crt
     key: {{ .TLSDir }}/tls.key
-    sni: {{ .Domain }}
+    sni: {{ .ControlPlaneDomain }}
     verify: true
