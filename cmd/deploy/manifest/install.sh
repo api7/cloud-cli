@@ -6,7 +6,7 @@ if [[ $? -ne 0 ]]; then
   yum install -y apisix-{{ .Version }}
 else
   ori_version=$(echo $ori_version |grep -o "{{ .Version }}")
-  if [[ $org_version != "" ]]; then
+  if [[ $org_version == "" ]]; then
     echo "another version of Apache APISIX have already installed."
     exit 1
   fi
