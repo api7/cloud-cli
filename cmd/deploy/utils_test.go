@@ -178,12 +178,11 @@ etcd:
 
 func TestDeployPreRunForKubernetes(t *testing.T) {
 	testCases := []struct {
-		name           string
-		errorReason    string
-		mockFn         func(t *testing.T)
-		filledContext  deployContext
-		checkSecret    func()
-		checkConfigMap func()
+		name          string
+		errorReason   string
+		mockFn        func(t *testing.T)
+		filledContext deployContext
+		globalOptions options.Options
 	}{
 		{
 			name:        "failed to get default control plane",
@@ -229,6 +228,59 @@ func TestDeployPreRunForKubernetes(t *testing.T) {
 				mockClient.EXPECT().GetCloudLuaModule().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
 			},
+		},
+		{
+			name: "create namespace, secret or configMap on kubernetes failed",
+			mockFn: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "3",
+					},
+					Domain: "foo.com",
+				}, nil)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				buffer := bytes.NewBuffer(nil)
+				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
+				assert.NoError(t, err, "create gzip writer")
+				tarWriter := tar.NewWriter(gzipWriter)
+				body := "hello world"
+				hdr := &tar.Header{
+					Name: "foo.txt",
+					Size: int64(len(body)),
+				}
+				err = tarWriter.WriteHeader(hdr)
+				assert.NoError(t, err, "write tar header")
+				_, err = tarWriter.Write([]byte(body))
+				assert.NoError(t, err, "write tar body")
+				err = tarWriter.Flush()
+				assert.NoError(t, err, "flush tar body")
+				err = tarWriter.Close()
+				assert.NoError(t, err, "close tar writer")
+				err = gzipWriter.Close()
+				assert.NoError(t, err, "close gzip writer")
+				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+
+				cloud.DefaultClient = mockClient
+			},
+			globalOptions: options.Options{
+				Verbose: true,
+				Deploy: options.DeployOptions{
+					Kubernetes: options.KubernetesDeployOptions{
+						NameSpace:      "apisix",
+						APISIXImage:    "apache/apisix:2.11.0-centos",
+						ReplicaCount:   1,
+						KubectlCLIPath: "/tmp/kubectl",
+					},
+				},
+			},
+			errorReason: "/tmp/kubectl",
 		},
 		{
 			name: "deploy on kubernetes pre run was succeed",
@@ -316,14 +368,13 @@ etcd:
       certFilename: tls.crt
       certKeyFilename: tls.key
 `),
+				KubernetesOpts: &options.KubernetesDeployOptions{
+					NameSpace:    "apisix",
+					APISIXImage:  "apache/apisix:2.11.0-centos",
+					ReplicaCount: 1,
+				},
 			},
-		},
-	}
-
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			options.Global = options.Options{
+			globalOptions: options.Options{
 				DryRun:  true,
 				Verbose: true,
 				Deploy: options.DeployOptions{
@@ -333,8 +384,14 @@ etcd:
 						ReplicaCount: 1,
 					},
 				},
-			}
+			},
+		},
+	}
 
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			options.Global = tc.globalOptions
 			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
 			if err := persistence.Init(); err != nil {
 				panic(err)

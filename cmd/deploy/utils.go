@@ -123,7 +123,7 @@ func deployPreRunForKubernetes(ctx *deployContext) error {
 	}
 	ctx.essentialConfig = buf.Bytes()
 
-	if err = createOnKubernetes(ctx, nameSpace); err != nil {
+	if err = createOnKubernetes(ctx, namespace); err != nil {
 		return fmt.Errorf("Failed to create namespace on kubernetes: %s", err.Error())
 	}
 	if err = createOnKubernetes(ctx, secret); err != nil {
@@ -163,7 +163,7 @@ func createOnKubernetes(ctx *deployContext, k kind) error {
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-metrics.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-utils.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud-utils.ljbc")))
 		kubectl.AppendArgs("--namespace", opts.NameSpace)
-	case nameSpace:
+	case namespace:
 		kubectl.AppendArgs("create", "ns", opts.NameSpace)
 	default:
 		return fmt.Errorf("invaild kind: %s", k)
@@ -184,6 +184,10 @@ func createOnKubernetes(ctx *deployContext, k kind) error {
 	stdout, stderr, err := kubectl.Run(newCtx)
 	if stderr != "" {
 		output.Warnf(stderr)
+		// if stderr contains AlreadyExists flag, we don't think it's a error
+		if strings.Contains(stderr, "AlreadyExists") {
+			err = nil
+		}
 	}
 	if stdout != "" {
 		output.Verbosef(stdout)
