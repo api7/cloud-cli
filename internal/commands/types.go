@@ -20,6 +20,7 @@ import (
 	"context"
 )
 
+// Cmd is the command constructor and runner.
 type Cmd interface {
 	// AppendArgs appends a couple of args to the Cmd.
 	AppendArgs(args ...string)
