@@ -29,7 +29,7 @@ func newKubernetesCommand() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "kubernetes [ARGS...]",
-		Short: "Deploy Apache APISIX on kubernetes",
+		Short: "Deploy Apache APISIX on Kubernetes",
 		Example: `
 cloud-cli deploy kubernetes \
 		--name apisix \
