@@ -18,6 +18,7 @@ package deploy
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -27,6 +28,7 @@ func newKubernetesCommand() *cobra.Command {
 	var (
 		ctx deployContext
 	)
+
 	cmd := &cobra.Command{
 		Use:   "kubernetes [ARGS...]",
 		Short: "Deploy Apache APISIX on Kubernetes",
@@ -38,11 +40,17 @@ cloud-cli deploy kubernetes \
 		--helm-install-arg --output=table \
 		--helm-install-arg --wait`,
 		PreRun: func(cmd *cobra.Command, args []string) {
+			opts := &options.Global.Deploy.Kubernetes
+			if opts.KubectlCLIPath == "" {
+				opts.KubectlCLIPath = "kubectl"
+			}
+			kubectl := commands.New(opts.KubectlCLIPath, options.Global.DryRun)
+
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
 				return
 			}
-			if err := deployPreRunForKubernetes(&ctx); err != nil {
+			if err := deployPreRunForKubernetes(&ctx, kubectl); err != nil {
 				output.Errorf(err.Error())
 				return
 			}

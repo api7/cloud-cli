@@ -89,7 +89,7 @@ func deployPreRunForDocker(ctx *deployContext) error {
 	return nil
 }
 
-func deployPreRunForKubernetes(ctx *deployContext) error {
+func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	opts := &options.Global.Deploy.Kubernetes
 	image := strings.Split(opts.APISIXImage, ":")
 	opts.APISIXImageRepo = image[0]
@@ -123,13 +123,13 @@ func deployPreRunForKubernetes(ctx *deployContext) error {
 	}
 	ctx.essentialConfig = buf.Bytes()
 
-	if err = createOnKubernetes(ctx, namespace); err != nil {
+	if err = createOnKubernetes(ctx, namespace, kubectl); err != nil {
 		return fmt.Errorf("Failed to create namespace on kubernetes: %s", err.Error())
 	}
-	if err = createOnKubernetes(ctx, secret); err != nil {
+	if err = createOnKubernetes(ctx, secret, kubectl); err != nil {
 		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
 	}
-	if err = createOnKubernetes(ctx, configMap); err != nil {
+	if err = createOnKubernetes(ctx, configMap, kubectl); err != nil {
 		return fmt.Errorf("Failed to create configmap on kubernetes: %s", err.Error())
 	}
 
@@ -137,17 +137,11 @@ func deployPreRunForKubernetes(ctx *deployContext) error {
 }
 
 // createOnKubernetes create namespace, secret or configmap on Kubernetes
-func createOnKubernetes(ctx *deployContext, k kind) error {
+func createOnKubernetes(ctx *deployContext, k kind, kubectl commands.Cmd) error {
 	var (
-		kubectl *commands.Cmd
-		err     error
+		err  error
+		opts = ctx.KubernetesOpts
 	)
-
-	opts := ctx.KubernetesOpts
-	if opts.KubectlCLIPath == "" {
-		opts.KubectlCLIPath = "kubectl"
-	}
-	kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
 
 	switch k {
 	case secret:
