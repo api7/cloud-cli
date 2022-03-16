@@ -44,12 +44,12 @@ var (
 	helmEssentialConfigTemplate = template.Must(template.New("helm essential config").Parse(helmEssentialConfig))
 )
 
-type kind string
+type kind uint8
 
-var (
-	configMap kind = "configMap"
-	secret    kind = "secret"
-	namespace kind = "namespace"
+const (
+	configMap kind = iota
+	secret
+	namespace
 )
 
 type deployContext struct {
@@ -166,7 +166,7 @@ func createOnKubernetes(ctx *deployContext, k kind) error {
 	case namespace:
 		kubectl.AppendArgs("create", "ns", opts.NameSpace)
 	default:
-		return fmt.Errorf("invaild kind: %s", k)
+		panic(fmt.Sprintf("invaild kind: %d", k))
 	}
 
 	if options.Global.DryRun {
