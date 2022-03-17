@@ -28,6 +28,8 @@ type Cmd interface {
 	String() string
 	// Run launches the command and return the stdout, stderr.
 	Run(ctx context.Context) (string, string, error)
+	// Execute launches the command and return error, and print stdout and stderr to console.
+	Execute(ctx context.Context) error
 }
 
 // Cmd wraps the os/exec.Cmd object.
