@@ -95,7 +95,7 @@ func deployPreRunForBare(ctx *deployContext) error {
 	buf := bytes.NewBuffer(nil)
 	if err := essentialConfigTemplate.Execute(buf, &config{
 		CloudLuaModuleDir:  ctx.cloudLuaModuleDir,
-		TLSDir:             "/usr/local/apisix/certs",
+		TLSDir:             "/usr/local/apisix/conf/certs",
 		ControlPlaneDomain: ctx.ControlPlane.Domain,
 	}); err != nil {
 		return fmt.Errorf("Failed to execute essential config template: %s", err)
