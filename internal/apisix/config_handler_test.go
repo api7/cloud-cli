@@ -169,7 +169,7 @@ func TestSaveConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			filename, err := SaveConfig(tc.config)
+			filename, err := SaveConfig(tc.config, "apisix-config-*.yaml")
 			if tc.errorReason != "" {
 				assert.NotNil(t, err, "check if err is not nil")
 				assert.Equal(t, tc.errorReason, err.Error(), "check error")
