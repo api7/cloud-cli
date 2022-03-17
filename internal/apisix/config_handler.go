@@ -45,12 +45,12 @@ func MergeConfig(config []byte, defaultConfig []byte) (map[string]interface{}, e
 }
 
 // SaveConfig saves the config to the temporary file and return its name.
-func SaveConfig(config map[string]interface{}) (string, error) {
+func SaveConfig(config map[string]interface{}, pattern string) (string, error) {
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return "", errors.Wrap(err, "marshal config")
 	}
-	tempFile, err := ioutil.TempFile("", "apisix-config-*.yaml")
+	tempFile, err := ioutil.TempFile("", pattern)
 	if err != nil {
 		return "", err
 	}
