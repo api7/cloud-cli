@@ -43,6 +43,8 @@ type DeployOptions struct {
 	APISIXConfigFile string
 	// Docker contains the options for the deploy docker command.
 	Docker DockerDeployOptions
+	// KubernetesDeployOptions contains options for the kubernetes or helm command.
+	Kubernetes KubernetesDeployOptions
 }
 
 // DockerDeployOptions contains options for the deploy docker command.
@@ -53,4 +55,24 @@ type DockerDeployOptions struct {
 	DockerRunArgs []string
 	// DockerCLIPath is the filepath of the docker command.
 	DockerCLIPath string
+}
+
+// KubernetesDeployOptions contains options for the kubectl or helm command.
+type KubernetesDeployOptions struct {
+	// NameSpace is the name space of kubernetes
+	NameSpace string
+	// APISIXImage is the name of the APISIX image to deploy.
+	APISIXImage string `validate:"image"`
+	// APISIXImageRepo is the APISIXImage name
+	APISIXImageRepo string
+	// APISIXImageTag is the APISIXImage tag
+	APISIXImageTag string
+	// ReplicaCount is the pod replica count
+	ReplicaCount uint
+	// HelmInstallArgs contains a series of arguments to pass to the helm install command.
+	HelmInstallArgs []string
+	// KubectlCLIPath is the filepath of the kubectl command.
+	KubectlCLIPath string
+	// HelmCLIPath is the filepath of the helm command.
+	HelmCLIPath string
 }

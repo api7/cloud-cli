@@ -16,6 +16,7 @@
 package commands
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"os/exec"
@@ -36,6 +37,11 @@ func (c *cmd) String() string {
 
 // Run launches the command and return the stdout, stderr.
 func (c *cmd) Run(ctx context.Context) (string, string, error) {
+	defer func() {
+		c.args = nil
+		c.stdout = bytes.NewBuffer(nil)
+		c.stderr = bytes.NewBuffer(nil)
+	}()
 	if c.dryrun {
 		return "", "", nil
 	}
