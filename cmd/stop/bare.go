@@ -30,7 +30,7 @@ import (
 func newStopBareCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "bare",
-		Short: "Stop Apache APISIX on bare metal (only CentOS 7) ",
+		Short: "Stop Apache APISIX on bare metal (only CentOS 7)",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Minute)
 			go utils.WaitForSignal(func() {
