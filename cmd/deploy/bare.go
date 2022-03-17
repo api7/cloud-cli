@@ -97,7 +97,7 @@ cloud-cli deploy bare \
 
 			var configFile string
 			if len(mergedConfig) > 0 {
-				configFile, err = apisix.SaveConfig(mergedConfig)
+				configFile, err = apisix.SaveConfig(mergedConfig, "apisix-config-*.yaml")
 				if err != nil {
 					output.Errorf(err.Error())
 					return
