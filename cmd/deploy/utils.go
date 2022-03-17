@@ -61,7 +61,51 @@ type deployContext struct {
 	KubernetesOpts *options.KubernetesDeployOptions
 }
 
+type config struct {
+	CloudLuaModuleDir  string
+	TLSDir             string
+	ControlPlaneDomain string
+}
+
 func deployPreRunForDocker(ctx *deployContext) error {
+	err := deployPreRun(ctx)
+	if err != nil {
+		return err
+	}
+
+	buf := bytes.NewBuffer(nil)
+	if err := essentialConfigTemplate.Execute(buf, &config{
+		CloudLuaModuleDir:  "/cloud_lua_module",
+		TLSDir:             "/cloud/tls",
+		ControlPlaneDomain: ctx.ControlPlane.Domain,
+	}); err != nil {
+		return fmt.Errorf("Failed to execute essential config template: %s", err)
+	}
+
+	ctx.essentialConfig = buf.Bytes()
+	return nil
+}
+
+func deployPreRunForBare(ctx *deployContext) error {
+	err := deployPreRun(ctx)
+	if err != nil {
+		return err
+	}
+
+	buf := bytes.NewBuffer(nil)
+	if err := essentialConfigTemplate.Execute(buf, &config{
+		CloudLuaModuleDir:  ctx.cloudLuaModuleDir,
+		TLSDir:             "/usr/local/apisix/conf/ssl",
+		ControlPlaneDomain: ctx.ControlPlane.Domain,
+	}); err != nil {
+		return fmt.Errorf("Failed to execute essential config template: %s", err)
+	}
+
+	ctx.essentialConfig = buf.Bytes()
+	return nil
+}
+
+func deployPreRun(ctx *deployContext) error {
 	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
 	if err != nil {
 		return fmt.Errorf("Failed to get default control plane: %s", err.Error())
@@ -79,13 +123,6 @@ func deployPreRunForDocker(ctx *deployContext) error {
 
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
 	ctx.ControlPlane = cp
-
-	buf := bytes.NewBuffer(nil)
-	if err := essentialConfigTemplate.Execute(buf, ctx); err != nil {
-		return fmt.Errorf("Failed to execute essential config template: %s", err)
-	}
-
-	ctx.essentialConfig = buf.Bytes()
 	return nil
 }
 

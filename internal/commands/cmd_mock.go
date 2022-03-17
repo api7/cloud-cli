@@ -50,6 +50,20 @@ func (mr *MockCmdMockRecorder) AppendArgs(args ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AppendArgs", reflect.TypeOf((*MockCmd)(nil).AppendArgs), args...)
 }
 
+// Execute mocks base method.
+func (m *MockCmd) Execute(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Execute", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Execute indicates an expected call of Execute.
+func (mr *MockCmdMockRecorder) Execute(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockCmd)(nil).Execute), ctx)
+}
+
 // Run mocks base method.
 func (m *MockCmd) Run(ctx context.Context) (string, string, error) {
 	m.ctrl.T.Helper()

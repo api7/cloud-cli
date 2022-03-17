@@ -43,6 +43,8 @@ type DeployOptions struct {
 	APISIXConfigFile string
 	// Docker contains the options for the deploy docker command.
 	Docker DockerDeployOptions
+	// Bare contains the options for the bare metal deployment command.
+	Bare BareDeployOptions
 	// KubernetesDeployOptions contains options for the kubernetes or helm command.
 	Kubernetes KubernetesDeployOptions
 }
@@ -75,4 +77,10 @@ type KubernetesDeployOptions struct {
 	KubectlCLIPath string
 	// HelmCLIPath is the filepath of the helm command.
 	HelmCLIPath string
+}
+
+// BareDeployOptions contains options for the bare metal deployment command.
+type BareDeployOptions struct {
+	// APISIXVersion specifies the APISIX version to deploy.
+	APISIXVersion string
 }
