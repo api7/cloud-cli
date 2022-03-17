@@ -43,5 +43,5 @@ func TestNewStopCommand(t *testing.T) {
 
 	output, err := cmd.CombinedOutput()
 	assert.NoError(t, err, "check if the command executed successfully")
-	assert.Contains(t, string(output), "apisix stop", "check if the composed docker command is correct")
+	assert.Contains(t, string(output), "apisix stop", "check if the stop command is correct on bare metal")
 }
