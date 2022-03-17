@@ -85,6 +85,49 @@ func TestBareMetalDeployCommand(t *testing.T) {
 				cloud.DefaultClient = api
 			},
 		},
+		{
+			name:       "test deploy bare metal command with apisix config",
+			args:       []string{"bare", "--apisix-version", "2.11.0", "--apisix-config", "./testdata/apisix.yaml"},
+			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
+			mockCloud: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				api := cloud.NewMockAPI(ctrl)
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
+					},
+					OrganizationID: "org1",
+				}, nil)
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+				buffer := bytes.NewBuffer(nil)
+				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
+				assert.NoError(t, err, "create gzip writer")
+				tarWriter := tar.NewWriter(gzipWriter)
+				body := "hello world"
+				hdr := &tar.Header{
+					Name: "foo.txt",
+					Size: int64(len(body)),
+				}
+				err = tarWriter.WriteHeader(hdr)
+				assert.NoError(t, err, "write tar header")
+				_, err = tarWriter.Write([]byte(body))
+				assert.NoError(t, err, "write tar body")
+				err = tarWriter.Flush()
+				assert.NoError(t, err, "flush tar body")
+				err = tarWriter.Close()
+				assert.NoError(t, err, "close tar writer")
+				err = gzipWriter.Close()
+				assert.NoError(t, err, "close gzip writer")
+
+				api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+
+				cloud.DefaultClient = api
+			},
+		},
 	}
 	for _, tc := range testCases {
 		tc := tc

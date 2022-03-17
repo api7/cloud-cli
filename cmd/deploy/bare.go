@@ -34,11 +34,12 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-//go:embed manifest/install.sh
-var _installScript string
-var installer *template.Template
-
-var APISIXRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
+var (
+	//go:embed manifest/install.sh
+	_installScript string
+	_installer     *template.Template
+	apisixRepoURL  = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
+)
 
 type installContext struct {
 	APISIXRepoURL string
@@ -48,7 +49,7 @@ type installContext struct {
 }
 
 func init() {
-	installer = template.Must(template.New("install script").Parse(_installScript))
+	_installer = template.Must(template.New("install script").Parse(_installScript))
 }
 
 func newBareCommand() *cobra.Command {
@@ -104,8 +105,8 @@ cloud-cli deploy bare \
 			}
 
 			buf := bytes.NewBuffer(nil)
-			err = installer.Execute(buf, &installContext{
-				APISIXRepoURL: APISIXRepoURL,
+			err = _installer.Execute(buf, &installContext{
+				APISIXRepoURL: apisixRepoURL,
 				TLSDir:        ctx.tlsDir,
 				ConfigFile:    configFile,
 				Version:       opts.APISIXVersion,
