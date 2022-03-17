@@ -21,7 +21,6 @@ import (
 
 	"github.com/api7/cloud-cli/cmd/configure"
 	"github.com/api7/cloud-cli/cmd/deploy"
-	"github.com/api7/cloud-cli/cmd/stop"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/version"
 )
@@ -37,7 +36,6 @@ func newCommand() *cobra.Command {
 
 	cmd.AddCommand(deploy.NewCommand())
 	cmd.AddCommand(configure.NewCommand())
-	cmd.AddCommand(stop.NewStopCommand())
 
 	return cmd
 }
