@@ -38,7 +38,7 @@ var (
 	//go:embed manifest/install.sh
 	_installScript string
 	_installer     *template.Template
-	apisixRepoURL  = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
+	_apisixRepoURL = "https://repos.apiseven.com/packages/centos/apache-apisix-repo-1.0-1.noarch.rpm"
 )
 
 type installContext struct {
@@ -106,7 +106,7 @@ cloud-cli deploy bare \
 
 			buf := bytes.NewBuffer(nil)
 			err = _installer.Execute(buf, &installContext{
-				APISIXRepoURL: apisixRepoURL,
+				APISIXRepoURL: _apisixRepoURL,
 				TLSDir:        ctx.tlsDir,
 				ConfigFile:    configFile,
 				Version:       opts.APISIXVersion,

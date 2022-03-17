@@ -8,6 +8,7 @@ if [[ $? -ne 0 ]]; then
   yum install -y apisix-$version
 fi
 
-cp -rf {{ .TLSDir }} /usr/local/apisix/conf/certs
+# copy certs to apisix directory to avoid permission issue
+cp -rf {{ .TLSDir }} /usr/local/apisix/conf/ssl
 
 apisix start -c {{ .ConfigFile }}
