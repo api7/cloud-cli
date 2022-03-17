@@ -154,7 +154,7 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			assert.NoError(t, err, "check if the command executed successfully")
 
 			for _, pattern := range tc.cmdPatterns {
-				assert.Regexp(t, pattern, string(output), "check if the composed docker command is correct")
+				assert.Regexp(t, pattern, string(output), "check if the kubectl and helm command is correct")
 			}
 		})
 	}
