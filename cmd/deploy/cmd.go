@@ -57,6 +57,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(newDockerCommand())
 	cmd.AddCommand(newBareCommand())
+	cmd.AddCommand(newKubernetesCommand())
 
 	return cmd
 }
