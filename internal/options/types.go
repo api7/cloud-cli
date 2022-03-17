@@ -27,6 +27,8 @@ type Options struct {
 	DryRun bool
 	// Deploy contains the options for the deploy command.
 	Deploy DeployOptions
+	// Stop contains the options for the stop command.
+	Stop StopOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -77,6 +79,23 @@ type KubernetesDeployOptions struct {
 	KubectlCLIPath string
 	// HelmCLIPath is the filepath of the helm command.
 	HelmCLIPath string
+}
+
+// StopOptions contains options for the stop command.
+type StopOptions struct {
+	// Name is an identifier of this deployment.
+	// It'll be container name if deploy on Docker;
+	// It'll be the Helm release name if deploy on Kubernetes;
+	// It'll be noop if deploy on Bare metal.
+	Name string
+	// Docker contains the options for the stop docker command.
+	Docker DockerStopOptions
+}
+
+// DockerStopOptions contains options for the stop docker command.
+type DockerStopOptions struct {
+	// DockerCLIPath is the filepath of the docker command.
+	DockerCLIPath string
 }
 
 // BareDeployOptions contains options for the bare metal deployment command.

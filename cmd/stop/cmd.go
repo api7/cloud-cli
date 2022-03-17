@@ -17,6 +17,8 @@ package stop
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/api7/cloud-cli/internal/options"
 )
 
 // NewStopCommand creates the stop sub-command object.
@@ -26,6 +28,9 @@ func NewStopCommand() *cobra.Command {
 		Short: "Stop Apache APISIX instance.",
 	}
 
+	cmd.PersistentFlags().StringVar(&options.Global.Stop.Name, "name", "apisix", "The identifier of this deployment, it would be the container name (on Docker), the helm release (on Kubernetes) and it's useless if APISIX is deployed on bare metal")
+
 	cmd.AddCommand(newStopBareCommand())
+	cmd.AddCommand(newStopDockerCommand())
 	return cmd
 }
