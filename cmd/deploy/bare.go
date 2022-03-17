@@ -58,7 +58,7 @@ func newBareCommand() *cobra.Command {
 	)
 	cmd := &cobra.Command{
 		Use:   "bare [ARGS...]",
-		Short: "Deploy Apache APISIX on bare metal (only CentOS 7) ",
+		Short: "Deploy Apache APISIX on bare metal (only CentOS 7)",
 		Example: `
 cloud-cli deploy bare \
 		--apisix-version 2.11.0`,
