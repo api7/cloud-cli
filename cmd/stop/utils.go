@@ -18,15 +18,13 @@ package stop
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
-
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
+	"strings"
 )
 
 func stopPreRunForKubernetes(kubectl commands.Cmd) error {
@@ -41,7 +39,7 @@ func stopPreRunForKubernetes(kubectl commands.Cmd) error {
 	return nil
 }
 
-func deleteOnKubernetes(kubectl commands.Cmd, k types.Kind) error {
+func deleteOnKubernetes(kubectl commands.Cmd, k types.K8sResourceKind) error {
 	opts := options.Global.Stop.Kubernetes
 
 	kubectl.AppendArgs("delete")
@@ -62,7 +60,7 @@ func deleteOnKubernetes(kubectl commands.Cmd, k types.Kind) error {
 		output.Verbosef("Running:\n%s\n", kubectl.String())
 	}
 
-	newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*1)
+	newCtx, cancel := context.WithTimeout(context.TODO(), consts.DefaultKubectlTimeout)
 	defer cancel()
 	go utils.WaitForSignal(func() {
 		cancel()

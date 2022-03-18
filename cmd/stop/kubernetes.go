@@ -17,10 +17,9 @@ package stop
 
 import (
 	"context"
-	"strings"
-	"time"
-
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/spf13/cobra"
+	"strings"
 
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
@@ -51,7 +50,7 @@ cloud-cli stop kubernetes \
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			ctx, cancel := context.WithTimeout(context.TODO(), time.Minute*3)
+			ctx, cancel := context.WithTimeout(context.TODO(), consts.DefaultHelmTimeout)
 			defer cancel()
 			go utils.WaitForSignal(func() {
 				cancel()

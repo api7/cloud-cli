@@ -20,11 +20,6 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"html/template"
-	"path/filepath"
-	"strings"
-	"time"
-
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -33,6 +28,9 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
+	"html/template"
+	"path/filepath"
+	"strings"
 )
 
 var (
@@ -167,7 +165,7 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 }
 
 // createOnKubernetes create namespace, secret or configmap on Kubernetes
-func createOnKubernetes(ctx *deployContext, k types.Kind, kubectl commands.Cmd) error {
+func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl commands.Cmd) error {
 	var (
 		err  error
 		opts = ctx.KubernetesOpts
@@ -199,7 +197,7 @@ func createOnKubernetes(ctx *deployContext, k types.Kind, kubectl commands.Cmd) 
 		output.Verbosef("Running:\n%s\n", kubectl.String())
 	}
 
-	newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*1)
+	newCtx, cancel := context.WithTimeout(context.TODO(), consts.DefaultKubectlTimeout)
 	defer cancel()
 	go utils.WaitForSignal(func() {
 		cancel()
