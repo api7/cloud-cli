@@ -21,9 +21,10 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestKubernetesStopCommand(t *testing.T) {
