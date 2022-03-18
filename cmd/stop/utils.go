@@ -18,13 +18,14 @@ package stop
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
-	"strings"
 )
 
 func stopPreRunForKubernetes(kubectl commands.Cmd) error {

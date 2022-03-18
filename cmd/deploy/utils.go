@@ -20,6 +20,10 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"html/template"
+	"path/filepath"
+	"strings"
+
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -28,9 +32,6 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
-	"html/template"
-	"path/filepath"
-	"strings"
 )
 
 var (
