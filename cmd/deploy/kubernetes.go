@@ -19,12 +19,12 @@ import (
 	"context"
 	"io/ioutil"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -80,7 +80,7 @@ cloud-cli deploy kubernetes \
 			}
 			helm := commands.New(ctx.KubernetesOpts.HelmCLIPath, options.Global.DryRun)
 
-			newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*5)
+			newCtx, cancel := context.WithTimeout(context.TODO(), consts.DefaultHelmTimeout)
 			defer cancel()
 			go utils.WaitForSignal(func() {
 				cancel()

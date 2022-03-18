@@ -23,10 +23,10 @@ import (
 	"html/template"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
+	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -42,14 +42,6 @@ var (
 
 	essentialConfigTemplate     = template.Must(template.New("essential config").Parse(essentialConfig))
 	helmEssentialConfigTemplate = template.Must(template.New("helm essential config").Parse(helmEssentialConfig))
-)
-
-type kind uint8
-
-const (
-	configMap kind = iota
-	secret
-	namespace
 )
 
 type deployContext struct {
@@ -160,13 +152,13 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	}
 	ctx.essentialConfig = buf.Bytes()
 
-	if err = createOnKubernetes(ctx, namespace, kubectl); err != nil {
+	if err = createOnKubernetes(ctx, types.Namespace, kubectl); err != nil {
 		return fmt.Errorf("Failed to create namespace on kubernetes: %s", err.Error())
 	}
-	if err = createOnKubernetes(ctx, secret, kubectl); err != nil {
+	if err = createOnKubernetes(ctx, types.Secret, kubectl); err != nil {
 		return fmt.Errorf("Failed to create secret on kubernetes: %s", err.Error())
 	}
-	if err = createOnKubernetes(ctx, configMap, kubectl); err != nil {
+	if err = createOnKubernetes(ctx, types.ConfigMap, kubectl); err != nil {
 		return fmt.Errorf("Failed to create configmap on kubernetes: %s", err.Error())
 	}
 
@@ -174,27 +166,27 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 }
 
 // createOnKubernetes create namespace, secret or configmap on Kubernetes
-func createOnKubernetes(ctx *deployContext, k kind, kubectl commands.Cmd) error {
+func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl commands.Cmd) error {
 	var (
 		err  error
 		opts = ctx.KubernetesOpts
 	)
 
 	switch k {
-	case secret:
-		kubectl.AppendArgs("create", "secret", "generic", "cloud-ssl")
+	case types.Secret:
+		kubectl.AppendArgs("create", "secret", "generic", consts.DefaultSecretName)
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.crt=%s", filepath.Join(ctx.tlsDir, "tls.crt")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.key=%s", filepath.Join(ctx.tlsDir, "tls.key")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("ca.crt=%s", filepath.Join(ctx.tlsDir, "ca.crt")))
 		kubectl.AppendArgs("--namespace", opts.NameSpace)
-	case configMap:
-		kubectl.AppendArgs("create", "configmap", "cloud-module")
+	case types.ConfigMap:
+		kubectl.AppendArgs("create", "configmap", consts.DefaultConfigMapName)
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-agent.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/agent.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/metrics.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-utils.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/utils.ljbc")))
 		kubectl.AppendArgs("--namespace", opts.NameSpace)
-	case namespace:
+	case types.Namespace:
 		kubectl.AppendArgs("create", "ns", opts.NameSpace)
 	default:
 		panic(fmt.Sprintf("invaild kind: %d", k))
@@ -206,7 +198,7 @@ func createOnKubernetes(ctx *deployContext, k kind, kubectl commands.Cmd) error 
 		output.Verbosef("Running:\n%s\n", kubectl.String())
 	}
 
-	newCtx, cancel := context.WithTimeout(context.TODO(), time.Minute*1)
+	newCtx, cancel := context.WithTimeout(context.TODO(), consts.DefaultKubectlTimeout)
 	defer cancel()
 	go utils.WaitForSignal(func() {
 		cancel()

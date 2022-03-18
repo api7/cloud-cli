@@ -15,6 +15,8 @@
 
 package consts
 
+import "time"
+
 const (
 	// Api7CloudAddrEnv is the environment variable used to specify the API7 Cloud address,
 	// e.g. https://console.api7.cloud
@@ -30,4 +32,18 @@ const (
 const (
 	// DefaultDeploymentName is the default name for the cloud-cli deploy operation.
 	DefaultDeploymentName = "apisix"
+)
+
+const (
+	// DefaultConfigMapName is the default name for the configMap when deploy on kubernetes
+	DefaultConfigMapName = "cloud-module"
+	// DefaultSecretName is the default name for the secret when deploy on kubernetes
+	DefaultSecretName = "cloud-ssl"
+)
+
+const (
+	// DefaultKubectlTimeout is the default timeout for execute kubectl command.
+	DefaultKubectlTimeout = time.Minute
+	// DefaultHelmTimeout is the default timeout for execute helm command.
+	DefaultHelmTimeout = time.Minute * 5
 )

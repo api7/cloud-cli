@@ -90,6 +90,8 @@ type StopOptions struct {
 	Name string
 	// Docker contains the options for the stop docker command.
 	Docker DockerStopOptions
+	// Kubernetes contains options for the kubectl or helm command.
+	Kubernetes KubernetesStopOptions
 }
 
 // DockerStopOptions contains options for the stop docker command.
@@ -102,4 +104,16 @@ type DockerStopOptions struct {
 type BareDeployOptions struct {
 	// APISIXVersion specifies the APISIX version to deploy.
 	APISIXVersion string
+}
+
+// KubernetesStopOptions contains options for the kubectl or helm command.
+type KubernetesStopOptions struct {
+	// NameSpace is the name space of kubernetes
+	NameSpace string
+	// HelmUnInstallArgs contains a series of arguments to pass to the helm uninstall command.
+	HelmUnInstallArgs []string
+	// KubectlCLIPath is the filepath of the kubectl command.
+	KubectlCLIPath string
+	// HelmCLIPath is the filepath of the helm command.
+	HelmCLIPath string
 }
