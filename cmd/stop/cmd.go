@@ -32,5 +32,6 @@ func NewStopCommand() *cobra.Command {
 
 	cmd.AddCommand(newStopBareCommand())
 	cmd.AddCommand(newStopDockerCommand())
+	cmd.AddCommand(newStopKubernetesCommand())
 	return cmd
 }

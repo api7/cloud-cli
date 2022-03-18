@@ -31,3 +31,10 @@ const (
 	// DefaultDeploymentName is the default name for the cloud-cli deploy operation.
 	DefaultDeploymentName = "apisix"
 )
+
+const (
+	// DefaultConfigMapName is the default name for the configMap when deploy on kubernetes
+	DefaultConfigMapName = "cloud-module"
+	// DefaultSecretName is the default name for the secret when deploy on kubernetes
+	DefaultSecretName = "cloud-ssl"
+)
