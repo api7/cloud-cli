@@ -345,9 +345,10 @@ func TestGetCloudLuaModule(t *testing.T) {
 	}
 }
 
-func TestGetDockerJoinConfig(t *testing.T) {
+func TestGetStartupConfig(t *testing.T) {
 	testCases := []struct {
 		name         string
+		configType   StartupConfigType
 		errorReason  string
 		code         int
 		expectedBody string
@@ -355,6 +356,7 @@ func TestGetDockerJoinConfig(t *testing.T) {
 	}{
 		{
 			name:        "bad code 400",
+			configType:  APISIX,
 			errorReason: "Error Code:4, Error Reason",
 			code:        http.StatusBadRequest,
 			body: `
@@ -366,8 +368,25 @@ func TestGetDockerJoinConfig(t *testing.T) {
 				}`,
 		},
 		{
-			name: "success",
-			code: http.StatusOK,
+			name:       "success (apisix)",
+			configType: APISIX,
+			code:       http.StatusOK,
+			body: `
+				{
+					"status": {
+						"code": 0
+					},
+					"payload": {
+						"configuration": "abc"
+					}
+				}
+			`,
+			expectedBody: "abc",
+		},
+		{
+			name:       "success (helm)",
+			configType: HELM,
+			code:       http.StatusOK,
 			body: `
 				{
 					"status": {
@@ -385,6 +404,7 @@ func TestGetDockerJoinConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/controlplanes/%s/startup_config_tpl/%s", "1", tc.configType))
 				rw.WriteHeader(tc.code)
 				if tc.body != "" {
 					_, err := rw.Write([]byte(tc.body))
@@ -400,13 +420,13 @@ func TestGetDockerJoinConfig(t *testing.T) {
 			api, err := newClient("test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
-			data, err := api.GetDockerJoinConfig("1")
+			data, err := api.GetStartupConfig("1", tc.configType)
 
 			if tc.errorReason != "" {
 				assert.Contains(t, err.Error(), tc.errorReason, "checking error reason")
 			} else {
 				assert.NoError(t, err, "checking error")
-				assert.Equal(t, tc.expectedBody, string(data), "check the docker join config")
+				assert.Equal(t, tc.expectedBody, data, "check the startup config")
 			}
 		})
 	}

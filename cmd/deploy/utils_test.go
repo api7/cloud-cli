@@ -34,6 +34,96 @@ import (
 	"github.com/api7/cloud-cli/internal/types"
 )
 
+var (
+	_apisixStartupConfigTpl = `apisix:
+  enable_admin: false
+  ssl:
+    ssl_trusted_certificate: {{ .TLSDir }}/ca.crt
+  lua_module_hook: cloud
+  extra_lua_path: {{ .CloudModuleDir }}/?.ljbc;
+nginx_config:
+  http:
+    custom_lua_shared_dict:
+      cloud: 1m
+etcd:
+  host:
+    - "https://foo.com:443"
+  tls:
+    cert: {{ .TLSDir }}/tls.crt
+    key: {{ .TLSDir }}/tls.key
+    sni: foo.com
+    verify: true
+`
+
+	_helmStartupConfigTpl = `apisix:
+  image:
+    repository: {{ .ImageRepository }}
+    tag: {{ .ImageTag }}
+  replicaCount: {{ .ReplicaCount }}
+  setIDFromPodUID: true
+  luaModuleHook:
+    enabled: true
+    luaPath: "/lua-module-hook/?.ljbc"
+    hookPoint: cloud
+    configMapRef:
+      name: "cloud-module"
+      mounts:
+        - key: cloud.ljbc
+          path: /lua-module-hook/cloud.ljbc
+        - key: cloud-agent.ljbc
+          path: /lua-module-hook/cloud/agent.ljbc
+        - key: cloud-metrics.ljbc
+          path: /lua-module-hook/cloud/metrics.ljbc
+        - key: cloud-utils.ljbc
+          path: /lua-module-hook/cloud/utils.ljbc
+  customLuaSharedDicts:
+    - name: cloud
+      size: 1m
+gateway:
+  tls:
+    enabled: true
+    existingCASecret: cloud-ssl
+    certCAFilename: "ca.crt"
+admin:
+  enabled: false
+etcd:
+  enabled: false
+  host:
+    - "https://foo.com:443"
+  timeout: 30
+  auth:
+    tls:
+      enabled: true
+      sni: foo.com
+      existingSecret: cloud-ssl
+      certFilename: tls.crt
+      certKeyFilename: tls.key
+`
+)
+
+func mockCloudModule(t *testing.T) []byte {
+	buffer := bytes.NewBuffer(nil)
+	gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
+	assert.NoError(t, err, "create gzip writer")
+	tarWriter := tar.NewWriter(gzipWriter)
+	body := "hello world"
+	hdr := &tar.Header{
+		Name: "foo.txt",
+		Size: int64(len(body)),
+	}
+	err = tarWriter.WriteHeader(hdr)
+	assert.NoError(t, err, "write tar header")
+	_, err = tarWriter.Write([]byte(body))
+	assert.NoError(t, err, "write tar body")
+	err = tarWriter.Flush()
+	assert.NoError(t, err, "flush tar body")
+	err = tarWriter.Close()
+	assert.NoError(t, err, "close tar writer")
+	err = gzipWriter.Close()
+	assert.NoError(t, err, "close gzip writer")
+	return buffer.Bytes()
+}
+
 func TestDeployPreRunForDocker(t *testing.T) {
 	testCases := []struct {
 		name          string
@@ -87,6 +177,31 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			},
 		},
 		{
+			name:        "get startup config failed",
+			errorReason: "failed to get startup config: mock error",
+			mockFn: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "3",
+					},
+					Domain: "foo.com",
+				}, nil)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return("", errors.New("mock error"))
+
+				cloud.DefaultClient = mockClient
+			},
+		},
+		{
 			name: "success",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
@@ -102,28 +217,10 @@ func TestDeployPreRunForDocker(t *testing.T) {
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
 
-				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
+				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
@@ -170,6 +267,7 @@ etcd:
 			if tc.errorReason != "" {
 				assert.Equal(t, tc.errorReason, err.Error(), "check error")
 			} else {
+				assert.NoError(t, err, "check error")
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Equal(t, string(tc.filledContext.essentialConfig), string(ctx.essentialConfig), "check essential config")
 			}
@@ -230,6 +328,31 @@ func TestDeployPreRunForBare(t *testing.T) {
 			},
 		},
 		{
+			name:        "get startup config failed",
+			errorReason: "failed to get startup config: mock error",
+			mockFn: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "3",
+					},
+					Domain: "foo.com",
+				}, nil)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return("", errors.New("mock error"))
+
+				cloud.DefaultClient = mockClient
+			},
+		},
+		{
 			name: "success",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
@@ -245,27 +368,10 @@ func TestDeployPreRunForBare(t *testing.T) {
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
 
-				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
 				cloud.DefaultClient = mockClient
 			},
@@ -313,6 +419,7 @@ etcd:
 			if tc.errorReason != "" {
 				assert.Equal(t, tc.errorReason, err.Error(), "check error")
 			} else {
+				assert.NoError(t, err, "check error")
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Regexp(t, string(tc.filledContext.essentialConfig), string(ctx.essentialConfig), "check essential config")
 			}
@@ -422,6 +529,31 @@ etcd:
 			},
 		},
 		{
+			name:        "get startup config failed",
+			errorReason: "failed to get startup config: mock error",
+			mockFn: func(t *testing.T, test *testCase) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "3",
+					},
+					Domain: "foo.com",
+				}, nil)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return("", errors.New("mock error"))
+
+				cloud.DefaultClient = mockClient
+			},
+		},
+		{
 			name: "create namespace, secret or configMap on kubernetes failed",
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
@@ -438,26 +570,9 @@ etcd:
 					CACertificate: "1",
 				}, nil)
 
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
-				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				mockCmd := commands.NewMockCmd(ctrl)
@@ -495,26 +610,9 @@ etcd:
 					CACertificate: "1",
 				}, nil)
 
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
-				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				mockCmd := commands.NewMockCmd(ctrl)
@@ -561,26 +659,9 @@ etcd:
 					CACertificate: "1",
 				}, nil)
 
-				buffer := bytes.NewBuffer(nil)
-				gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-				assert.NoError(t, err, "create gzip writer")
-				tarWriter := tar.NewWriter(gzipWriter)
-				body := "hello world"
-				hdr := &tar.Header{
-					Name: "foo.txt",
-					Size: int64(len(body)),
-				}
-				err = tarWriter.WriteHeader(hdr)
-				assert.NoError(t, err, "write tar header")
-				_, err = tarWriter.Write([]byte(body))
-				assert.NoError(t, err, "write tar body")
-				err = tarWriter.Flush()
-				assert.NoError(t, err, "flush tar body")
-				err = tarWriter.Close()
-				assert.NoError(t, err, "close tar writer")
-				err = gzipWriter.Close()
-				assert.NoError(t, err, "close gzip writer")
-				mockClient.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+
+				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				test.kubectl = commands.New("kubectl", test.globalOptions.DryRun)

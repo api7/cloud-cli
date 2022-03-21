@@ -64,19 +64,19 @@ func (mr *MockAPIMockRecorder) GetDefaultControlPlane() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultControlPlane", reflect.TypeOf((*MockAPI)(nil).GetDefaultControlPlane))
 }
 
-// GetDockerJoinConfig mocks base method.
-func (m *MockAPI) GetDockerJoinConfig(cpID string) ([]byte, error) {
+// GetStartupConfig mocks base method.
+func (m *MockAPI) GetStartupConfig(cpID string, configType StartupConfigType) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDockerJoinConfig", cpID)
-	ret0, _ := ret[0].([]byte)
+	ret := m.ctrl.Call(m, "GetStartupConfig", cpID, configType)
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDockerJoinConfig indicates an expected call of GetDockerJoinConfig.
-func (mr *MockAPIMockRecorder) GetDockerJoinConfig(cpID interface{}) *gomock.Call {
+// GetStartupConfig indicates an expected call of GetStartupConfig.
+func (mr *MockAPIMockRecorder) GetStartupConfig(cpID, configType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDockerJoinConfig", reflect.TypeOf((*MockAPI)(nil).GetDockerJoinConfig), cpID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStartupConfig", reflect.TypeOf((*MockAPI)(nil).GetStartupConfig), cpID, configType)
 }
 
 // GetTLSBundle mocks base method.
