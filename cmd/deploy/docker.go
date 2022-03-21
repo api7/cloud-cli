@@ -41,7 +41,7 @@ func newDockerCommand() *cobra.Command {
 		Example: `
 cloud-cli deploy docker \
 		--name apisix-0 \
-		--apisix-image apisix/apisix:2.11.0 \
+		--apisix-image apache/apisix:2.11.0-centos \
 		--docker-run-arg --detach \
 		--docker-run-arg --hostname=apisix-1`,
 		PreRun: func(cmd *cobra.Command, args []string) {
@@ -131,7 +131,7 @@ cloud-cli deploy docker \
 			}
 		},
 	}
-	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.11.0", "Specify the Apache APISIX image")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.11.0-centos", "Specify the Apache APISIX image")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.DockerCLIPath, "docker-cli-path", "", "Specify the filepath of the docker command")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Docker.DockerRunArgs, "docker-run-arg", []string{}, "Specify the arguments (in the format of name=value) for the docker run command")
 
