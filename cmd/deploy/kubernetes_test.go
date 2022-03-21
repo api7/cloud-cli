@@ -66,7 +66,7 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			cmdPatterns: []string{
 				`kubectl create ns apisix`,
 				`kubectl create secret generic cloud-ssl --from-file tls.crt=.*?tls.crt --from-file tls.key=.*?tls.key --from-file ca.crt=.*?ca.crt --namespace apisix`,
-				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --namespace apisix`,
+				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --from-file cloud-file.ljbc=.*?file.ljbc --namespace apisix`,
 				`helm repo add apisix https://charts.apiseven.com`,
 				`helm repo update`,
 				`helm install apisix apisix/apisix --namespace apisix --values .*?.yaml`,
@@ -80,7 +80,7 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			cmdPatterns: []string{
 				`kubectl create ns my-apisix`,
 				`kubectl create secret generic cloud-ssl --from-file tls.crt=.*?tls.crt --from-file tls.key=.*?tls.key --from-file ca.crt=.*?ca.crt --namespace my-apisix`,
-				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --namespace my-apisix`,
+				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --from-file cloud-file.ljbc=.*?file.ljbc --namespace my-apisix`,
 				`helm repo add apisix https://charts.apiseven.com`,
 				`helm repo update`,
 				`helm install apisix-test apisix/apisix --namespace my-apisix --output table --wait --values .*?.yaml`,
@@ -93,7 +93,7 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			cmdPatterns: []string{
 				`kubectl create ns apisix`,
 				`kubectl create secret generic cloud-ssl --from-file tls.crt=.*?tls.crt --from-file tls.key=.*?tls.key --from-file ca.crt=.*?ca.crt --namespace apisix`,
-				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --namespace apisix`,
+				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --from-file cloud-file.ljbc=.*?file.ljbc --namespace apisix`,
 				`helm repo add apisix https://charts.apiseven.com`,
 				`helm repo update`,
 				`helm install apisix apisix/apisix --namespace apisix --values .*?.yaml`,

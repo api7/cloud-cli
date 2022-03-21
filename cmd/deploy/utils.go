@@ -212,6 +212,7 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-agent.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/agent.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/metrics.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-utils.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/utils.ljbc")))
+		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-file.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/file.ljbc")))
 		kubectl.AppendArgs("--namespace", opts.NameSpace)
 	case types.Namespace:
 		kubectl.AppendArgs("create", "ns", opts.NameSpace)
