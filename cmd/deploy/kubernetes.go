@@ -48,7 +48,7 @@ func newKubernetesCommand() *cobra.Command {
 cloud-cli deploy kubernetes \
 		--name apisix \
 		--namespace apisix \
-		--apisix-image apisix/apisix:2.11.0 \
+		--apisix-image apache/apisix:2.11.0-centos \
 		--helm-install-arg --output=table \
 		--helm-install-arg --wait`,
 		PreRun: func(cmd *cobra.Command, args []string) {
