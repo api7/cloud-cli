@@ -46,6 +46,7 @@ type installContext struct {
 	TLSDir        string
 	ConfigFile    string
 	Version       string
+	InstanceID    string
 }
 
 func init() {
@@ -110,6 +111,7 @@ cloud-cli deploy bare \
 				TLSDir:        ctx.tlsDir,
 				ConfigFile:    configFile,
 				Version:       opts.APISIXVersion,
+				InstanceID:    options.Global.Deploy.APISIXInstanceID,
 			})
 			if err != nil {
 				output.Errorf(err.Error())

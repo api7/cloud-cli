@@ -17,6 +17,7 @@ package deploy
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,21 +29,49 @@ import (
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestBareMetalDeployCommand(t *testing.T) {
 	testCases := []struct {
-		name       string
-		args       []string
-		configFile string
-		cmdPattern string
-		mockCloud  func(t *testing.T)
+		name          string
+		args          []string
+		configFile    string
+		cmdPattern    string
+		installScript string
+		mockCloud     func(t *testing.T)
 	}{
 		{
 			name:       "test deploy bare metal command",
 			args:       []string{"bare", "--apisix-version", "2.11.0"},
 			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
+			installScript: `#!/usr/bin/env bash
+
+version="2\.11\.0"
+instance_id=""
+
+installed_version=\$\(apisix version 2>/dev/null\)
+if \[\[ \$\? -ne 0 \]\]; then
+  yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
+  yum install -y apisix-\$version
+fi
+
+# copy certs to apisix directory to avoid permission issue
+cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
+
+# does not instance id stored when it is customized through the config\.yaml file
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+fi
+
+apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+
+if \[\[ \$\? -eq 0 \]\]; then
+  echo "Your APISIX Instance was deployed successfully!"
+  echo "Instance ID: \$\{instance_id\}"
+fi
+`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -68,6 +97,83 @@ func TestBareMetalDeployCommand(t *testing.T) {
 			name:       "test deploy bare metal command with apisix config",
 			args:       []string{"bare", "--apisix-version", "2.11.0", "--apisix-config", "./testdata/apisix.yaml"},
 			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
+			installScript: `#!/usr/bin/env bash
+
+version="2\.11\.0"
+instance_id=""
+
+installed_version=\$\(apisix version 2>/dev/null\)
+if \[\[ \$\? -ne 0 \]\]; then
+  yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
+  yum install -y apisix-\$version
+fi
+
+# copy certs to apisix directory to avoid permission issue
+cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
+
+# does not instance id stored when it is customized through the config\.yaml file
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+fi
+
+apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+
+if \[\[ \$\? -eq 0 \]\]; then
+  echo "Your APISIX Instance was deployed successfully!"
+  echo "Instance ID: \$\{instance_id\}"
+fi
+`,
+			mockCloud: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				api := cloud.NewMockAPI(ctrl)
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
+					},
+					OrganizationID: "org1",
+				}, nil)
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+				api.EXPECT().GetStartupConfig("12345", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+
+				cloud.DefaultClient = api
+			},
+		},
+		{
+			name:       "test deploy bare metal command with apisix id",
+			args:       []string{"bare", "--apisix-version", "2.11.0", "--apisix-id", "1234-abcd"},
+			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
+			installScript: `#!/usr/bin/env bash
+
+version="2\.11\.0"
+instance_id="1234-abcd"
+
+installed_version=\$\(apisix version 2>/dev/null\)
+if \[\[ \$\? -ne 0 \]\]; then
+  yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
+  yum install -y apisix-\$version
+fi
+
+# copy certs to apisix directory to avoid permission issue
+cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
+
+# does not instance id stored when it is customized through the config\.yaml file
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+fi
+
+apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+
+if \[\[ \$\? -eq 0 \]\]; then
+  echo "Your APISIX Instance was deployed successfully!"
+  echo "Instance ID: \$\{instance_id\}"
+fi
+`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -121,6 +227,12 @@ func TestBareMetalDeployCommand(t *testing.T) {
 			assert.NoError(t, err, "check if the command executed successfully")
 
 			assert.Regexp(t, tc.cmdPattern, string(output), "check if the composed docker command is correct")
+
+			installFile := filepath.Join(persistence.HomeDir, "scripts/install.sh")
+			file, err := ioutil.ReadFile(installFile)
+			assert.NoError(t, err, "check if dump the install script successful")
+			fmt.Println(string(file))
+			assert.Regexp(t, tc.installScript, string(file), "checking")
 		})
 	}
 }
