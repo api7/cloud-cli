@@ -208,6 +208,7 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 		kubectl.AppendArgs("--namespace", opts.NameSpace)
 	case types.ConfigMap:
 		kubectl.AppendArgs("create", "configmap", consts.DefaultConfigMapName)
+		// TODO: dynamic list files in cloud lua module instead of hard code maybe better
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-agent.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/agent.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("cloud-metrics.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "cloud/metrics.ljbc")))
