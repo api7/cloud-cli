@@ -8,7 +8,7 @@ SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")
 PROJECT_ROOT="$SCRIPT_ROOT/.."
 
 pushd "$PROJECT_ROOT"/internal/cloud
-mockgen -source=./types.go -package=cloud > ./api_mock.go
+mockgen -source=./types.go -package=cloud -self_package=github.com/api7/cloud-cli/internal/cloud > ./api_mock.go
 popd
 
 pushd "$PROJECT_ROOT"/internal/commands

@@ -52,6 +52,14 @@ const (
 	defaultApi7CloudLuaModuleURL = "https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz"
 )
 
+// StartupConfigType is type of data plane startup config
+type StartupConfigType string
+
+const (
+	APISIX StartupConfigType = "apisix"
+	HELM   StartupConfigType = "helm"
+)
+
 // API warp API7 Cloud REST API
 type API interface {
 	// Me returns the current user information
@@ -62,8 +70,8 @@ type API interface {
 	GetTLSBundle(cpID string) (*types.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)
 	GetCloudLuaModule() ([]byte, error)
-	// GetDockerJoinConfig gets the essential configuration from API7 Cloud for deploy APISIX on Docker.
-	GetDockerJoinConfig(cpID string) ([]byte, error)
+	// GetStartupConfig gets the startup configuration from API7 Cloud for deploy APISIX by specify config type.
+	GetStartupConfig(cpID string, configType StartupConfigType) (string, error)
 	// GetDefaultControlPlane returns the default control plane for the current organization.
 	GetDefaultControlPlane() (*types.ControlPlane, error)
 }

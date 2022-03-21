@@ -20,9 +20,9 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"html/template"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
@@ -32,16 +32,6 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
-)
-
-var (
-	//go:embed apisix.yaml
-	essentialConfig string
-	//go:embed apisix_chart_values.yaml
-	helmEssentialConfig string
-
-	essentialConfigTemplate     = template.Must(template.New("essential config").Parse(essentialConfig))
-	helmEssentialConfigTemplate = template.Must(template.New("helm essential config").Parse(helmEssentialConfig))
 )
 
 type deployContext struct {
@@ -54,9 +44,28 @@ type deployContext struct {
 }
 
 type config struct {
-	CloudLuaModuleDir  string
-	TLSDir             string
-	ControlPlaneDomain string
+	CloudModuleDir string
+	TLSDir         string
+}
+
+type helmConfig struct {
+	ImageRepository string
+	ImageTag        string
+	ReplicaCount    uint
+}
+
+func getEssentialConfigTpl(ctx *deployContext, configType cloud.StartupConfigType) (*template.Template, error) {
+	config, err := cloud.DefaultClient.GetStartupConfig(ctx.ControlPlane.ID, configType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get startup config: %s", err.Error())
+	}
+
+	configTemplate, err := template.New("essential config").Parse(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse startup config template: %s", err.Error())
+	}
+
+	return configTemplate, nil
 }
 
 func deployPreRunForDocker(ctx *deployContext) error {
@@ -65,11 +74,15 @@ func deployPreRunForDocker(ctx *deployContext) error {
 		return err
 	}
 
+	essentialConfigTpl, err := getEssentialConfigTpl(ctx, cloud.APISIX)
+	if err != nil {
+		return err
+	}
+
 	buf := bytes.NewBuffer(nil)
-	if err := essentialConfigTemplate.Execute(buf, &config{
-		CloudLuaModuleDir:  "/cloud_lua_module",
-		TLSDir:             "/cloud/tls",
-		ControlPlaneDomain: ctx.ControlPlane.Domain,
+	if err := essentialConfigTpl.Execute(buf, &config{
+		CloudModuleDir: "/cloud_lua_module",
+		TLSDir:         "/cloud/tls",
 	}); err != nil {
 		return fmt.Errorf("Failed to execute essential config template: %s", err)
 	}
@@ -84,11 +97,15 @@ func deployPreRunForBare(ctx *deployContext) error {
 		return err
 	}
 
+	essentialConfigTemplate, err := getEssentialConfigTpl(ctx, cloud.APISIX)
+	if err != nil {
+		return err
+	}
+
 	buf := bytes.NewBuffer(nil)
 	if err := essentialConfigTemplate.Execute(buf, &config{
-		CloudLuaModuleDir:  ctx.cloudLuaModuleDir,
-		TLSDir:             "/usr/local/apisix/conf/ssl",
-		ControlPlaneDomain: ctx.ControlPlane.Domain,
+		CloudModuleDir: ctx.cloudLuaModuleDir,
+		TLSDir:         "/usr/local/apisix/conf/ssl",
 	}); err != nil {
 		return fmt.Errorf("Failed to execute essential config template: %s", err)
 	}
@@ -146,8 +163,18 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
 
 	ctx.ControlPlane = cp
+
+	helmEssentialConfigTemplate, err := getEssentialConfigTpl(ctx, cloud.HELM)
+	if err != nil {
+		return err
+	}
+
 	buf := bytes.NewBuffer(nil)
-	if err = helmEssentialConfigTemplate.Execute(buf, ctx); err != nil {
+	if err = helmEssentialConfigTemplate.Execute(buf, helmConfig{
+		ImageRepository: ctx.KubernetesOpts.APISIXImageRepo,
+		ImageTag:        ctx.KubernetesOpts.APISIXImageTag,
+		ReplicaCount:    ctx.KubernetesOpts.ReplicaCount,
+	}); err != nil {
 		return fmt.Errorf("Failed to execute helm essential config template: %s", err.Error())
 	}
 	ctx.essentialConfig = buf.Bytes()

@@ -16,9 +16,6 @@
 package deploy
 
 import (
-	"archive/tar"
-	"bytes"
-	"compress/gzip"
 	"fmt"
 	"os"
 	"os/exec"
@@ -50,27 +47,9 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			PrivateKey:    "1",
 			CACertificate: "1",
 		}, nil)
-		buffer := bytes.NewBuffer(nil)
-		gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
-		assert.NoError(t, err, "create gzip writer")
-		tarWriter := tar.NewWriter(gzipWriter)
-		body := "hello world"
-		hdr := &tar.Header{
-			Name: "foo.txt",
-			Size: int64(len(body)),
-		}
-		err = tarWriter.WriteHeader(hdr)
-		assert.NoError(t, err, "write tar header")
-		_, err = tarWriter.Write([]byte(body))
-		assert.NoError(t, err, "write tar body")
-		err = tarWriter.Flush()
-		assert.NoError(t, err, "flush tar body")
-		err = tarWriter.Close()
-		assert.NoError(t, err, "close tar writer")
-		err = gzipWriter.Close()
-		assert.NoError(t, err, "close gzip writer")
 
-		api.EXPECT().GetCloudLuaModule().Return(buffer.Bytes(), nil)
+		api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+		api.EXPECT().GetStartupConfig("12345", cloud.HELM).Return(_helmStartupConfigTpl, nil)
 
 		cloud.DefaultClient = api
 	}

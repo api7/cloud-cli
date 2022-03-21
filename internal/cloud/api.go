@@ -85,16 +85,15 @@ func (a *api) GetCloudLuaModule() ([]byte, error) {
 	return data, nil
 }
 
-func (a *api) GetDockerJoinConfig(cpID string) ([]byte, error) {
-	var response types.GetJoinConfigResponsePayload
+func (a *api) GetStartupConfig(cpID string, configType StartupConfigType) (string, error) {
+	var response types.ControlPlaneStartupConfigResponsePayload
 
 	if err := a.makeGetRequest(&url.URL{
-		Path:     fmt.Sprintf("/api/v1/controlplanes/%s/join", cpID),
-		RawQuery: "type=docker",
+		Path: fmt.Sprintf("/api/v1/controlplanes/%s/startup_config_tpl/%s", cpID, configType),
 	}, &response); err != nil {
-		return nil, err
+		return "", err
 	}
-	return []byte(response.Configuration), nil
+	return response.Configuration, nil
 }
 
 func (a *api) GetDefaultControlPlane() (*types.ControlPlane, error) {
