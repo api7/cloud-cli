@@ -65,7 +65,7 @@ if \[\[ -z \$\{instance_id\} \]\]; then
   instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
 fi
 
-apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+apisix start -c .*/apisix-config-\d+\.yaml
 
 if \[\[ \$\? -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
@@ -116,7 +116,7 @@ if \[\[ -z \$\{instance_id\} \]\]; then
   instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
 fi
 
-apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+apisix start -c /.*/apisix-config-\d+\.yaml
 
 if \[\[ \$\? -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
@@ -167,7 +167,7 @@ if \[\[ -z \$\{instance_id\} \]\]; then
   instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
 fi
 
-apisix start -c /var/.*/T/apisix-config-\d+\.yaml
+apisix start -c /.*/apisix-config-\d+\.yaml
 
 if \[\[ \$\? -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
