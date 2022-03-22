@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 version="{{ .Version }}"
 instance_id="{{ .InstanceID }}"
 
