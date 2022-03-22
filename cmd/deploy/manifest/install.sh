@@ -12,7 +12,7 @@ fi
 # copy certs to apisix directory to avoid permission issue
 cp -rf {{ .TLSDir }} /usr/local/apisix/conf/ssl
 
-# does not instance id stored when it is customized through the config.yaml file
+# get the APISIX instance id when instance id is not set
 if [[ -z ${instance_id} ]]; then
   instance_id="$(cat /usr/local/apisix/conf/apisix.uid)"
 fi
