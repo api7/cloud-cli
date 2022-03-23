@@ -1,3 +1,6 @@
+Configuring Cloud CLI
+=====================
+
 This section will introduce how to configure cloud-cli with credentials for accessing API7 Cloud.
 
 # Create Access Token
