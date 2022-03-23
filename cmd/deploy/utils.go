@@ -250,3 +250,27 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 
 	return nil
 }
+
+func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name string) (string, error) {
+	docker.AppendArgs("ps", "--filter", "name="+name, "--format", "{{.ID}}")
+	stdout, stderr, err := docker.Run(ctx)
+	if err != nil {
+		return "", err
+	}
+	if stderr != "" {
+		return "", fmt.Errorf("get container id: stderr: %s", stderr)
+	}
+	return stdout, nil
+}
+
+func getAPISIXIDFromDocker(ctx context.Context, docker commands.Cmd, id string) (string, error) {
+	docker.AppendArgs("exec", id, "cat", "/usr/local/apisix/conf/apisix.uid")
+	stdout, stderr, err := docker.Run(ctx)
+	if err != nil {
+		return "", err
+	}
+	if stderr != "" {
+		return "", fmt.Errorf("get apisix id: stderr: %s", stderr)
+	}
+	return stdout, nil
+}

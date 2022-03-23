@@ -17,6 +17,7 @@ package deploy
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"strings"
 
@@ -56,16 +57,11 @@ cloud-cli deploy docker \
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			var (
-				docker commands.Cmd
-				data   []byte
-				err    error
+				data []byte
+				err  error
 			)
 			opts := options.Global.Deploy.Docker
-			if opts.DockerCLIPath != "" {
-				docker = commands.New(opts.DockerCLIPath, options.Global.DryRun)
-			} else {
-				docker = commands.New("docker", options.Global.DryRun)
-			}
+			docker := getDockerCommand()
 			docker.AppendArgs("run")
 			for _, args := range opts.DockerRunArgs {
 				docker.AppendArgs(strings.Split(args, "=")...)
@@ -129,6 +125,26 @@ cloud-cli deploy docker \
 				output.Errorf(err.Error())
 				return
 			}
+			fmt.Println("Congratulations! Your APISIX instance was deployed successfully")
+
+			docker = getDockerCommand()
+			containerID, err := getDockerContainerIDByName(ctx, docker, options.Global.Deploy.Name)
+			if err != nil {
+				message := fmt.Sprintf("failed to get APISIX container ID: %s\nPlease check it via docker ps command\n", err)
+				output.Errorf(message)
+				return
+			}
+			fmt.Printf("Container ID: %s\n", containerID)
+
+			docker = getDockerCommand()
+			apisixID, err := getAPISIXIDFromDocker(ctx, docker, containerID)
+			if err != nil {
+				message := fmt.Sprintf("failed to get APISIX ID: %s\nPlease check it by login the container %s and see /usr/local/apisix/conf/apisix.uid\n", containerID, err)
+				output.Errorf(message)
+				return
+			}
+
+			fmt.Printf("APISIX ID: %s\n", apisixID)
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.11.0-centos", "Specify the Apache APISIX image")
@@ -136,4 +152,12 @@ cloud-cli deploy docker \
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Docker.DockerRunArgs, "docker-run-arg", []string{}, "Specify the arguments (in the format of name=value) for the docker run command")
 
 	return cmd
+}
+
+func getDockerCommand() commands.Cmd {
+	opts := options.Global.Deploy.Docker
+	if opts.DockerCLIPath != "" {
+		return commands.New(opts.DockerCLIPath, options.Global.DryRun)
+	}
+	return commands.New("docker", options.Global.DryRun)
 }

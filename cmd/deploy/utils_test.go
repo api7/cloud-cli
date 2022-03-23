@@ -19,6 +19,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -714,6 +715,120 @@ etcd:
 				assert.NoError(t, err)
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Equal(t, tc.filledContext.essentialConfig, ctx.essentialConfig, "check essential config")
+			}
+		})
+	}
+}
+
+func TestGetDockerContainerIDbyName(t *testing.T) {
+	testCases := []struct {
+		name        string
+		mockFn      func(t *testing.T) commands.Cmd
+		output      string
+		errorReason string
+	}{
+		{
+			name: "mock error",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("ps", "--filter", "name=apisix", "--format", "{{.ID}}")
+				cmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error"))
+				return cmd
+			},
+			errorReason: "mock error",
+		},
+		{
+			name: "stderr is not empty",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("ps", "--filter", "name=apisix", "--format", "{{.ID}}")
+				cmd.EXPECT().Run(gomock.Any()).Return("", "stderr", nil)
+				return cmd
+			},
+			errorReason: "get container id: stderr: stderr",
+		},
+		{
+			name: "success",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("ps", "--filter", "name=apisix", "--format", "{{.ID}}")
+				cmd.EXPECT().Run(gomock.Any()).Return("2b68d1dcfe34", "", nil)
+				return cmd
+			},
+			output: "2b68d1dcfe34",
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			cmd := tc.mockFn(t)
+			out, err := getDockerContainerIDByName(context.TODO(), cmd, "apisix")
+			if tc.errorReason != "" {
+				assert.Empty(t, out, "check if output is empty")
+				assert.Equal(t, tc.errorReason, err.Error(), "check the error reason")
+			} else {
+				assert.Nil(t, err, "check if error is nil")
+				assert.Equal(t, tc.output, out, "check the output")
+			}
+		})
+	}
+}
+
+func TestGetAPISIXIDFromDocker(t *testing.T) {
+	testCases := []struct {
+		name        string
+		mockFn      func(t *testing.T) commands.Cmd
+		output      string
+		errorReason string
+	}{
+		{
+			name: "mock error",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
+				cmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error"))
+				return cmd
+			},
+			errorReason: "mock error",
+		},
+		{
+			name: "stderr is not empty",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
+				cmd.EXPECT().Run(gomock.Any()).Return("", "stderr", nil)
+				return cmd
+			},
+			errorReason: "get apisix id: stderr: stderr",
+		},
+		{
+			name: "success",
+			mockFn: func(t *testing.T) commands.Cmd {
+				ctrl := gomock.NewController(t)
+				cmd := commands.NewMockCmd(ctrl)
+				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
+				cmd.EXPECT().Run(gomock.Any()).Return("c777db9b-c2bc-4d2a-bbb1-0ee393a0b2c0", "", nil)
+				return cmd
+			},
+			output: "c777db9b-c2bc-4d2a-bbb1-0ee393a0b2c0",
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			cmd := tc.mockFn(t)
+			out, err := getAPISIXIDFromDocker(context.TODO(), cmd, "123")
+			if tc.errorReason != "" {
+				assert.Empty(t, out, "check if output is empty")
+				assert.Equal(t, tc.errorReason, err.Error(), "check the error reason")
+			} else {
+				assert.Nil(t, err, "check if error is nil")
+				assert.Equal(t, tc.output, out, "check the output")
 			}
 		})
 	}
