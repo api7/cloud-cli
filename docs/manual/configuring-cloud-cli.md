@@ -1,4 +1,4 @@
-This section will introduce how to configure cloud-cli with credentials for accessing API7 CLOUD.
+This section will introduce how to configure cloud-cli with credentials for accessing API7 Cloud.
 
 # Create Access Token
 First, you need to log in to [API7 Cloud Web Console](https://console.api7.cloud) to create an **Access Token** associated with your account. 
