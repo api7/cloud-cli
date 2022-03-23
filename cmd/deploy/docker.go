@@ -125,22 +125,26 @@ cloud-cli deploy docker \
 				output.Errorf(err.Error())
 				return
 			}
+			fmt.Println("Congratulations! Your APISIX instance was deployed successfully")
 
 			docker = getDockerCommand()
 			containerID, err := getDockerContainerIDByName(ctx, docker, options.Global.Deploy.Name)
 			if err != nil {
-				output.Errorf(err.Error())
+				message := fmt.Sprintf("failed to get APISIX container ID: %s\nPlease check it via docker ps command\n", err)
+				output.Errorf(message)
 				return
 			}
+			fmt.Printf("Container ID: %s\n", containerID)
 
 			docker = getDockerCommand()
 			apisixID, err := getAPISIXIDFromDocker(ctx, docker, containerID)
 			if err != nil {
-				output.Errorf(err.Error())
+				message := fmt.Sprintf("failed to get APISIX ID: %s\nPlease check it by login the container %s and see /usr/local/apisix/conf/apisix.uid\n", containerID, err)
+				output.Errorf(message)
 				return
 			}
 
-			fmt.Printf("Congraulations! Your APISIX instance was deployed successfully!\nAPISIX ID: %s\nContainer ID: %s", apisixID, containerID)
+			fmt.Printf("APISIX ID: %s\n", apisixID)
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.11.0-centos", "Specify the Apache APISIX image")
