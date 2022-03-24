@@ -18,6 +18,11 @@ package deploy
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -25,9 +30,6 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/utils"
-	"github.com/spf13/cobra"
-	"io/ioutil"
-	"strings"
 )
 
 func newDockerCommand() *cobra.Command {

@@ -20,12 +20,13 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
