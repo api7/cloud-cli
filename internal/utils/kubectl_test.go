@@ -53,6 +53,7 @@ func TestGetDeploymentName(t *testing.T) {
 			if tc.errorReason != "" {
 				assert.Contains(t, err.Error(), tc.errorReason, "check error")
 			} else {
+				assert.NoError(t, err)
 				assert.Equal(t, tc.wantRsp, rsp, "check response")
 			}
 		})
@@ -102,6 +103,7 @@ func TestGetPodsNames(t *testing.T) {
 			if tc.errorReason != "" {
 				assert.Contains(t, err.Error(), tc.errorReason, "check error")
 			} else {
+				assert.NoError(t, err)
 				assert.Equal(t, tc.wantRsp, rsp, "check response")
 			}
 		})
@@ -126,19 +128,7 @@ func TestGetAPISIXID(t *testing.T) {
 				mockCmd := commands.NewMockCmd(ctrl)
 				mockCmd.EXPECT().String().AnyTimes()
 				mockCmd.EXPECT().AppendArgs(gomock.Any()).AnyTimes()
-				mockCmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error"))
-				test.kubectl = mockCmd
-			},
-		},
-		{
-			name:        "container not found",
-			errorReason: "mock error",
-			mockFn: func(t *testing.T, test *testCase) {
-				ctrl := gomock.NewController(t)
-				mockCmd := commands.NewMockCmd(ctrl)
-				mockCmd.EXPECT().String().AnyTimes()
-				mockCmd.EXPECT().AppendArgs(gomock.Any()).AnyTimes()
-				mockCmd.EXPECT().Run(gomock.Any()).Return("", "container not found", errors.New("mock error")).Times(getAPISIXIDRetry)
+				mockCmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error")).AnyTimes()
 				test.kubectl = mockCmd
 			},
 		},
@@ -149,7 +139,7 @@ func TestGetAPISIXID(t *testing.T) {
 				mockCmd := commands.NewMockCmd(ctrl)
 				mockCmd.EXPECT().String().AnyTimes()
 				mockCmd.EXPECT().AppendArgs(gomock.Any()).AnyTimes()
-				mockCmd.EXPECT().Run(gomock.Any()).Return("aaa-id", "", nil)
+				mockCmd.EXPECT().Run(gomock.Any()).Return("aaa-id", "", nil).AnyTimes()
 				test.kubectl = mockCmd
 			},
 			wantRsp: "aaa-id",
@@ -163,6 +153,57 @@ func TestGetAPISIXID(t *testing.T) {
 			if tc.errorReason != "" {
 				assert.Contains(t, err.Error(), tc.errorReason, "check error")
 			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.wantRsp, rsp, "check response")
+			}
+		})
+	}
+}
+
+func TestGetServiceName(t *testing.T) {
+	type testCase struct {
+		name        string
+		errorReason string
+		mockFn      func(t *testing.T, test *testCase)
+		kubectl     commands.Cmd
+		wantRsp     string
+	}
+
+	testCases := []testCase{
+		{
+			name:        "execute kubectl command error",
+			errorReason: "mock error",
+			mockFn: func(t *testing.T, test *testCase) {
+				ctrl := gomock.NewController(t)
+				mockCmd := commands.NewMockCmd(ctrl)
+				mockCmd.EXPECT().String().AnyTimes()
+				mockCmd.EXPECT().AppendArgs(gomock.Any()).AnyTimes()
+				mockCmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error"))
+				test.kubectl = mockCmd
+			},
+		},
+		{
+			name: "get service name succeed",
+			mockFn: func(t *testing.T, test *testCase) {
+				ctrl := gomock.NewController(t)
+				mockCmd := commands.NewMockCmd(ctrl)
+				mockCmd.EXPECT().String().AnyTimes()
+				mockCmd.EXPECT().AppendArgs(gomock.Any()).AnyTimes()
+				mockCmd.EXPECT().Run(gomock.Any()).Return("aaa-apisix-gateway", "", nil)
+				test.kubectl = mockCmd
+			},
+			wantRsp: "aaa-apisix-gateway",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.mockFn(t, &tc)
+			rsp, err := GetServiceName(tc.kubectl)
+			if tc.errorReason != "" {
+				assert.Contains(t, err.Error(), tc.errorReason, "check error")
+			} else {
+				assert.NoError(t, err)
 				assert.Equal(t, tc.wantRsp, rsp, "check response")
 			}
 		})

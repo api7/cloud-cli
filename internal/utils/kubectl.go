@@ -4,9 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -14,10 +11,7 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 )
 
-var (
-	getAPISIXIDRetry = 3
-)
-
+// GetDeploymentName get the deploy name for APISIX instance
 func GetDeploymentName(kubectl commands.Cmd) (string, error) {
 	deployOpts := options.Global.Deploy
 	kubectl.AppendArgs("get", "deployment", "-n", deployOpts.Kubernetes.NameSpace)
@@ -32,6 +26,7 @@ func GetDeploymentName(kubectl commands.Cmd) (string, error) {
 	return stdout, nil
 }
 
+// GetPodsNames get the pod names for APISIX instance
 func GetPodsNames(kubectl commands.Cmd) ([]string, error) {
 	deployOpts := options.Global.Deploy
 	kubectl.AppendArgs("get", "pods", "-n", deployOpts.Kubernetes.NameSpace)
@@ -47,27 +42,37 @@ func GetPodsNames(kubectl commands.Cmd) ([]string, error) {
 	return podsNames, nil
 }
 
+// GetAPISIXID get the id for APISIX instance
 func GetAPISIXID(kubectl commands.Cmd, podName string) (string, error) {
-	var (
-		stdout     string
-		err        error
-		retry      int
-		deployOpts = options.Global.Deploy
-	)
+	deployOpts := options.Global.Deploy
 
-	for {
-		retry++
+	kubectl.AppendArgs("wait", "--for", "condition=Ready", "--timeout", "60s")
+	kubectl.AppendArgs(fmt.Sprintf("pod/%s", podName), "-n", deployOpts.Kubernetes.NameSpace)
+	if _, err := runKubectl(kubectl); err != nil {
+		return "", err
+	}
 
-		kubectl.AppendArgs("exec", podName, "-n", deployOpts.Kubernetes.NameSpace)
-		kubectl.AppendArgs("--", "cat", "/usr/local/apisix/conf/apisix.uid")
-		if stdout, err = runKubectl(kubectl); err == nil {
-			break
-		} else if strings.Contains(err.Error(), "container not found") && retry < getAPISIXIDRetry {
-			output.Warnf("After %d seconds will be auto retry!", retry)
-			time.Sleep(time.Second * time.Duration(retry))
-		} else {
-			return "", err
-		}
+	kubectl.AppendArgs("exec", podName, "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("--", "cat", "/usr/local/apisix/conf/apisix.uid")
+
+	stdout, err := runKubectl(kubectl)
+	if err != nil {
+		return "", err
+	}
+
+	return stdout, nil
+}
+
+// GetServiceName get the service name for APISIX instance
+func GetServiceName(kubectl commands.Cmd) (string, error) {
+	deployOpts := options.Global.Deploy
+	kubectl.AppendArgs("get", "service", "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("-l", fmt.Sprintf("app.kubernetes.io/instance=%s", deployOpts.Name))
+	kubectl.AppendArgs("-o", "jsonpath=\"{.items[0].metadata.name}\"")
+
+	stdout, err := runKubectl(kubectl)
+	if err != nil {
+		return "", err
 	}
 
 	return stdout, nil
@@ -91,7 +96,7 @@ func runKubectl(kubectl commands.Cmd) (string, error) {
 		output.Verbosef(stdout)
 	}
 	if err != nil {
-		return "", errors.Wrap(err, stderr)
+		return "", err
 	}
 
 	return stdout, nil

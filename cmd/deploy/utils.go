@@ -251,6 +251,7 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 func printInstallDetailForKubernetes(kubectl commands.Cmd) {
 	var (
 		deploymentName string
+		serviceName    string
 		podsNames      []string
 		APISIXID       string
 		err            error
@@ -271,12 +272,19 @@ func printInstallDetailForKubernetes(kubectl commands.Cmd) {
 	}
 	output.Infof("The APISIX Deployment name is: %s", deploymentName)
 
+	output.Infof("\nWorkloads:")
+
+	if serviceName, err = utils.GetServiceName(kubectl); err != nil {
+		output.Warnf("Failed to get Service: %s", err.Error())
+		return
+	}
+	output.Infof("Service name: %s", serviceName)
+
 	if podsNames, err = utils.GetPodsNames(kubectl); err != nil {
 		output.Warnf("Failed to get pods: %s", err.Error())
 		return
 	}
 
-	output.Infof("\nWorkloads:")
 	for _, podName := range podsNames {
 		if APISIXID, err = utils.GetAPISIXID(kubectl, podName); err != nil {
 			output.Warnf("Failed to get APISIXID: %s", err.Error())
