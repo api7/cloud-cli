@@ -268,9 +268,8 @@ func printInstallDetailForKubernetes(kubectl commands.Cmd) {
 	if deploymentName, err = utils.GetDeploymentName(kubectl); err != nil {
 		output.Warnf("Failed to get Deployment: %s", err.Error())
 		return
-	} else {
-		output.Infof("The APISIX Deployment name is: %s", deploymentName)
 	}
+	output.Infof("The APISIX Deployment name is: %s", deploymentName)
 
 	if podsNames, err = utils.GetPodsNames(kubectl); err != nil {
 		output.Warnf("Failed to get pods: %s", err.Error())
