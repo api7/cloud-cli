@@ -18,7 +18,7 @@ TODO: Add screenshot of Personal Access Token creation page.
 account, so please save it carefully.
 
 It is recommended to configure a reasonable expiry time for the Personal Access
-Token, such as `30` Days.
+Token, such as `30` days.
 
 Once it's leaked accidentally, you can revoke it on API7 Cloud to avoid possible
 security risks.
