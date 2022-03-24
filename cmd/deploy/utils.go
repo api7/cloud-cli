@@ -229,9 +229,6 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 
 	newCtx, cancel := context.WithTimeout(context.TODO(), consts.DefaultKubectlTimeout)
 	defer cancel()
-	go utils.WaitForSignal(func() {
-		cancel()
-	})
 
 	stdout, stderr, err := kubectl.Run(newCtx)
 	if stderr != "" {
@@ -249,6 +246,45 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 	}
 
 	return nil
+}
+
+func printInstallDetailForKubernetes(kubectl commands.Cmd) {
+	var (
+		deploymentName string
+		podsNames      []string
+		APISIXID       string
+		err            error
+	)
+
+	defer func() {
+		if err != nil {
+			output.Errorf("Deploy was succeed. Please view related resources of kubernetes manually.")
+		}
+	}()
+
+	output.Infof("\nCongratulations! Your APISIX cluster was deployed successfully on Kubernetes.\n")
+	output.Infof("The Helm release name is: %s", options.Global.Deploy.Name)
+
+	if deploymentName, err = utils.GetDeploymentName(kubectl); err != nil {
+		output.Warnf("Failed to get Deployment: %s", err.Error())
+		return
+	} else {
+		output.Infof("The APISIX Deployment name is: %s", deploymentName)
+	}
+
+	if podsNames, err = utils.GetPodsNames(kubectl); err != nil {
+		output.Warnf("Failed to get pods: %s", err.Error())
+		return
+	}
+
+	output.Infof("\nWorkloads:")
+	for _, podName := range podsNames {
+		if APISIXID, err = utils.GetAPISIXID(kubectl, podName); err != nil {
+			output.Warnf("Failed to get APISIXID: %s", err.Error())
+			return
+		}
+		output.Infof("Pod Name: %s APISIX ID: %s", podName, APISIXID)
+	}
 }
 
 func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name string) (string, error) {

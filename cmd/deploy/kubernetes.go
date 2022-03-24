@@ -38,7 +38,8 @@ const (
 
 func newKubernetesCommand() *cobra.Command {
 	var (
-		ctx deployContext
+		ctx     deployContext
+		kubectl commands.Cmd
 	)
 
 	cmd := &cobra.Command{
@@ -56,7 +57,7 @@ cloud-cli deploy kubernetes \
 			if opts.KubectlCLIPath == "" {
 				opts.KubectlCLIPath = "kubectl"
 			}
-			kubectl := commands.New(opts.KubectlCLIPath, options.Global.DryRun)
+			kubectl = commands.New(opts.KubectlCLIPath, options.Global.DryRun)
 
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
@@ -130,6 +131,7 @@ cloud-cli deploy kubernetes \
 				helm.AppendArgs("--values", configFile)
 
 				helmRun(newCtx, helm)
+				printInstallDetailForKubernetes(kubectl)
 			}
 		},
 	}
