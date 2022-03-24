@@ -52,9 +52,10 @@ set -e
 
 version="2\.11\.0"
 instance_id=""
+apisix_home="/usr/local/apisix"
 
-installed_version=\$\(apisix version 2>/dev/null\)
-if \[\[ \$\? -ne 0 \]\]; then
+installed_version=\$\(apisix version 2>/dev/null\) || true
+if \[\[ -z \$\{installed_version\} \]\]; then
   yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
   yum install -y apisix-\$version
 fi
@@ -62,14 +63,19 @@ fi
 # copy certs to apisix directory to avoid permission issue
 cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
 
-# get the APISIX instance id when instance id is not set
-if \[\[ -z \$\{instance_id\} \]\]; then
-  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+if \[\[ -n \$\{instance_id\} \]\]; then
+  echo "\$\{instance_id\}" > \$\{apisix_home\}/conf/apisix\.uid
 fi
 
 apisix start -c .*/apisix-config-\d+\.yaml
+status=\$\?
 
-if \[\[ \$\? -eq 0 \]\]; then
+# get the APISIX instance id when instance id is not set
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat \$\{apisix_home\}/conf/apisix\.uid\)"
+fi
+
+if \[\[ \$status -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
   echo "Instance ID: \$\{instance_id\}"
 fi
@@ -105,9 +111,10 @@ set -e
 
 version="2\.11\.0"
 instance_id=""
+apisix_home="/usr/local/apisix"
 
-installed_version=\$\(apisix version 2>/dev/null\)
-if \[\[ \$\? -ne 0 \]\]; then
+installed_version=\$\(apisix version 2>/dev/null\) || true
+if \[\[ -z \$\{installed_version\} \]\]; then
   yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
   yum install -y apisix-\$version
 fi
@@ -115,14 +122,19 @@ fi
 # copy certs to apisix directory to avoid permission issue
 cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
 
-# get the APISIX instance id when instance id is not set
-if \[\[ -z \$\{instance_id\} \]\]; then
-  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+if \[\[ -n \$\{instance_id\} \]\]; then
+  echo "\$\{instance_id\}" > \$\{apisix_home\}/conf/apisix\.uid
 fi
 
-apisix start -c /.*/apisix-config-\d+\.yaml
+apisix start -c .*/apisix-config-\d+\.yaml
+status=\$\?
 
-if \[\[ \$\? -eq 0 \]\]; then
+# get the APISIX instance id when instance id is not set
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat \$\{apisix_home\}/conf/apisix\.uid\)"
+fi
+
+if \[\[ \$status -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
   echo "Instance ID: \$\{instance_id\}"
 fi
@@ -158,9 +170,10 @@ set -e
 
 version="2\.11\.0"
 instance_id="1234-abcd"
+apisix_home="/usr/local/apisix"
 
-installed_version=\$\(apisix version 2>/dev/null\)
-if \[\[ \$\? -ne 0 \]\]; then
+installed_version=\$\(apisix version 2>/dev/null\) || true
+if \[\[ -z \$\{installed_version\} \]\]; then
   yum install -y https://repos.apiseven.com/packages/centos/apache-apisix-repo-1\.0-1\.noarch\.rpm
   yum install -y apisix-\$version
 fi
@@ -168,14 +181,19 @@ fi
 # copy certs to apisix directory to avoid permission issue
 cp -rf .*/\.api7cloud/tls /usr/local/apisix/conf/ssl
 
-# get the APISIX instance id when instance id is not set
-if \[\[ -z \$\{instance_id\} \]\]; then
-  instance_id="\$\(cat /usr/local/apisix/conf/apisix\.uid\)"
+if \[\[ -n \$\{instance_id\} \]\]; then
+  echo "\$\{instance_id\}" > \$\{apisix_home\}/conf/apisix\.uid
 fi
 
-apisix start -c /.*/apisix-config-\d+\.yaml
+apisix start -c .*/apisix-config-\d+\.yaml
+status=\$\?
 
-if \[\[ \$\? -eq 0 \]\]; then
+# get the APISIX instance id when instance id is not set
+if \[\[ -z \$\{instance_id\} \]\]; then
+  instance_id="\$\(cat \$\{apisix_home\}/conf/apisix\.uid\)"
+fi
+
+if \[\[ \$status -eq 0 \]\]; then
   echo "Your APISIX Instance was deployed successfully!"
   echo "Instance ID: \$\{instance_id\}"
 fi
