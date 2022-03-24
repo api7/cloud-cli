@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -127,10 +128,11 @@ func mockCloudModule(t *testing.T) []byte {
 
 func TestDeployPreRunForDocker(t *testing.T) {
 	testCases := []struct {
-		name          string
-		errorReason   string
-		mockFn        func(t *testing.T)
-		filledContext deployContext
+		name              string
+		errorReason       string
+		mockFn            func(t *testing.T)
+		specifiedAPISIXID string
+		filledContext     deployContext
 	}{
 		{
 			name:        "failed to get default control plane",
@@ -203,7 +205,8 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			},
 		},
 		{
-			name: "success",
+			name:              "success with specified apisix id",
+			specifiedAPISIXID: "abcabc",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
@@ -264,6 +267,10 @@ etcd:
 			ctx := &deployContext{}
 			tc.mockFn(t)
 
+			if tc.specifiedAPISIXID != "" {
+				options.Global.Deploy.APISIXInstanceID = tc.specifiedAPISIXID
+			}
+
 			err := deployPreRunForDocker(ctx)
 			if tc.errorReason != "" {
 				assert.Equal(t, tc.errorReason, err.Error(), "check error")
@@ -271,6 +278,13 @@ etcd:
 				assert.NoError(t, err, "check error")
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Equal(t, string(tc.filledContext.essentialConfig), string(ctx.essentialConfig), "check essential config")
+
+				id, err := ioutil.ReadFile(filepath.Join(persistence.HomeDir, "apisix.uid"))
+				assert.Nil(t, err, "read apisix.uid")
+				// We cannot add an assertion if the ID was generated randomly.
+				if tc.specifiedAPISIXID != "" {
+					assert.Equal(t, tc.specifiedAPISIXID, string(id), "check apisix id")
+				}
 			}
 		})
 	}
@@ -766,63 +780,6 @@ func TestGetDockerContainerIDbyName(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cmd := tc.mockFn(t)
 			out, err := getDockerContainerIDByName(context.TODO(), cmd, "apisix")
-			if tc.errorReason != "" {
-				assert.Empty(t, out, "check if output is empty")
-				assert.Equal(t, tc.errorReason, err.Error(), "check the error reason")
-			} else {
-				assert.Nil(t, err, "check if error is nil")
-				assert.Equal(t, tc.output, out, "check the output")
-			}
-		})
-	}
-}
-
-func TestGetAPISIXIDFromDocker(t *testing.T) {
-	testCases := []struct {
-		name        string
-		mockFn      func(t *testing.T) commands.Cmd
-		output      string
-		errorReason string
-	}{
-		{
-			name: "mock error",
-			mockFn: func(t *testing.T) commands.Cmd {
-				ctrl := gomock.NewController(t)
-				cmd := commands.NewMockCmd(ctrl)
-				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
-				cmd.EXPECT().Run(gomock.Any()).Return("", "", errors.New("mock error"))
-				return cmd
-			},
-			errorReason: "mock error",
-		},
-		{
-			name: "stderr is not empty",
-			mockFn: func(t *testing.T) commands.Cmd {
-				ctrl := gomock.NewController(t)
-				cmd := commands.NewMockCmd(ctrl)
-				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
-				cmd.EXPECT().Run(gomock.Any()).Return("", "stderr", nil)
-				return cmd
-			},
-			errorReason: "get apisix id: stderr: stderr",
-		},
-		{
-			name: "success",
-			mockFn: func(t *testing.T) commands.Cmd {
-				ctrl := gomock.NewController(t)
-				cmd := commands.NewMockCmd(ctrl)
-				cmd.EXPECT().AppendArgs("exec", "123", "cat", "/usr/local/apisix/conf/apisix.uid")
-				cmd.EXPECT().Run(gomock.Any()).Return("c777db9b-c2bc-4d2a-bbb1-0ee393a0b2c0", "", nil)
-				return cmd
-			},
-			output: "c777db9b-c2bc-4d2a-bbb1-0ee393a0b2c0",
-		},
-	}
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			cmd := tc.mockFn(t)
-			out, err := getAPISIXIDFromDocker(context.TODO(), cmd, "123")
 			if tc.errorReason != "" {
 				assert.Empty(t, out, "check if output is empty")
 				assert.Equal(t, tc.errorReason, err.Error(), "check the error reason")
