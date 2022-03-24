@@ -85,7 +85,7 @@ func TestConfigureCommand(t *testing.T) {
 		{
 			name: "success never expire token",
 			// never expire token
-			token:           "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOi0xLCJqdGkiOiJ1c2VyX2lkIn0.Jf6YGTi-SD6mc8y_VZ4dJ4PiV1wfBBvUXAggWWQPr-0ZRc8hHyTLhxrKag8qsbByKBCFWO9jfPYMUrDnIgWzhKMg6s60dScYXGN1eaqmajBJFLKlHCGFSPojbJAVhah3KZjLzJDFRj_xqm0Z-AL7V4eSP0Uz4Ax7Qqu-Ubzpb4WQcLgiALURD_f47eiakMMMrIQ-ZstF2Qw4zKaWiZv-YIUhjiHRCsN2nJ2RONAU5sclqy4AlXqgOYrm_OzkN9uBH0by7QNpK2lrSTrtNBrVOg8SX-vTihEEPP4Ao_x41zwcIp_67_2YQ8uaWc_CJBjwsO6wompIu5lbn-7ghWf5-A",
+			token:           "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkZW1vQGFwaTcuYWkifQ.B4A24SzFACF05wrZPmamfizi_7Qw5ftmN4HjHG8U2jU_eoOYzZsP0Rx8TqblUn9LW8TQshLQ-H5iEWvL8b37j1JuHg2jcZc0X8N9aFXqBt4vUNB5Ha-oq0N5ZmrY5sLGsXhhWdkH1SHU6yqsf9ZyR24gkC5ljoO5wnyX-JuiaL6HUkPcQ2lVI-BdIAvJy1G8Ujov1VjdZPCK-HI9JMpqq1pUmIOZ8axUvoaKEAXswiMag-U52cQjMtx5GguByXLQuzdIYq_YQZk90MWQMptD2KRs3AVYQy3ZJxZeEgwmZcf9eNZCAVVJy4H3ubSgdiGIzrNi_Cr9hRN-0tjboK6ECg",
 			successExpected: true,
 			outputExpected: []string{
 				"You are using a token that has no expiration time, please note the security risk",
