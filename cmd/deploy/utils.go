@@ -258,7 +258,7 @@ func printInstallDetailForKubernetes(kubectl commands.Cmd) {
 
 	defer func() {
 		if err != nil {
-			output.Errorf("Deploy was succeed. Please view related resources of kubernetes manually.")
+			output.Errorf("Failed to print APISIX installation details. Please view related resources of Kubernetes manually.")
 		}
 	}()
 
