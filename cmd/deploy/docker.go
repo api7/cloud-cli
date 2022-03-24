@@ -18,11 +18,6 @@ package deploy
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
-	"strings"
-
-	"github.com/spf13/cobra"
-
 	"github.com/api7/cloud-cli/internal/apisix"
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/consts"
@@ -30,6 +25,9 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/utils"
+	"github.com/spf13/cobra"
+	"io/ioutil"
+	"strings"
 )
 
 func newDockerCommand() *cobra.Command {
@@ -89,6 +87,7 @@ cloud-cli deploy docker \
 			}
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.cloudLuaModuleDir+",target=/cloud_lua_module,readonly")
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.tlsDir+",target=/cloud/tls,readonly")
+			docker.AppendArgs("--mount", "type=bind,source="+ctx.apisixIDFile+",target=/usr/local/apisix/conf/apisix.uid,readonly")
 
 			// TODO support customization of the HTTP and HTTPS ports.
 			docker.AppendArgs("-p", "9080:9080")
@@ -109,12 +108,12 @@ cloud-cli deploy docker \
 				output.Verbosef("Running:\n%s\n", docker.String())
 			}
 
-			ctx, cancel := context.WithCancel(context.TODO())
+			newctx, cancel := context.WithCancel(context.TODO())
 			go utils.WaitForSignal(func() {
 				cancel()
 			})
 
-			stdout, stderr, err := docker.Run(ctx)
+			stdout, stderr, err := docker.Run(newctx)
 			if stderr != "" {
 				output.Warnf(stderr)
 			}
@@ -128,23 +127,14 @@ cloud-cli deploy docker \
 			fmt.Println("Congratulations! Your APISIX instance was deployed successfully")
 
 			docker = getDockerCommand()
-			containerID, err := getDockerContainerIDByName(ctx, docker, options.Global.Deploy.Name)
+			containerID, err := getDockerContainerIDByName(newctx, docker, options.Global.Deploy.Name)
 			if err != nil {
 				message := fmt.Sprintf("failed to get APISIX container ID: %s\nPlease check it via docker ps command\n", err)
 				output.Errorf(message)
 				return
 			}
 			fmt.Printf("Container ID: %s\n", containerID)
-
-			docker = getDockerCommand()
-			apisixID, err := getAPISIXIDFromDocker(ctx, docker, containerID)
-			if err != nil {
-				message := fmt.Sprintf("failed to get APISIX ID: %s\nPlease check it by login the container %s and see /usr/local/apisix/conf/apisix.uid\n", containerID, err)
-				output.Errorf(message)
-				return
-			}
-
-			fmt.Printf("APISIX ID: %s\n", apisixID)
+			fmt.Printf("APISIX ID: %s\n", ctx.apisixID)
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.11.0-centos", "Specify the Apache APISIX image")

@@ -20,6 +20,9 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -38,6 +41,8 @@ type deployContext struct {
 	cloudLuaModuleDir string
 	tlsDir            string
 	essentialConfig   []byte
+	apisixIDFile      string
+	apisixID          string
 	// ControlPlane is the current control plane.
 	ControlPlane   *types.ControlPlane
 	KubernetesOpts *options.KubernetesDeployOptions
@@ -88,6 +93,22 @@ func deployPreRunForDocker(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
+
+	// We generate the APISIX instance ID and mount to /usr/local/apisix/conf/apisix.uid
+	ctx.apisixID = options.Global.Deploy.APISIXInstanceID
+	if ctx.apisixID == "" {
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return errors.Wrap(err, "failed to generate APISIX instance ID")
+		}
+		ctx.apisixID = id.String()
+	}
+
+	ctx.apisixIDFile = filepath.Join(persistence.HomeDir, "apisix.uid")
+	if err := ioutil.WriteFile(ctx.apisixIDFile, []byte(ctx.apisixID), 0644); err != nil {
+		return errors.Wrap(err, "failed to save APISIX instance ID")
+	}
+
 	return nil
 }
 
@@ -260,17 +281,5 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 	if stderr != "" {
 		return "", fmt.Errorf("get container id: stderr: %s", stderr)
 	}
-	return stdout, nil
-}
-
-func getAPISIXIDFromDocker(ctx context.Context, docker commands.Cmd, id string) (string, error) {
-	docker.AppendArgs("exec", id, "cat", "/usr/local/apisix/conf/apisix.uid")
-	stdout, stderr, err := docker.Run(ctx)
-	if err != nil {
-		return "", err
-	}
-	if stderr != "" {
-		return "", fmt.Errorf("get apisix id: stderr: %s", stderr)
-	}
-	return stdout, nil
+	return strings.TrimRight(stdout, "\r\n"), nil
 }
