@@ -61,8 +61,8 @@ func NewCommand() *cobra.Command {
 				output.Errorf("invalid claim type")
 			}
 
-			expireAt := int64(claim["exp"].(float64))
-			if expireAt > 0 {
+			if claim["exp"] != nil {
+				expireAt := int64(claim["exp"].(float64))
 				if expireAt < time.Now().Unix() {
 					output.Errorf("access token expired")
 				}
