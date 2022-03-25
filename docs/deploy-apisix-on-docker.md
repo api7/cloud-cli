@@ -19,7 +19,7 @@ heartbeat, status reporting, etc.), it'll be downloaded every time you run the c
 * The TLS Bundle
 
 TLS Bundle (Certificate, Private Key, CA Bundle) will be downloaded from API7
-Cloud, only instances with valid client certificate can be connected to API7 Cloud.
+Cloud, only instances with a valid client certificate can connect to API7 Cloud.
 
 > See the
 > [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getCertificates)
