@@ -62,7 +62,7 @@ In this command, we:
 4. specify the APISIX image `apache/apisix:2.11.0-centos`;
 5. prints the output in the table format for helm install command.
 
-In this command, the following operations will be done:
+And the following operations were done in the above command:
 
 1. create helm release that name is `my-apisix`;
 2. create namespace on Kubernetes that name is `apisix`, if it not already existed;
