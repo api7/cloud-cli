@@ -15,7 +15,7 @@ heartbeat, status reporting, etc.), it'll be downloaded every time you run the c
 
 > Currently, the Cloud Lua Module will be downloaded from [api7/cloud-scripts](https://github.com/api7/cloud-scripts).
 
-Secret contains the `TLS Bundle`.
+* TLS Bundle is stored in the Secret.
 
 TLS Bundle (Certificate, Private Key, CA Bundle) will be downloaded from API7
 Cloud, only instances with a valid client certificate can be connected to API7 Cloud.
