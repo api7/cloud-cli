@@ -71,7 +71,7 @@ apisix start -c .*/apisix-config-\d+\.yaml
 status=\$\?
 
 # wait for APISIX started and generated instance id
-sleep 3
+sleep 1
 
 # get the APISIX instance id when instance id is not set
 if \[\[ -z \$\{instance_id\} \]\]; then
@@ -133,7 +133,7 @@ apisix start -c .*/apisix-config-\d+\.yaml
 status=\$\?
 
 # wait for APISIX started and generated instance id
-sleep 3
+sleep 1
 
 # get the APISIX instance id when instance id is not set
 if \[\[ -z \$\{instance_id\} \]\]; then
@@ -195,7 +195,7 @@ apisix start -c .*/apisix-config-\d+\.yaml
 status=\$\?
 
 # wait for APISIX started and generated instance id
-sleep 3
+sleep 1
 
 # get the APISIX instance id when instance id is not set
 if \[\[ -z \$\{instance_id\} \]\]; then
