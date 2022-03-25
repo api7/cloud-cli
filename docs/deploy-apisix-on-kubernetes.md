@@ -79,7 +79,7 @@ APISIX instance was deployed successfully. You can redirect to the API7 Cloud co
 to check the status of your APISIX instance.
 ![img.png](./deploy-apisix-on-kubernetes-succeed.png)
 
-> You can also run the `kubectl get` command to check the status for this Deploying.
+> You can also run the `kubectl get` command to check the status for this deployment.
 
 Besides, the service will expose two ports on its host for HTTP and HTTPS, so
 you can access your APISIX instance through `node ip:port of http` (HTTP) or
