@@ -75,7 +75,7 @@ In this command, the following operations will be done:
 5. create Deployment, Service, Pod on namespace which name is `apisix`.
 
 If you see the similar output about the Helm release name, APISIX Deployment name, APISIX Service name, Pod Name and APISIX ID, then your
-APISIX instance is deployed successfully. You can redirect to API7 Cloud console
+APISIX instance was deployed successfully. You can redirect to the API7 Cloud console
 to check the status of your APISIX instance.
 ![img.png](./deploy-apisix-on-kubernetes-succeed.png)
 
