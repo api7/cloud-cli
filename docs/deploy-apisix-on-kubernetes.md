@@ -61,7 +61,7 @@ In this command, we:
 
 1. name the helm release to `my-apisix`;
 2. specify the namespace is `apisix`;
-3. specify the APISIX pods replica is `2`;
+3. specify the APISIX pods replica is `1`;
 4. specify the APISIX image `apache/apisix:2.11.0-centos`;
 5. prints the output in the table format for helm install command;
 6. wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state.
