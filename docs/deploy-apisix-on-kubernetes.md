@@ -6,7 +6,7 @@ In this section, you'll learn how to deploy APISIX on Kubernetes through Cloud C
 > Note, before you go ahead, make sure you read the section
 > [How to Configure Cloud CLI](./configuring-cloud-cli.md)
 
-Cloud CLI will create Deployment, Service, ConfigMap, Secret, and Pos on Kubernetes for APISIX.
+Cloud CLI will create Deployment, Service, ConfigMap, Secret, and Pod on Kubernetes for APISIX.
 
 ConfigMap contains the `Cloud Lua Module`.
 
