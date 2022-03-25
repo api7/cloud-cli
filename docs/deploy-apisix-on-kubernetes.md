@@ -6,16 +6,20 @@ In this section, you'll learn how to deploy APISIX on Kubernetes through Cloud C
 > Note, before you go ahead, make sure you read the section
 > [How to Configure Cloud CLI](./configuring-cloud-cli.md)
 
-Cloud CLI will create Deployment, Service, ConfigMap, Secret, and Pod on Kubernetes for APISIX.
+Cloud CLI will create [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment), 
+[Service](https://kubernetes.io/docs/concepts/services-networking/service), 
+[ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap) and 
+[Secret](https://kubernetes.io/docs/concepts/configuration/secret)
+on Kubernetes for APISIX, each resource provides different functionality.
 
-* The Cloud Lua Module is stored in the ConfigMap (default name is xxxx)
+* The Cloud Lua Module is stored in the ConfigMap (default name is cloud-module).
 
 The Cloud Lua Module contains codes to communicate with API7 Cloud (such as
 heartbeat, status reporting, etc.), it'll be downloaded every time you run the command.
 
 > Currently, the Cloud Lua Module will be downloaded from [api7/cloud-scripts](https://github.com/api7/cloud-scripts).
 
-* TLS Bundle is stored in the Secret.
+* TLS Bundle is stored in the Secret (default name is cloud-ssl).
 
 TLS Bundle (Certificate, Private Key, CA Bundle) will be downloaded from API7
 Cloud, only instances with a valid client certificate can be connected to API7 Cloud.
@@ -27,13 +31,8 @@ Cloud, only instances with a valid client certificate can be connected to API7 C
 Cloud CLI deploys APISIX on Kubernetes by using [helm](https://helm.sh/), so please make sure helm was installed before you go ahead.
 the essential parts that APISIX needs to run, the configuration items in values are referenced into the deployment.yaml.
 
-> See [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml)
-> to learn the completed APISIX Configuration.
-> See [deployment.yaml](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/templates/deployment.yaml)
-> and [helpers.tpl](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/templates/_helpers.tpl)
-> to learn configurations deployment for the kubernetes.
 > See [Helm Values Template API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getControlPlaneStartupConfig)
-> for the details.
+> you can get a value.yaml template of the helm.
 
 
 Run Command
@@ -45,8 +44,7 @@ cloud-cli deploy kubernetes \
   --namespace apisix \
   --replica-count 1 \
   --apisix-image apache/apisix:2.11.0-centos \
-  --helm-install-arg --output=table \
-  --helm-install-arg --wait`
+  --helm-install-arg --output=table
 
 Congratulations! Your APISIX cluster was deployed successfully on Kubernetes.
 The Helm release name is: my-apisix
@@ -63,8 +61,7 @@ In this command, we:
 2. specify the namespace is `apisix`;
 3. specify the APISIX pods replica is `1`;
 4. specify the APISIX image `apache/apisix:2.11.0-centos`;
-5. prints the output in the table format for helm install command;
-6. wait until all Pods, PVCs, Services, and minimum number of Pods of a Deployment, StatefulSet, or ReplicaSet are in a ready state.
+5. prints the output in the table format for helm install command.
 
 In this command, the following operations will be done:
 
@@ -76,15 +73,12 @@ In this command, the following operations will be done:
 
 If you see the similar output about the Helm release name, APISIX Deployment name, APISIX Service name, Pod Name and APISIX ID, then your
 APISIX instance was deployed successfully. You can redirect to the API7 Cloud console
-to check the status of your APISIX instance.
+to check the status of your APISIX cluster.
 ![img.png](./deploy-apisix-on-kubernetes-succeed.png)
 
 > You can also run the `kubectl get` command to check the status for this deployment.
 
-Besides, the service will expose two ports on its host for HTTP and HTTPS, so
-you can access your APISIX instance through `node ip:port of http` (HTTP) or
-`node ip:port of https` (HTTPS). And also, you can go into the Kubernetes 
-cluster and access service or pods of APISIX instance directly
+Besides, you can go into the Kubernetes and access APISIX cluster through by service or pods.
 
 Stop Instance
 -------------
@@ -99,10 +93,9 @@ cloud-cli stop kubernetes \
 
 In this command, the following operations will be done:
 
-1. delete helm release that name is `my-apisix`;
+1. delete helm release that name is `my-apisix`, it will be delete the Deployment and Service;
 2. delete secret with name is `cloud-ssl` on namespace which name is `apisix`;
-3. delete configMap with name is `cloud-module` on namespace which name is `apisix`;
-4. delete Deployment, Service, Pod on namespace which name is `apisix`.
+3. delete configMap with name is `cloud-module` on namespace which name is `apisix`.
 
 
 Command Option Reference
