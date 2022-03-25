@@ -29,7 +29,6 @@ Cloud, only instances with a valid client certificate can be connected to API7 C
 > to learn the details.
 
 Cloud CLI deploys APISIX on Kubernetes by using [helm](https://helm.sh/), so please make sure helm was installed before you go ahead.
-the essential parts that APISIX needs to run, the configuration items in values are referenced into the deployment.yaml.
 
 > See [Helm Values Template API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getControlPlaneStartupConfig)
 > you can get a value.yaml template of the helm.
