@@ -8,7 +8,7 @@ In this section, you'll learn how to deploy APISIX on Kubernetes through Cloud C
 
 Cloud CLI will create Deployment, Service, ConfigMap, Secret, and Pod on Kubernetes for APISIX.
 
-ConfigMap contains the `Cloud Lua Module`.
+* The Cloud Lua Module is stored in the ConfigMap (default name is xxxx)
 
 The Cloud Lua Module contains codes to communicate with API7 Cloud (such as
 heartbeat, status reporting, etc.), it'll be downloaded every time you run the command.
