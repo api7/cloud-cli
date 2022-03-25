@@ -1,4 +1,4 @@
-Docker APISIX on Docker
+Deploy APISIX on Docker
 =======================
 
 In this section, you'll learn how to deploy APISIX on Docker through Cloud CLI.
