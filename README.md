@@ -15,3 +15,4 @@ Cloud CLI supports deploying, stopping [Apache APISIX](https://apisix.apache.org
 
 * [How to Configure Cloud CLI](./docs/configuring-cloud-cli.md)
 * [How to Deploy APISIX on Docker](./docs/deploy-apisix-on-docker.md)
+* [How to Deploy APISIX on Kubernetes](./docs/deploy-apisix-on-kubernetes.md)
