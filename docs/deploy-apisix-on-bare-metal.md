@@ -29,7 +29,7 @@ avoid permission issue.
 
 * The APISIX Configuration Template
 
-Cloud CLI will also download the APISIX Configuration Template, which contains
+Cloud CLI will also download the APISIX configuration template, which contains
 the essential parts that APISIX needs to run.
 
 > See
@@ -55,15 +55,13 @@ In this command, we:
 2. install Apache APISIX and dependencies;
 3. load Cloud Lua Module and start Apache APISIX instance;
 
-If you see the similar output about the message, `Congratulations! Your APISIX instance was deployed successfully`
-and instance ID, then your APISIX instance is deployed successfully. You can 
+If you see a similar output about the message
+then your APISIX instance is deployed successfully. You can 
 redirect to API7 Cloud console to check the status of your APISIX instance.
 
 > You can also run the `ps -ef |grep apisix` command to check the status of the Apache APISIX service.
 
-Besides, Apache APISIX service will listen the incoming HTTP traffic on `9080` port, and
-listen the incoming HTTPS traffic on `9443`. Care must be taken here that you 
-**cannot start up** Apache APISIX instance when these ports are already be used.
+Besides, Apache APISIX service will listen the ports `9080` for HTTP traffic and `9443` for HTTPS. Care must be taken here that you may suffer from the "port is already in use" issue if these ports were occupied.
 
 Stop Instance
 -------------
