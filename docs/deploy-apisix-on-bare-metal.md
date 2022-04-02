@@ -1,12 +1,20 @@
 Deploy APISIX on Bare Metal
 =======================
 
-In this section, **it is available for CentOS 7 only**, you'll learn how to deploy APISIX on Bare Metal through Cloud CLI.
+In this section, you'll learn how to deploy APISIX on Bare Metal (**only CentOS 7
+is supported**) through Cloud CLI.
 
 > Note, before you go ahead, and please make sure you read the section
 > [How to Configure Cloud CLI](./configuring-cloud-cli.md)
 
-Cloud CLI will help you to install APISIX with dependencies, Cloud Lua Module, and generate configuration to communicate with Control Plane.
+Cloud CLI will help you to install Apache APISIX, Cloud Lua Module, and generate
+configuration (to communicate with Control Plane).
+
+* Apache APISIX
+
+Cloud CLI will install Apache APISIX via the RPM package, see
+[Installation via RPM Repository (CentOS 7)](https://apisix.apache.org/docs/apisix/how-to-build#installation-via-rpm-repository-centos-7)
+for more details.
 
 * The Cloud Lua Module
 
@@ -38,25 +46,11 @@ the essential parts that APISIX needs to run.
 > See [APISIX Configuration Template API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getControlPlaneStartupConfig)
 > for the details.
 
-* Dependencies of Apache APISIX
-
-Cloud CLI will help you to install repositories of Apache APISIX, which contains 
-both OpenResty and Apache APISIX. The following are the dependencies for installation:
-
-- apisix
-- openresty
-- openldap
-- iproute
-- iptable
-- libmnl
-...
-
 Run Command
 -----------
 
 ```shell
-cloud-cli deploy bare \
-    --apisix-version 2.11.0
+cloud-cli deploy bare --apisix-version 2.11.0
 
 Congratulations! Your APISIX instance was deployed successfully
 APISIX ID: 4189c82c-fdf1-40f2-87e2-9a7bb6ad5ed7
@@ -64,16 +58,19 @@ APISIX ID: 4189c82c-fdf1-40f2-87e2-9a7bb6ad5ed7
 
 In this command, we:
 
-1. install Apache APISIX and dependencies;
+1. install Apache APISIX;
 2. load Cloud Lua Module and start up Apache APISIX instance;
 
 If you see a similar output about the message
-then your APISIX instance is deployed successfully. You can 
+then your APISIX instance is deployed successfully. You can
 redirect to API7 Cloud console to check the status of your APISIX instance.
 
-> You can also run the `ps -ef |grep apisix` command to check the status of the Apache APISIX service.
+> You can also run the `ps -ef | grep apisix` command to check the status of the
+> Apache APISIX service.
 
-Besides, Apache APISIX service will listen the ports `9080` for HTTP traffic and `9443` for HTTPS. Care must be taken here that you may suffer from the "port is already in use" issue if these ports were occupied.
+Besides, Apache APISIX service will listen the ports `9080` for HTTP traffic and
+`9443` for HTTPS. Care must be taken here that you may suffer from the "port is
+already in use" issue if these ports were occupied.
 
 Stop Instance
 -------------
