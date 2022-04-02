@@ -15,6 +15,7 @@ git clone https://github.com/api7/cloud-cli.git
 cd /path/to/cloud-cli
 make build
 ```
+
 The executable will be saved in the `./bin` directory.
 
 Download by Go Install
