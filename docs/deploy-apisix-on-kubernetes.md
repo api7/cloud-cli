@@ -6,9 +6,10 @@ In this section, you'll learn how to deploy APISIX on Kubernetes through Cloud C
 > Note, before you go ahead, make sure you read the section
 > [How to Configure Cloud CLI](./configuring-cloud-cli.md)
 
-Cloud CLI will create [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment), 
-[Service](https://kubernetes.io/docs/concepts/services-networking/service), 
-[ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap) and 
+Cloud CLI will create
+[Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment),
+[Service](https://kubernetes.io/docs/concepts/services-networking/service),
+[ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap) and
 [Secret](https://kubernetes.io/docs/concepts/configuration/secret)
 on Kubernetes for APISIX, each resource provides different functionality.
 
@@ -28,11 +29,11 @@ Cloud, only instances with a valid client certificate can be connected to API7 C
 > [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getCertificates)
 > to learn the details.
 
-Cloud CLI deploys APISIX on Kubernetes by using [helm](https://helm.sh/), so please make sure helm was installed before you go ahead.
+Cloud CLI deploys APISIX on Kubernetes by using [helm](https://helm.sh/), so
+please make sure helm was installed before you go ahead.
 
 > See [Helm Values Template API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getControlPlaneStartupConfig)
 > you can get a value.yaml template of the helm.
-
 
 Run Command
 -----------
@@ -65,19 +66,23 @@ In this command, we:
 And the following operations were done in the above command:
 
 1. create helm release that name is `my-apisix`;
-2. create namespace on Kubernetes that name is `apisix`, if it not already existed;
-3. create secret with name is `cloud-ssl` on namespace which name is `apisix`, if it not already existed;
-4. create configMap with name is `cloud-module` on namespace which name is `apisix`, if it not already existed;
-5. create Deployment, Service, Pod on namespace which name is `apisix`.
+2. create namespace on Kubernetes that name is `apisix` ( if it doesn't exist);
+3. create secret with name is `cloud-ssl` on namespace which name is `apisix` (if
+it doesn't exist);
+4. create configMap with name is `cloud-module` on namespace which name is
+`apisix` (if it doesn't exist);
+5. create Deployment, Service, Pod on namespace.
 
-If you see the similar output about the Helm release name, APISIX Deployment name, APISIX Service name, Pod Name and APISIX ID, then your
+If you see the similar output about the Helm release name, APISIX Deployment name,
+APISIX Service name, Pod Name and APISIX ID, then your
 APISIX instance was deployed successfully. You can redirect to the API7 Cloud console
 to check the status of your APISIX cluster.
-![img.png](./deploy-apisix-on-kubernetes-succeed.png)
+![img.png](assets/deploy-apisix-on-kubernetes-succeed.png)
 
 > You can also run the `kubectl get` command to check the status for this deployment.
 
-Besides, you can go into the Kubernetes and access APISIX cluster through by service or pods.
+Besides, you can go into the Kubernetes and access APISIX cluster through by
+service or pods.
 
 Stop Instance
 -------------
@@ -92,13 +97,14 @@ cloud-cli stop kubernetes \
 
 In this command, the following operations will be done:
 
-1. delete helm release that name is `my-apisix`, it will be delete the Deployment and Service;
+1. delete helm release that name is `my-apisix`, it will be delete the Deployment
+and Service;
 2. delete secret with name is `cloud-ssl` on namespace which name is `apisix`;
 3. delete configMap with name is `cloud-module` on namespace which name is `apisix`.
-
 
 Command Option Reference
 ------------------------
 
-You can run `cloud-cli deploy kubernetes --help` or `cloud-cli stop kubernetes --help` to learn 
+You can run `cloud-cli deploy kubernetes --help` or
+`cloud-cli stop kubernetes --help` to learn
 the command line option meanings.
