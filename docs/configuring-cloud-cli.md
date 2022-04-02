@@ -12,13 +12,13 @@ First, you need to log in
 to [API7 Cloud Web Console](https://console.api7.cloud) to create a **Personal
 Access Token** associated with your account.
 
-<img width="1949" alt="Personal Access Token" src="https://user-images.githubusercontent.com/57465570/161368878-2c1e3649-7aa9-49a6-b087-6cd513a3bb0d.png">
+![img.png](assets/personal-access-token.png)
 
-<img width="1954" alt="Generate a new token" src="https://user-images.githubusercontent.com/57465570/161368910-45ed37e0-58cb-48ee-9ccd-9e1cff7d0c1a.png">
+![img.png](assets/generate-a-new-token.png)
 
-<img width="1954" alt="Enter token information" src="https://user-images.githubusercontent.com/57465570/161369019-31eb9abd-6fc9-4a17-81a9-d2da0c581d39.png">
+![img.png](assets/token-information.png)
 
-<img width="1954" alt="Created token successfully " src="https://user-images.githubusercontent.com/57465570/161369078-e3268466-1dca-44e7-a95e-796ae37032c7.png">
+![img.png](assets/created-token-successfully.png)
 
 **NOTE**: This Token will have the permission to operate resources under your
 account, so please save it carefully.
