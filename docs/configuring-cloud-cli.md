@@ -12,7 +12,13 @@ First, you need to log in
 to [API7 Cloud Web Console](https://console.api7.cloud) to create a **Personal
 Access Token** associated with your account.
 
-TODO: Add screenshot of Personal Access Token creation page.
+![img.png](assets/personal-access-token.png)
+
+![img.png](assets/generate-a-new-token.png)
+
+![img.png](assets/token-information.png)
+
+![img.png](assets/created-token-successfully.png)
 
 **NOTE**: This Token will have the permission to operate resources under your
 account, so please save it carefully.
