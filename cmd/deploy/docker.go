@@ -66,6 +66,7 @@ cloud-cli deploy docker \
 			for _, args := range opts.DockerRunArgs {
 				docker.AppendArgs(strings.Split(args, "=")...)
 			}
+			docker.AppendArgs("--detach")
 
 			if options.Global.Deploy.APISIXConfigFile != "" {
 				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
