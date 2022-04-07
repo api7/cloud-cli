@@ -29,6 +29,7 @@ func NewStopCommand() *cobra.Command {
 	}
 
 	cmd.PersistentFlags().StringVar(&options.Global.Stop.Name, "name", "apisix", "The identifier of this deployment, it would be the container name (on Docker), the helm release (on Kubernetes) and it's useless if APISIX is deployed on bare metal")
+	cmd.PersistentFlags().BoolVar(&options.Global.Stop.Remove, "rm", false, "The identifier of this deployment, which will force the removal of containers in docker")
 
 	cmd.AddCommand(newStopBareCommand())
 	cmd.AddCommand(newStopDockerCommand())

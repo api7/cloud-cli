@@ -50,6 +50,11 @@ func TestNewStopDockerCommand(t *testing.T) {
 			args:       []string{"docker", "--docker-cli-path", "/opt/docker"},
 			cmdPattern: "/opt/docker stop apisix",
 		},
+		{
+			name:       "test deploy docker command with rm",
+			args:       []string{"docker", "--name", "apisix-0", "--rm", "true"},
+			cmdPattern: "docker rm -f apisix-0",
+		},
 	}
 	for _, tc := range testcases {
 		tc := tc
