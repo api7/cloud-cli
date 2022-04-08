@@ -46,7 +46,12 @@ func newStopDockerCommand() *cobra.Command {
 			} else {
 				docker = commands.New("docker", options.Global.DryRun)
 			}
-			docker.AppendArgs("stop")
+			if options.Global.Stop.Remove {
+				docker.AppendArgs("rm")
+				docker.AppendArgs("-f")
+			} else {
+				docker.AppendArgs("stop")
+			}
 
 			if options.Global.Stop.Name != "" {
 				docker.AppendArgs(options.Global.Stop.Name)

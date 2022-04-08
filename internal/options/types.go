@@ -88,6 +88,8 @@ type StopOptions struct {
 	// It'll be the Helm release name if deploy on Kubernetes;
 	// It'll be noop if deploy on Bare metal.
 	Name string
+	// Remove controls whether to delete containers in docker
+	Remove bool
 	// Docker contains the options for the stop docker command.
 	Docker DockerStopOptions
 	// Kubernetes contains options for the kubectl or helm command.
