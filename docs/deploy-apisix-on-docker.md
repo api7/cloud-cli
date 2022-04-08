@@ -39,12 +39,12 @@ the essential parts that APISIX needs to run.
 Run Command
 -----------
 
+We always run the container in the background.
+
 ```shell
 cloud-cli deploy docker \
   --apisix-image apache/apisix:2.11.0-centos \
-  --name my-apisix \
-  --docker-run-arg --detach \
-  --docker-run-arg --rm
+  --name my-apisix
 
 Congratulations! Your APISIX instance was deployed successfully
 Container ID: 1b2e54380cdc
@@ -54,9 +54,7 @@ APISIX ID: 4189c82c-fdf1-40f2-87e2-9a7bb6ad5ed7
 In this command, we:
 
 1. name the container to `my-apisix`;
-2. use the APISIX image `apache/apisix:2.11.0-centos`;
-3. run the container in detached mode;
-4. remove the container after it's stopped.
+2. use the APISIX image `apache/apisix:2.11.0-centos`.
 
 If you see the similar output about the instance ID and container ID, then your
 APISIX instance is deployed successfully. You can redirect to API7 Cloud console
@@ -76,6 +74,12 @@ If you want to stop the container, just run the command below:
 
 ```shell
 cloud-cli stop docker --name my-apisix
+```
+
+If you want to stop and remove the container, just run the following command:
+
+```shell
+cloud-cli stop docker --name my-apisix --rm
 ```
 
 Command Option Reference
