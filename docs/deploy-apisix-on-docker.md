@@ -39,8 +39,6 @@ the essential parts that APISIX needs to run.
 Run Command
 -----------
 
-We always run the container in the background.
-
 ```shell
 cloud-cli deploy docker \
   --apisix-image apache/apisix:2.11.0-centos \
@@ -65,7 +63,8 @@ to check the status of your APISIX instance.
 Besides, the container will expose the port `9080` and `9443` to the host, so
 you can access your APISIX instance through `127.0.0.1:9080` (HTTP) or
 `127.0.0.1:9443` (HTTPS). Care must be taken here that you **cannot run** another
-APISIX instance on the same machine due to the port conflict.
+APISIX instance on the same machine due to the port conflict. We always run the
+container in the background.
 
 Stop Instance
 -------------
@@ -76,7 +75,9 @@ If you want to stop the container, just run the command below:
 cloud-cli stop docker --name my-apisix
 ```
 
-If you want to stop and remove the container, just run the following command:
+This command will stop the container but won't remove it (unless you already add
+the `--rm` flag when you deploy it), so if you want to remove the container, just
+run the following command:
 
 ```shell
 cloud-cli stop docker --name my-apisix --rm
