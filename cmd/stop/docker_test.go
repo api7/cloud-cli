@@ -52,7 +52,7 @@ func TestNewStopDockerCommand(t *testing.T) {
 		},
 		{
 			name:       "test deploy docker command with rm",
-			args:       []string{"docker", "--name", "apisix-0", "--rm", "true"},
+			args:       []string{"docker", "--name", "apisix-0", "--rm"},
 			cmdPattern: "docker rm -f apisix-0",
 		},
 	}
