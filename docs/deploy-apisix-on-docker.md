@@ -63,8 +63,9 @@ to check the status of your APISIX instance.
 Besides, the container will expose the port `9080` and `9443` to the host, so
 you can access your APISIX instance through `127.0.0.1:9080` (HTTP) or
 `127.0.0.1:9443` (HTTPS). Care must be taken here that you **cannot run** another
-APISIX instance on the same machine due to the port conflict. We always run the
-container in the background.
+APISIX instance on the same machine due to the port conflict.
+
+> Note: we always run the container in the background.
 
 Stop Instance
 -------------
