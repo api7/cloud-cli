@@ -2,8 +2,11 @@
 name: build the binary and push it to the release page
 on:
   push:
-    tags:
-      - '**'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -25,17 +28,17 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: '1.16.5'
-      - name: Generate release tag
-        id: tag
+      - name: Set tag
         run: |
-          echo "::set-output name=release_tag")"
+            echo "BINARY_TAG=`git describe --tags --abbrev=0`" >> $GITHUB_ENV
       - name: Build Cloud-cli binary
         run: |
           make build
       - name: Release
         uses: softprops/action-gh-release@v1
+        env: 
+          BINARY_TAG: ${{ env.BINARY_TAG }}
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
           files: |
             bin/cloud-cli
 
