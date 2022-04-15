@@ -2,8 +2,8 @@
 name: build the binary and push it to the release page
 on:
   push:
-    tags:
-      - "**"
+    targ:
+      - '**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -35,7 +35,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "cloud-cli/**"
+          files: "cloud-cli/bin/**"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
