@@ -38,7 +38,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.BINARY_TAG }}
+          tag_name: ${{ steps.tag.GITHUB_ENV }}
           files: |
             bin/cloud-cli
 
