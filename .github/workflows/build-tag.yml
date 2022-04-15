@@ -37,7 +37,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         env: 
-          BINARY_TAG: ${{ env.BINARY_TAG }}
+          BINARY_TAG: ${env.BINARY_TAG}
         with:
           files: |
             bin/cloud-cli
