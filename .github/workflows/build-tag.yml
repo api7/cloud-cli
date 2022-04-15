@@ -31,11 +31,10 @@ jobs:
       - name: Build Cloud-cli binary
         run: |
           make build
-      - name: Create release
+      - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: "cloud-cli/bin/**"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            bin/cloud-cli
 
