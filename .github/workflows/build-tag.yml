@@ -39,7 +39,7 @@ jobs:
         env: 
           BINARY_TAG: ${{ env.BINARY_TAG }}
         with:
-          tag_name: $BINARY_TAG
+          tag_name: ${{ BINARY_TAG }}
           files: |
             bin/cloud-cli
 
