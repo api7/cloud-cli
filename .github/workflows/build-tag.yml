@@ -1,0 +1,51 @@
+
+name: build the binary and push it to the release page
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main 
+concurrency: #使用并发取消任何当前作业或运行
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true #取消同一并发组的其他工作流程
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest #选择作业的运行器
+    timeout-minutes: 30
+    steps: 
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Setup Go Environment
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.17'
+      - name: Set tag #设置标签
+          run: |
+            echo "BINARY_TAG=`git describe --tags --abbrev=0`" >> $GITHUB_ENV
+      - name: Build Cloud-cli binary #构建二进制文件
+        run: |
+          make build
+      - name: Push Cloud-cli binary #将二进制文件推送到 release page
+        env:
+          REGISTRY: ${{ steps.login-ecr-staging.outputs.registry }}
+          BINARY_TAG: ${{ env.BINARY_TAG }}
+        run: |
+          git tag api7/cloud-cli:
+          git push origin v1.4
+      - name: Push Cloud-cli binary (Production)
+        env:
+          REGISTRY: ${{ steps.login-ecr-prod.outputs.registry }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+
+
+
