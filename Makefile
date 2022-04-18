@@ -23,6 +23,8 @@ VERSION_MAJOR=0
 VERSION_MINOR=1
 BINDIR=bin
 
+VERSION=$(shell git tag || echo "unknown version")
+
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
 default: help
@@ -59,3 +61,12 @@ install-tools: ## Install necessary tools
 .PHONY: codegen
 codegen: install-tools ## Run code generation
 	./scripts/mockgen.sh
+
+.PHONY: build-all
+build-all: create-bin-dir ## Build binary packages
+	@VERSION=$(shell git tag || echo "unknown version")
+	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/darsin-amd64 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-amd64 github.com/api7/cloud-cli
+	@GOARCH=386 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-386 github.com/api7/cloud-cli
+	@chmod +x $(BINDIR)/*
+	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
