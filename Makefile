@@ -14,7 +14,7 @@
 
 BUILD_DATE ?= "$(shell date +"%Y-%m-%dT%H:%M")"
 GITSHA=$(shell git rev-parse --short=7 HEAD)
-NAME=clash
+NAME=cloud-cli
 
 MAJORSYM="$(shell go list -m)/internal/pkg/version._major"
 MINORSYM="$(shell go list -m)/internal/pkg/version._minor"
@@ -69,8 +69,9 @@ codegen: install-tools ## Run code generation
 
 .PHONY: build-all
 build-all: create-bin-dir ## Build binary packages
-	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-darsin-amd64 github.com/api7/cloud-cli
-	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-linux-amd64 github.com/api7/cloud-cli
-	@GOARCH=386 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-linux-386 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/$(NAME)-darsin-amd64 github.com/api7/cloud-cli
+	@GOARCH=386 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/$(NAME)-darsin-386 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/$(NAME)-linux-amd64 github.com/api7/cloud-cli
+	@GOARCH=386 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/$(NAME)-linux-386 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
 	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
