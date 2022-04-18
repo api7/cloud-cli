@@ -30,7 +30,7 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::$(date +"%Y.%m.%d_%H-%M")"
+          echo "::set-output name=release_tag::$(git tag)"
       - name: Build Cloud-cli binary
         env:
           VERSION: ${{ steps.tag.outputs.release_tag }}
@@ -41,4 +41,3 @@ jobs:
         with:
           tag_name: test
           files: "bin/**"
-
