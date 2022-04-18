@@ -30,7 +30,7 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+          echo "::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}"
       - name: Build Cloud-cli binary
         run: |
           make build-all
