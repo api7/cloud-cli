@@ -22,6 +22,7 @@ GITCOMMITSYM="$(shell go list -m)/internal/pkg/version._gitCommit"
 VERSION_MAJOR=0
 VERSION_MINOR=1
 BINDIR=bin
+VERSION=$(shell git tag || echo "unknown version")
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
@@ -30,10 +31,6 @@ default: help
 .PHONY: help
 help:  ## Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
-
-.PHONY: build
-build: create-bin-dir ## Build the binary
-	go build -ldflags $(GO_LDFLAGS) -o bin/cloud-cli github.com/api7/cloud-cli
 
 create-bin-dir:
 	@mkdir -p $(BINDIR)
@@ -59,3 +56,10 @@ install-tools: ## Install necessary tools
 .PHONY: codegen
 codegen: install-tools ## Run code generation
 	./scripts/mockgen.sh
+
+.PHONY: build
+build: create-bin-dir ## Build the binary
+	go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/$(VERSION) github.com/api7/cloud-cli
+	GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/darsin-amd64_$(VERSION) github.com/api7/cloud-cli
+	GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-amd64_$(VERSION) github.com/api7/cloud-cli
+	GOARCH=386 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-386_$(VERSION) github.com/api7/cloud-cli

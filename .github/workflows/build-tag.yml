@@ -1,5 +1,4 @@
-
-name: build the binary and push it to the release page
+name: Build the binary and push to the release page
 on:
   push:
     tags:
