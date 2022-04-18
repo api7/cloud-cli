@@ -30,13 +30,14 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo "BINARY_TAG=`git describe --tags --abbrev=0`"
+          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Build Cloud-cli binary
         run: |
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ GITHUB_ENV }}
+          tag_name: ${{ steps.tag.output.VERSION }}
+          release_name: ${{ steps.tag.output.VERSION }}
           files: "bin/**"
 
