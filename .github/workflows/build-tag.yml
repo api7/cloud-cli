@@ -31,6 +31,7 @@ jobs:
       - name: Build Cloud-cli binary
         env:
           VERSION: $(shell git tag || echo "unknown version")
+        run: |
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
