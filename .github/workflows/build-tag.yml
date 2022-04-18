@@ -1,11 +1,8 @@
 name: Build the binary and push to the release page
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - "**"
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -32,7 +29,8 @@ jobs:
         run: |
           echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
       - name: Build Cloud-cli binary
-        run: |
+        env:
+          VERSION: $(shell git tag || echo "unknown version")
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
