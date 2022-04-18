@@ -72,6 +72,6 @@ build-all: create-bin-dir ## Build binary packages
 	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/darsin-amd64 github.com/api7/cloud-cli
 	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-amd64 github.com/api7/cloud-cli
 	@GOARCH=386 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/linux-386 github.com/api7/cloud-cli
-	@VERSION=$(shell git tag || echo "unknown version")
+	@ecport VERSION=$(shell git tag || echo "unknown version")
 	@chmod +x $(BINDIR)/*
 	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
