@@ -27,18 +27,17 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: '1.16.5'
-      - name: Generate release tag
-        id: tag
+      - name: Set image tag
         run: |
-          echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
+          echo "IMAGE_TAG=`git describe --tags --abbrev=0`"
       - name: Build Cloud-cli binary
         env:
-          VERSION: $(git describe --tags --abbrev=0)
+          VERSION: ${{ IMAGE_TAG }}
         run: |
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
+          tag_name: test
           files: "bin/**"
 
