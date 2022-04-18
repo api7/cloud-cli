@@ -30,7 +30,7 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo "BINARY_TAG=`git describe --tags --abbrev=0`" >> $GITHUB_ENV
+          echo "BINARY_TAG=`git describe --tags --abbrev=0`"
       - name: Build Cloud-cli binary
         run: |
           make build-all
