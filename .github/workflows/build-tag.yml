@@ -32,7 +32,7 @@ jobs:
           echo "IMAGE_TAG=`git describe --tags --abbrev=0`"
       - name: Build Cloud-cli binary
         env:
-          VERSION: ${{ IMAGE_TAG }}
+          VERSION: echo "IMAGE_TAG=`git describe --tags --abbrev=0`"
         run: |
           make build-all
       - name: Release
