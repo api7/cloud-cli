@@ -31,10 +31,9 @@ jobs:
         id: tag
         run: |
           echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
-      - name: Set image tag
-        run: |
-          echo "IMAGE_TAG=`git describe --tags --abbrev=0`" >> $VERSION
       - name: Build Cloud-cli binary
+        env:
+          VERSION: $(git describe --tags --abbrev=0)
         run: |
           make build-all
       - name: Release
