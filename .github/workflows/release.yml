@@ -27,12 +27,15 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
+          echo "${GITHUB_REF##*/}"
       - name: Build Cloud-cli binary
+        env:
+          VERSION: ${{ steps.tag.outputs.release_tag }}
         run: |
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
+          tag_name: test
           files: "bin/**"
+
