@@ -29,8 +29,6 @@ jobs:
         run: |
           echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
       - name: Build Cloud-cli binary
-        env:
-          VERSION: $(shell git tag || echo "unknown version")
         run: |
           make build-all
       - name: Release
