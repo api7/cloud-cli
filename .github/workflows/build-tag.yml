@@ -30,9 +30,11 @@ jobs:
           echo "::set-output name=release_tag::UserBuild_$(date +"%Y.%m.%d_%H-%M")"
       - name: Build Cloud-cli binary
         run: |
-          make build
+          make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.release_tag }}
+          files: bin/*
+          draft: true
 
