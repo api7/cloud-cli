@@ -14,7 +14,6 @@
 
 BUILD_DATE ?= "$(shell date +"%Y-%m-%dT%H:%M")"
 GITSHA=$(shell git rev-parse --short=7 HEAD)
-NAME=clash
 
 MAJORSYM="$(shell go list -m)/internal/pkg/version._major"
 MINORSYM="$(shell go list -m)/internal/pkg/version._minor"
