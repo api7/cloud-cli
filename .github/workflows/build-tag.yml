@@ -23,25 +23,17 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - uses: little-core-labs/get-git-tag@v3.0.1
-        id: tagName
-        with:
-          tagRegex: "foobar-(.*)"  # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
-          tagRegexGroup: 1 # Optional. Default is 1.
-      - name: Some other step # Output usage example
-        with:
-          tagname: ${{ steps.tagName.outputs.tag }}
       - name: Setup Go Environment
         uses: actions/setup-go@v1
         with:
           go-version: '1.16.5'
       - name: Generate release tag
-        id: binary-tag
+        id: tag
         run: |
-          echo debug "::set-output name=release_tag::$(git tag)"
+          echo debug "::set-output name=release_tag::$(shell git tag)"
       - name: Build Cloud-cli binary
         env:
-          VERSION: $GIT_TAG_NAME
+          VERSION: ${{ steps.tag.outputs.release_tag }}
         run: |
           make build-all
       - name: Release
