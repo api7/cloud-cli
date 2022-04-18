@@ -1,7 +1,8 @@
 name: Build the binary and push to the release page
 on:
-  tags:
-    - '**'
+  push:
+    tags:
+      - '**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
