@@ -30,7 +30,7 @@ jobs:
       - name: Generate release tag
         id: tag
         run: |
-          echo debug "$(shell git tag)"
+          echo debug "$(git tag)"
       - name: Build Cloud-cli binary
         env:
           VERSION: ${{ steps.tag.outputs.release_tag }}
