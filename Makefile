@@ -1,8 +1,8 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with // this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
+# Copyright 2022 API7.ai, Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
@@ -69,3 +69,7 @@ build-all: create-bin-dir ## Build binary packages
 	@GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-arm64 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
 	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
+	
+.PHONY: license-check
+license-check:
+	docker run -it --rm -v $(PWD):/github/workspace apache/skywalking-eyes header check
