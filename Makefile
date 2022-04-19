@@ -14,7 +14,6 @@
 
 BUILD_DATE ?= "$(shell date +"%Y-%m-%dT%H:%M")"
 GITSHA=$(shell git rev-parse --short=7 HEAD)
-NAME=clash
 
 MAJORSYM="$(shell go list -m)/internal/pkg/version._major"
 MINORSYM="$(shell go list -m)/internal/pkg/version._minor"
@@ -26,11 +25,6 @@ BINDIR=bin
 VERSION=$(shell git tag || echo "unknown version")
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
-
-
-all-arch: $(PLATFORM_LIST) $(WINDOWS_ARCH_LIST)
-
-releases: $(gz_releases) $(zip_releases)
 
 default: help
 
@@ -69,9 +63,9 @@ codegen: install-tools ## Run code generation
 
 .PHONY: build-all
 build-all: create-bin-dir ## Build binary packages
-	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-darwin-amd64 github.com/api7/cloud-cli
-	@GOARCH=arm64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-darwin-arm64 github.com/api7/cloud-cli
-	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-linux-amd64 github.com/api7/cloud-cli
-	@GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/clash-linux-arm64 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-amd64 github.com/api7/cloud-cli
+	@GOARCH=arm64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-arm64 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-amd64 github.com/api7/cloud-cli
+	@GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-arm64 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
 	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
