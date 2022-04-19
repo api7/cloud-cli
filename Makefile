@@ -34,7 +34,7 @@ help:  ## Display this help
 
 .PHONY: build
 build: create-bin-dir ## Build the binary
-	go build -ldflags $(GO_LDFLAGS) -o cloud-cli/bin github.com/api7/cloud-cli
+	go build -ldflags $(GO_LDFLAGS) -o bin/cloud-cli github.com/api7/cloud-cli
 
 create-bin-dir:
 	@mkdir -p $(BINDIR)
