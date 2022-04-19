@@ -22,7 +22,7 @@ GITCOMMITSYM="$(shell go list -m)/internal/pkg/version._gitCommit"
 VERSION_MAJOR=0
 VERSION_MINOR=1
 BINDIR=bin
-VERSION=$(shell git tag || echo "unknown version")
+VERSION ?= "$(shell git tag || echo "unknown version")"
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
