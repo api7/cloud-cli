@@ -24,18 +24,10 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: '1.16.5'
-      - name: Generate release tag
-        id: tag
-        run: |
-          echo "${GITHUB_REF##*/}"
       - name: Build Cloud-cli binary
-        env:
-          VERSION: ${{ steps.tag.outputs.release_tag }}
         run: |
           make build-all
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: test
           files: "bin/**"
-
