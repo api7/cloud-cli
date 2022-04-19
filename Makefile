@@ -30,42 +30,42 @@ default: help
 
 .PHONY: help
 help:  ## Display this help
-    @awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 .PHONY: build
 build: create-bin-dir ## Build the binary
-    go build -ldflags $(GO_LDFLAGS) -o cloud-cli/bin github.com/api7/cloud-cli
+	go build -ldflags $(GO_LDFLAGS) -o cloud-cli/bin github.com/api7/cloud-cli
 
 create-bin-dir:
-    @mkdir -p $(BINDIR)
+	@mkdir -p $(BINDIR)
 .PHONY: create-bin-dir
 
 gofmt: ## Format the source code
-    @find . -type f -name "*.go" | xargs gofmt -w -s
+	@find . -type f -name "*.go" | xargs gofmt -w -s
 .PHONY: gofmt
 
 lint: ## Apply go lint check
-    @golangci-lint run --timeout 10m ./...
+	@golangci-lint run --timeout 10m ./...
 .PHONY: lint
 
 test: ## Run the unit tests
-    # go test run cases in different package parallel by default, but cloud cli config file is referenced by multi test cases, so we need to run them in sequence with -p=1
-    @mkdir -p /tmp/cloud-cli-unit-test
-    @HOME=/tmp/cloud-cli-unit-test go test -count 1 -p 1 ./...
+	# go test run cases in different package parallel by default, but cloud cli config file is referenced by multi test cases, so we need to run them in sequence with -p=1
+	@mkdir -p /tmp/cloud-cli-unit-test
+	@HOME=/tmp/cloud-cli-unit-test go test -count 1 -p 1 ./...
 
 .PHONY: install-tools
 install-tools: ## Install necessary tools
-    @bash -c 'go install github.com/golang/mock/mockgen@v1.6.0'
+	@bash -c 'go install github.com/golang/mock/mockgen@v1.6.0'
 
 .PHONY: codegen
 codegen: install-tools ## Run code generation
-    ./scripts/mockgen.sh
+	./scripts/mockgen.sh
 
 .PHONY: build-all
 build-all: create-bin-dir ## Build binary packages
-    @GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-amd64 github.com/api7/cloud-cli
-    @GOARCH=arm64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-arm64 github.com/api7/cloud-cli
-    @GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-amd64 github.com/api7/cloud-cli
-    @GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-arm64 github.com/api7/cloud-cli
-    @chmod +x $(BINDIR)/*
-    @gzip -f -S -$(VERSION).gz $(BINDIR)/*
+	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-amd64 github.com/api7/cloud-cli
+	@GOARCH=arm64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-arm64 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-amd64 github.com/api7/cloud-cli
+	@GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-arm64 github.com/api7/cloud-cli
+	@chmod +x $(BINDIR)/*
+	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
