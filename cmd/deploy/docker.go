@@ -63,7 +63,7 @@ cloud-cli deploy docker \
 			docker := getDockerCommand()
 			docker.AppendArgs("run")
 			for _, args := range opts.DockerRunArgs {
-				docker.AppendArgs(strings.Split(args, "=")...)
+				docker.AppendArgs(strings.SplitN(args, "=", 2)...)
 			}
 			docker.AppendArgs("--detach")
 

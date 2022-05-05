@@ -120,6 +120,26 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			},
 			mockCloud: defaultMockCloud,
 		},
+		{
+			name: "deploy on kubernetes with customize helm install --set options",
+			args: []string{"kubernetes", "--helm-install-arg", "--set=apisix.ingress.enabled=false"},
+			cmdPatterns: []string{
+				`kubectl create ns apisix`,
+				`kubectl create secret generic cloud-ssl --from-file tls.crt=.*?tls.crt --from-file tls.key=.*?tls.key --from-file ca.crt=.*?ca.crt --namespace apisix`,
+				`kubectl create configmap cloud-module --from-file cloud.ljbc=.*?cloud.ljbc --from-file cloud-agent.ljbc=.*?agent.ljbc --from-file cloud-metrics.ljbc=.*?metrics.ljbc --from-file cloud-utils.ljbc=.*?utils.ljbc --from-file cloud-file.ljbc=.*?file.ljbc --namespace apisix`,
+				`helm repo add apisix https://charts.apiseven.com`,
+				`helm repo update`,
+				`helm install apisix apisix/apisix --namespace apisix --set apisix.ingress.enabled=false`,
+				`Congratulations! Your APISIX cluster was deployed successfully on Kubernetes.`,
+				`The Helm release name is: apisix`,
+				`kubectl get deployment -n apisix -l app.kubernetes.io/instance=apisix -o jsonpath="\{.items\[0\].metadata.name\}"`,
+				`kubectl get pods -n apisix -l app.kubernetes.io/instance=apisix -o jsonpath="\{.items\[\*\].metadata.name\}"`,
+				`kubectl exec  -n apisix -- cat /usr/local/apisix/conf/apisix.uid`,
+				`kubectl wait --for condition=Ready --timeout 60s pod/ -n apisix`,
+				`kubectl get service -n apisix -l app.kubernetes.io/instance=apisix -o jsonpath="\{.items\[0\].metadata.name\}"`,
+			},
+			mockCloud: defaultMockCloud,
+		},
 	}
 	for _, tc := range testCases {
 		tc := tc

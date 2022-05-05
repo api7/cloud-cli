@@ -112,7 +112,7 @@ cloud-cli deploy kubernetes \
 						customizeValues = kv[1]
 						continue
 					}
-					helm.AppendArgs(strings.Split(args, "=")...)
+					helm.AppendArgs(strings.SplitN(args, "=", 2)...)
 				}
 
 				if customizeValues != "" {
