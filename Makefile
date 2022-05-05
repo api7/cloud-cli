@@ -62,14 +62,20 @@ codegen: install-tools ## Run code generation
 	./scripts/mockgen.sh
 
 .PHONY: build-all
-build-all: create-bin-dir ## Build binary packages
+build-all: clean create-bin-dir ## Build binary packages
 	@GOARCH=amd64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-amd64 github.com/api7/cloud-cli
 	@GOARCH=arm64 GOOS=darwin go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-darwin-arm64 github.com/api7/cloud-cli
 	@GOARCH=amd64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-amd64 github.com/api7/cloud-cli
 	@GOARCH=arm64 GOOS=linux go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-linux-arm64 github.com/api7/cloud-cli
+	@GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-amd64 github.com/api7/cloud-cli
+	@GOARCH=arm64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-arm64 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
 	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
 	
 .PHONY: license-check
 license-check:
 	docker run -it --rm -v $(PWD):/github/workspace apache/skywalking-eyes header check
+
+.PHONY: clean
+clean:
+	rm -rf bin
