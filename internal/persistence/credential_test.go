@@ -27,7 +27,7 @@ import (
 
 func TestSaveCredential(t *testing.T) {
 	id := uuid.NewString()
-	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
+	credentialDir = fmt.Sprintf("/tmp/%s/credential", id)
 	err := SaveCredential(&Credential{
 		User: User{AccessToken: "test-0"},
 	})
@@ -41,7 +41,7 @@ func TestSaveCredential(t *testing.T) {
 	err = os.MkdirAll(fmt.Sprintf("/tmp/%s", id), fs.ModePerm)
 	assert.NoError(t, err, "create dir should be success")
 
-	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
+	credentialDir = fmt.Sprintf("/tmp/%s/credential", id)
 	err = SaveCredential(&Credential{
 		User: User{AccessToken: "test-1"},
 	})
@@ -63,16 +63,16 @@ func TestSaveCredential(t *testing.T) {
 
 func TestLoad(t *testing.T) {
 	id := uuid.NewString()
-	credentialFileLocation = fmt.Sprintf("/tmp/%s/credential", id)
+	credentialDir = fmt.Sprintf("/tmp/%s/credential", id)
 
 	_, err := LoadCredential()
 	assert.Contains(t, err.Error(), "no such file or directory", "load from file should be failed")
 
-	dir := filepath.Dir(credentialFileLocation)
+	dir := filepath.Dir(credentialDir)
 	err = os.MkdirAll(dir, 0750)
 	assert.NoError(t, err, "create dir should be success")
 
-	err = os.WriteFile(credentialFileLocation, []byte("invalid credential"), fs.ModePerm)
+	err = os.WriteFile(credentialDir, []byte("invalid credential"), fs.ModePerm)
 	assert.NoError(t, err, "write credential file should be success")
 
 	_, err = LoadCredential()

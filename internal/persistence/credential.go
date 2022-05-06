@@ -22,12 +22,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var (
-	credentialFileLocation string
-)
-
 func init() {
-	credentialFileLocation = filepath.Join(os.Getenv("HOME"), ".api7cloud/credentials")
+	if err := Init(); err != nil {
+		panic(err)
+	}
 }
 
 // SaveCredential to file for persistence
@@ -37,7 +35,7 @@ func SaveCredential(credential *Credential) error {
 		panic(err)
 	}
 
-	dir := filepath.Dir(credentialFileLocation)
+	dir := filepath.Dir(credentialDir)
 	if _, err = os.Stat(dir); err != nil {
 		err = os.MkdirAll(dir, 0750)
 		if err != nil {
@@ -45,17 +43,17 @@ func SaveCredential(credential *Credential) error {
 		}
 	}
 
-	file, err := os.Create(credentialFileLocation)
+	file, err := os.Create(credentialDir)
 	if err != nil {
-		return fmt.Errorf("failed create file in %s for credential: %s", credentialFileLocation, err)
+		return fmt.Errorf("failed to create file in %s for credential: %s", credentialDir, err)
 	}
 
 	write, err := file.Write(data)
 	if err != nil {
-		return fmt.Errorf("failed write credential to %s, %s", credentialFileLocation, err)
+		return fmt.Errorf("failed to write credential to %s, %s", credentialDir, err)
 	}
 	if write != len(data) {
-		return fmt.Errorf("failed write credential to %s", credentialFileLocation)
+		return fmt.Errorf("failed to write credential to %s", credentialDir)
 	}
 
 	return nil
@@ -63,7 +61,7 @@ func SaveCredential(credential *Credential) error {
 
 // LoadCredential from file
 func LoadCredential() (*Credential, error) {
-	file, err := os.Open(credentialFileLocation)
+	file, err := os.Open(credentialDir)
 	if err != nil {
 		return nil, err
 	}
