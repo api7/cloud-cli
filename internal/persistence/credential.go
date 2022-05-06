@@ -45,15 +45,15 @@ func SaveCredential(credential *Credential) error {
 
 	file, err := os.Create(credentialDir)
 	if err != nil {
-		return fmt.Errorf("failed create file in %s for credential: %s", credentialDir, err)
+		return fmt.Errorf("failed to create file in %s for credential: %s", credentialDir, err)
 	}
 
 	write, err := file.Write(data)
 	if err != nil {
-		return fmt.Errorf("failed write credential to %s, %s", credentialDir, err)
+		return fmt.Errorf("failed to write credential to %s, %s", credentialDir, err)
 	}
 	if write != len(data) {
-		return fmt.Errorf("failed write credential to %s", credentialDir)
+		return fmt.Errorf("failed to write credential to %s", credentialDir)
 	}
 
 	return nil
