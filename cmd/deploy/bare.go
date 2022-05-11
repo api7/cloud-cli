@@ -61,7 +61,7 @@ func newBareCommand() *cobra.Command {
 		Short: "Deploy Apache APISIX on bare metal (only CentOS 7)",
 		Example: `
 cloud-cli deploy bare \
-		--apisix-version 2.11.0`,
+		--apisix-version 2.13.1`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
@@ -142,7 +142,7 @@ cloud-cli deploy bare \
 			}
 		},
 	}
-	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.11.0", "Specifies the APISIX version, default value is 2.11.0")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.13.1", "Specifies the APISIX version, default value is 2.13.1")
 
 	return cmd
 }

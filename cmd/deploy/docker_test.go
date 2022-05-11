@@ -41,8 +41,8 @@ func TestDockerDeployCommand(t *testing.T) {
 	}{
 		{
 			name:       "test deploy docker command",
-			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos"},
-			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.11.0-centos`,
+			args:       []string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos"},
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.13.1-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -66,8 +66,8 @@ func TestDockerDeployCommand(t *testing.T) {
 		},
 		{
 			name:       "test deploy docker command with apisix config",
-			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--apisix-config", "./testdata/apisix.yaml"},
-			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.11.0-centos`,
+			args:       []string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos", "--apisix-config", "./testdata/apisix.yaml"},
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.13.1-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
@@ -90,8 +90,8 @@ func TestDockerDeployCommand(t *testing.T) {
 		},
 		{
 			name:       "test deploy docker command with complicated docker run arg",
-			args:       []string{"docker", "--apisix-image", "apache/apisix:2.11.0-centos", "--docker-run-arg", "\"--mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly\""},
-			cmdPattern: `docker run --mount type=bind,source=/etc/hosts,target=/etc/hosts,readonly --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.11.0-centos`,
+			args:       []string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos", "--docker-run-arg", "\"--mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly\""},
+			cmdPattern: `docker run --mount type=bind,source=/etc/hosts,target=/etc/hosts,readonly --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.13.1-centos`,
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)

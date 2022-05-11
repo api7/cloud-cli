@@ -43,7 +43,7 @@ func TestBareMetalDeployCommand(t *testing.T) {
 	}{
 		{
 			name:       "test deploy bare metal command",
-			args:       []string{"bare", "--apisix-version", "2.11.0"},
+			args:       []string{"bare", "--apisix-version", "2.13.1"},
 			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
 			installScript: `#!/usr/bin/env bash
 
@@ -105,7 +105,7 @@ fi
 		},
 		{
 			name:       "test deploy bare metal command with apisix config",
-			args:       []string{"bare", "--apisix-version", "2.11.0", "--apisix-config", "./testdata/apisix.yaml"},
+			args:       []string{"bare", "--apisix-version", "2.13.1", "--apisix-config", "./testdata/apisix.yaml"},
 			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
 			installScript: `#!/usr/bin/env bash
 
@@ -167,7 +167,7 @@ fi
 		},
 		{
 			name:       "test deploy bare metal command with apisix id",
-			args:       []string{"bare", "--apisix-version", "2.11.0", "--apisix-id", "1234-abcd"},
+			args:       []string{"bare", "--apisix-version", "2.13.1", "--apisix-id", "1234-abcd"},
 			cmdPattern: "/usr/bin/bash -C .*/scripts/install\\.sh",
 			installScript: `#!/usr/bin/env bash
 
