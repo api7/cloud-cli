@@ -48,7 +48,7 @@ func newKubernetesCommand() *cobra.Command {
 cloud-cli deploy kubernetes \
 		--name apisix \
 		--namespace apisix \
-		--apisix-image apache/apisix:2.11.0-centos \
+		--apisix-image apache/apisix:2.13.1-centos \
 		--helm-install-arg --output=table \
 		--helm-install-arg --set=apisix.image.tag=2.13.1-centos \
 		--helm-install-arg --wait`,
@@ -137,7 +137,7 @@ cloud-cli deploy kubernetes \
 	}
 
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.NameSpace, "namespace", "apisix", "Specify the Kubernetes name space")
-	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.APISIXImage, "apisix-image", "apache/apisix:2.11.0-centos", "Specify the Apache APISIX image")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.APISIXImage, "apisix-image", "apache/apisix:2.13.1-centos", "Specify the Apache APISIX image")
 	cmd.PersistentFlags().UintVar(&options.Global.Deploy.Kubernetes.ReplicaCount, "replica-count", 1, "Specify the pod replica count")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Kubernetes.HelmInstallArgs, "helm-install-arg", []string{}, "Specify the arguments (in the format of name=value, e.g. --set=apisix.image.tag=2.13.1-centos) for the helm install command")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.KubectlCLIPath, "kubectl-cli-path", "", "Specify the filepath of the kubectl command")
