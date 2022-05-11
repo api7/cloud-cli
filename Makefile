@@ -15,14 +15,13 @@
 BUILD_DATE ?= "$(shell date +"%Y-%m-%dT%H:%M")"
 GITSHA=$(shell git rev-parse --short=7 HEAD)
 
-MAJORSYM="$(shell go list -m)/internal/pkg/version._major"
-MINORSYM="$(shell go list -m)/internal/pkg/version._minor"
-BUILDDATESYM="$(shell go list -m)/internal/pkg/version._buildDate"
-GITCOMMITSYM="$(shell go list -m)/internal/pkg/version._gitCommit"
+MAJORSYM="$(shell go list -m)/internal/version._major"
+MINORSYM="$(shell go list -m)/internal/version._minor"
+BUILDDATESYM="$(shell go list -m)/internal/version._buildDate"
+GITCOMMITSYM="$(shell go list -m)/internal/version._gitCommit"
 VERSION_MAJOR=0
-VERSION_MINOR=1
+VERSION_MINOR=9
 BINDIR=bin
-VERSION ?= 0.9.0
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
