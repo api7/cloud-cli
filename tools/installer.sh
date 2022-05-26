@@ -51,7 +51,7 @@ install_cloud_cli() {
 
 OS=`uname -s | tr A-Z a-z`
 ARCH=`uname -m | tr A-Z a-z`
-CLOUD_CLI_VER="0.9.0"
+CLOUD_CLI_VER="0.10.0"
 
 if [ "$ARCH" = "x86_64" ]; then
   ARCH=amd64
