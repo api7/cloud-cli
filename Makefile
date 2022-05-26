@@ -69,7 +69,7 @@ build-all: clean create-bin-dir ## Build binary packages
 	@GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-amd64 github.com/api7/cloud-cli
 	@GOARCH=arm64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-arm64 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
-	@gzip -f -S -$(VERSION).gz $(BINDIR)/*
+	@gzip -f -S -$(VERSION_MAJOR).$(VERSION_MINOR).0.gz $(BINDIR)/*
 	
 .PHONY: license-check
 license-check:
