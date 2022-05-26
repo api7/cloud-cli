@@ -24,7 +24,7 @@ error() {
 
 validate_os() {
   for os in $SUPPORTED_OS_LIST; do
-    if [[ "$os" == "$1" ]]; then
+    if [ "$os" = "$1" ]; then
       return 0
     fi
   done
@@ -34,7 +34,7 @@ validate_os() {
 
 validate_arch() {
   for arch in $SUPPORTED_ARCH_LIST; do
-    if [[ "$arch" == "$1" ]]; then
+    if [ "$arch" = "$1" ]; then
       return 0
     fi
   done
