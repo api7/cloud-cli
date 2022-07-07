@@ -48,6 +48,21 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 	return m.recorder
 }
 
+// DebugShowConfig mocks base method.
+func (m *MockAPI) DebugShowConfig(cpID, resource, id string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DebugShowConfig", cpID, resource, id)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DebugShowConfig indicates an expected call of DebugShowConfig.
+func (mr *MockAPIMockRecorder) DebugShowConfig(cpID, resource, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), cpID, resource, id)
+}
+
 // GetCloudLuaModule mocks base method.
 func (m *MockAPI) GetCloudLuaModule() ([]byte, error) {
 	m.ctrl.T.Helper()

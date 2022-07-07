@@ -16,6 +16,8 @@
 package debug
 
 import (
+	"fmt"
+	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/options"
@@ -40,9 +42,22 @@ cloud-cli debug show-config api \
 			if len(args) != 1 {
 				output.Errorf("Please specify an API7 Cloud resource. Resource can be application, api, consumer and certificate.")
 			}
-			if options.Global.Debug.ShowConfig.ID == "" {
+
+			id := options.Global.Debug.ShowConfig.ID
+			if id == "" {
 				output.Errorf("Empty resource ID, please specify --id option")
 			}
+
+			defaultCP, err := cloud.DefaultClient.GetDefaultControlPlane()
+			if err != nil {
+				output.Errorf(err.Error())
+			}
+
+			data, err := cloud.DefaultClient.DebugShowConfig(defaultCP.ID, args[0], id)
+			if err != nil {
+				output.Errorf("Failed to show config: %s", err.Error())
+			}
+			fmt.Println(data)
 		},
 	}
 
