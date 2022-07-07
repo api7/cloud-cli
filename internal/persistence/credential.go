@@ -20,6 +20,10 @@ import (
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/consts"
+	"github.com/api7/cloud-cli/internal/output"
 )
 
 func init() {
@@ -74,4 +78,24 @@ func LoadCredential() (*Credential, error) {
 	}
 
 	return &credential, nil
+}
+
+// CheckAccessTokenAndInitCloudClient checks if cloud-cli configured the token correctly.
+// Then use this token to initialize the cloud client.
+func CheckAccessTokenAndInitCloudClient() error {
+	accessToken := os.Getenv(consts.Api7CloudAccessTokenEnv)
+	if accessToken == "" {
+		credential, err := LoadCredential()
+		if err != nil {
+			return fmt.Errorf("Failed to load credential: %s,\nPlease run 'cloud-cli configure' first, access token can be created from https://console.api7.cloud", err)
+		}
+		accessToken = credential.User.AccessToken
+	}
+
+	output.Verbosef("Loaded access token: %s", accessToken)
+
+	if err := cloud.InitDefaultClient(accessToken); err != nil {
+		return fmt.Errorf("Failed to init api7 cloud client: %s", err)
+	}
+	return nil
 }
