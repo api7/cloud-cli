@@ -14,6 +14,10 @@
 
 package options
 
+import (
+	"errors"
+)
+
 var (
 	// Global contains all options.
 	Global Options
@@ -61,6 +65,23 @@ type DockerDeployOptions struct {
 	DockerRunArgs []string
 	// DockerCLIPath is the filepath of the docker command.
 	DockerCLIPath string
+	// Specify the host port for HTTP
+	HTTPHostPort int
+	// Specify the host port for HTTPS
+	HTTPSHostPort int
+}
+
+// Validate validates the docker deploy options.
+func (o *DockerDeployOptions) Validate() error {
+	if o.HTTPHostPort <= 0 || o.HTTPHostPort > 65535 {
+		return errors.New("invalid http host port")
+	}
+
+	if o.HTTPSHostPort <= 0 || o.HTTPSHostPort > 65535 {
+		return errors.New("invalid https host port")
+	}
+
+	return nil
 }
 
 // KubernetesDeployOptions contains options for the kubectl or helm command.
