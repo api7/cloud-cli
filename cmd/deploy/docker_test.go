@@ -65,6 +65,31 @@ func TestDockerDeployCommand(t *testing.T) {
 			},
 		},
 		{
+			name:       "test deploy docker command with custom http and https host ports",
+			args:       []string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos", "--http-host-port", "8080", "--https-host-port", "443"},
+			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 8080:9080 -p 443:9443 --name apisix --hostname apisix apache/apisix:2.13.1-centos`,
+			mockCloud: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				api := cloud.NewMockAPI(ctrl)
+				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
+					TypeMeta: types.TypeMeta{
+						ID: "12345",
+					},
+					OrganizationID: "org1",
+				}, nil)
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+
+				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
+				api.EXPECT().GetStartupConfig("12345", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+
+				cloud.DefaultClient = api
+			},
+		},
+		{
 			name:       "test deploy docker command with apisix config",
 			args:       []string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos", "--apisix-config", "./testdata/apisix.yaml"},
 			cmdPattern: `docker run --detach --mount type=bind,source=/.+?/apisix-config-\d+.yaml,target=/usr/local/apisix/conf/config.yaml,readonly --mount type=bind,source=/.+?/\.api7cloud,target=/cloud_lua_module,readonly --mount type=bind,source=/.+?/\.api7cloud/tls,target=/cloud/tls,readonly --mount type=bind,source=/.+?/\.api7cloud/apisix\.uid,target=/usr/local/apisix/conf/apisix.uid,readonly -p 9080:9080 -p 9443:9443 --name apisix --hostname apisix apache/apisix:2.13.1-centos`,
