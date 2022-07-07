@@ -46,6 +46,11 @@ cloud-cli deploy docker \
 		--docker-run-arg --mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly \
 		--docker-run-arg --hostname=apisix-1`,
 		PreRun: func(cmd *cobra.Command, args []string) {
+			if err := options.Global.Deploy.Docker.Validate(); err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
 				return
@@ -93,8 +98,9 @@ cloud-cli deploy docker \
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.apisixIDFile+",target=/usr/local/apisix/conf/apisix.uid,readonly")
 
 			// TODO support customization of the HTTP and HTTPS ports.
-			docker.AppendArgs("-p", "9080:9080")
-			docker.AppendArgs("-p", "9443:9443")
+			docker.AppendArgs("-p", fmt.Sprintf("%d:9080", options.Global.Deploy.Docker.HTTPHostPort))
+			docker.AppendArgs("-p", fmt.Sprintf("%d:9443", options.Global.Deploy.Docker.HTTPSHostPort))
+
 			if options.Global.Deploy.Name != "" {
 				docker.AppendArgs("--name", options.Global.Deploy.Name)
 				docker.AppendArgs("--hostname", options.Global.Deploy.Name)
@@ -141,6 +147,8 @@ cloud-cli deploy docker \
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.13.1-centos", "Specify the Apache APISIX image")
+	cmd.PersistentFlags().IntVar(&options.Global.Deploy.Docker.HTTPHostPort, "http-host-port", 9080, "Specify the host port for HTTP")
+	cmd.PersistentFlags().IntVar(&options.Global.Deploy.Docker.HTTPSHostPort, "https-host-port", 9443, "Specify the host port for HTTPS")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.DockerCLIPath, "docker-cli-path", "", "Specify the filepath of the docker command")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Docker.DockerRunArgs, "docker-run-arg", []string{}, "Specify the arguments (in the format of name=value, e.g. --mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly) for the docker run command")
 
