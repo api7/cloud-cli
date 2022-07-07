@@ -29,6 +29,8 @@ type Options struct {
 	Deploy DeployOptions
 	// Stop contains the options for the stop command.
 	Stop StopOptions
+	// Debug contains the options for the debug command.
+	Debug DebugOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -118,4 +120,16 @@ type KubernetesStopOptions struct {
 	KubectlCLIPath string
 	// HelmCLIPath is the filepath of the helm command.
 	HelmCLIPath string
+}
+
+// DebugOptions contains options for `cloud-cli debug` command.
+type DebugOptions struct {
+	// ShowConfig contains options for `cloud-cli debug show-config` command.
+	ShowConfig DebugShowConfigOptions
+}
+
+// DebugShowConfigOptions contains options for `cloud-cli debug show-config` command.
+type DebugShowConfigOptions struct {
+	// ID is the API7 Cloud resource id.
+	ID string
 }
