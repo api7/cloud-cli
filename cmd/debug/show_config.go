@@ -16,7 +16,6 @@ package debug
 
 import (
 	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
