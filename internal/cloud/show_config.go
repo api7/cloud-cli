@@ -18,6 +18,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -41,7 +43,30 @@ func (a *api) DebugShowConfig(cpID, resource, id string) (string, error) {
 		return "", err
 	}
 
-	rawData = json.RawMessage("{\"route\"}")
+	return formatJSONData(rawData)
+}
 
-	return string(rawData), nil
+func formatJSONData(raw []byte) (string, error) {
+	var data map[string]interface{}
+	if err := json.Unmarshal(raw, &data); err != nil {
+		return "", errors.Wrap(err, "unmarshal data")
+	}
+	for key, arr := range data {
+		// arr is a specific apisix resource array.
+		for _, rawObj := range arr.([]interface{}) {
+			var structualValue map[string]interface{}
+			obj := rawObj.(map[string]interface{})
+			// value is a JSON string, and we want to show it structurally, so
+			// here we unmarshal and reset it.
+			if err := json.Unmarshal([]byte(obj["value"].(string)), &structualValue); err != nil {
+				return "", errors.Wrap(err, fmt.Sprintf("unmarshal %s", key))
+			}
+			obj["value"] = structualValue
+		}
+	}
+	newData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(newData), nil
 }
