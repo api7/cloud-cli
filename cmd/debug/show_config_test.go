@@ -17,15 +17,16 @@ package debug
 import (
 	"errors"
 	"fmt"
-	"github.com/api7/cloud-cli/internal/consts"
-	"github.com/api7/cloud-cli/internal/types"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/consts"
+	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestDebugShowConfig(t *testing.T) {
