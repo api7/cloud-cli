@@ -20,7 +20,7 @@ MINORSYM="$(shell go list -m)/internal/version._minor"
 BUILDDATESYM="$(shell go list -m)/internal/version._buildDate"
 GITCOMMITSYM="$(shell go list -m)/internal/version._gitCommit"
 VERSION_MAJOR=0
-VERSION_MINOR=10
+VERSION_MINOR=13
 BINDIR=bin
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
