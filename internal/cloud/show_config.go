@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/bitly/go-simplejson"
 	"github.com/pkg/errors"
 )
 
@@ -47,24 +48,31 @@ func (a *api) DebugShowConfig(cpID, resource, id string) (string, error) {
 }
 
 func formatJSONData(raw []byte) (string, error) {
-	var data map[string]interface{}
-	if err := json.Unmarshal(raw, &data); err != nil {
-		return "", errors.Wrap(err, "unmarshal data")
+	js, err := simplejson.NewJson(raw)
+	if err != nil {
+		return "", errors.Wrap(err, "invalid json")
 	}
-	for key, arr := range data {
-		// arr is a specific apisix resource array.
-		for _, rawObj := range arr.([]interface{}) {
+
+	for _, resName := range []string{"routes", "services", "upstreams", "certificates", "consumers"} {
+		res, ok := js.CheckGet(resName)
+		if !ok {
+			continue
+		}
+
+		for i := 0; i < len(res.MustArray()); i++ {
 			var structualValue map[string]interface{}
-			obj := rawObj.(map[string]interface{})
+			value := res.GetIndex(i).Get("value").MustString()
+
 			// value is a JSON string, and we want to show it structurally, so
 			// here we unmarshal and reset it.
-			if err := json.Unmarshal([]byte(obj["value"].(string)), &structualValue); err != nil {
-				return "", errors.Wrap(err, fmt.Sprintf("unmarshal %s", key))
+			if err := json.Unmarshal([]byte(value), &structualValue); err != nil {
+				return "", errors.Wrap(err, fmt.Sprintf("unmarshal %s", value))
 			}
-			obj["value"] = structualValue
+
+			res.GetIndex(i).Set("value", structualValue)
 		}
 	}
-	newData, err := json.MarshalIndent(data, "", "  ")
+	newData, err := js.MarshalJSON()
 	if err != nil {
 		return "", err
 	}
