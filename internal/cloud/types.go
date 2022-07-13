@@ -73,6 +73,8 @@ type API interface {
 	GetStartupConfig(cpID string, configType StartupConfigType) (string, error)
 	// GetDefaultControlPlane returns the default control plane for the current organization.
 	GetDefaultControlPlane() (*types.ControlPlane, error)
+	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
+	DebugShowConfig(cpID string, resource string, id string) (string, error)
 }
 
 type api struct {

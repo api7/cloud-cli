@@ -176,7 +176,7 @@ func decodeResponse(resp *http.Response, v interface{}) error {
 		if err != nil {
 			return errors.Wrap(err, "Got a malformed response from server")
 		}
-		return errors.New(fmt.Sprintf("Error Code:%d, Error Reason: %s", rw.Status.Code, rw.ErrorReason))
+		return errors.New(fmt.Sprintf("Error Code: %d, Error Reason: %s", rw.Status.Code, rw.ErrorReason))
 	}
 	var rw types.ResponseWrapper
 	dec := json.NewDecoder(resp.Body)

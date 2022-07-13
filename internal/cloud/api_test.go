@@ -356,7 +356,7 @@ func TestGetStartupConfig(t *testing.T) {
 		{
 			name:        "bad code 400",
 			configType:  APISIX,
-			errorReason: "Error Code:4, Error Reason",
+			errorReason: "Error Code: 4, Error Reason",
 			code:        http.StatusBadRequest,
 			body: `
 				{
