@@ -41,7 +41,7 @@ func newDockerCommand() *cobra.Command {
 		Example: `
 cloud-cli deploy docker \
 		--name apisix-0 \
-		--apisix-image apache/apisix:2.13.1-centos \
+		--apisix-image apache/apisix:2.15.0-centos \
 		--docker-run-arg --detach \
 		--docker-run-arg --mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly \
 		--docker-run-arg --hostname=apisix-1`,
@@ -146,7 +146,7 @@ cloud-cli deploy docker \
 			fmt.Printf("APISIX ID: %s\n", ctx.apisixID)
 		},
 	}
-	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.13.1-centos", "Specify the Apache APISIX image")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.APISIXImage, "apisix-image", "apache/apisix:2.15.0-centos", "Specify the Apache APISIX image")
 	cmd.PersistentFlags().IntVar(&options.Global.Deploy.Docker.HTTPHostPort, "http-host-port", 9080, "Specify the host port for HTTP")
 	cmd.PersistentFlags().IntVar(&options.Global.Deploy.Docker.HTTPSHostPort, "https-host-port", 9443, "Specify the host port for HTTPS")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.DockerCLIPath, "docker-cli-path", "", "Specify the filepath of the docker command")

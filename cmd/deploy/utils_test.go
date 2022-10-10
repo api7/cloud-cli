@@ -445,7 +445,7 @@ func TestDeployPreRunForKubernetes(t *testing.T) {
 	essentialConfig := []byte(`apisix:
   image:
     repository: apache/apisix
-    tag: 2.13.1-centos
+    tag: 2.15.0-centos
   replicaCount: 1
   setIDFromPodUID: true
   luaModuleHook:
@@ -600,7 +600,7 @@ etcd:
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
 						NameSpace:    "apisix",
-						APISIXImage:  "apache/apisix:2.13.1-centos",
+						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},
 				},
@@ -640,7 +640,7 @@ etcd:
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
 					NameSpace:    "apisix",
-					APISIXImage:  "apache/apisix:2.13.1-centos",
+					APISIXImage:  "apache/apisix:2.15.0-centos",
 					ReplicaCount: 1,
 				},
 			},
@@ -650,7 +650,7 @@ etcd:
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
 						NameSpace:    "apisix",
-						APISIXImage:  "apache/apisix:2.13.1-centos",
+						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},
 				},
@@ -685,7 +685,7 @@ etcd:
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
 					NameSpace:    "apisix",
-					APISIXImage:  "apache/apisix:2.13.1-centos",
+					APISIXImage:  "apache/apisix:2.15.0-centos",
 					ReplicaCount: 1,
 				},
 			},
@@ -695,7 +695,7 @@ etcd:
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
 						NameSpace:    "apisix",
-						APISIXImage:  "apache/apisix:2.13.1-centos",
+						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},
 				},

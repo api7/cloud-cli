@@ -66,7 +66,7 @@ Run Command
 -----------
 
 ```shell
-cloud-cli deploy bare --apisix-version 2.13.1
+cloud-cli deploy bare --apisix-version 2.15.0
 
 Congratulations! Your APISIX instance was deployed successfully
 APISIX ID: 4189c82c-fdf1-40f2-87e2-9a7bb6ad5ed7

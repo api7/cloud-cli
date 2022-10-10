@@ -57,7 +57,7 @@ Run Command
 
 ```shell
 cloud-cli deploy docker \
-  --apisix-image apache/apisix:2.13.1-centos \
+  --apisix-image apache/apisix:2.15.0-centos \
   --name my-apisix
 
 Congratulations! Your APISIX instance was deployed successfully
@@ -68,7 +68,7 @@ APISIX ID: 4189c82c-fdf1-40f2-87e2-9a7bb6ad5ed7
 In this command, we:
 
 1. name the container to `my-apisix`;
-2. use the APISIX image `apache/apisix:2.13.1-centos`.
+2. use the APISIX image `apache/apisix:2.15.0-centos`.
 
 If you see the similar output about the instance ID and container ID, then your
 APISIX instance is deployed successfully. You can redirect to API7 Cloud console

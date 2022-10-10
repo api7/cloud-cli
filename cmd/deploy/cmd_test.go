@@ -74,7 +74,7 @@ We'll try to test the credential logic separately
 				options.Global.DryRun = true
 				options.Global.Verbose = true
 				cmd := NewCommand()
-				cmd.SetArgs([]string{"docker", "--apisix-image", "apache/apisix:2.13.1-centos", "--docker-run-arg", "--detach"})
+				cmd.SetArgs([]string{"docker", "--apisix-image", "apache/apisix:2.15.0-centos", "--docker-run-arg", "--detach"})
 				err := cmd.Execute()
 				assert.NoError(t, err, "check if the command executed successfully")
 				return
