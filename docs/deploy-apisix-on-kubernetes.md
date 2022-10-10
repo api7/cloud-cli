@@ -59,7 +59,7 @@ cloud-cli deploy kubernetes \
   --name my-apisix \
   --namespace apisix \
   --replica-count 1 \
-  --apisix-image apache/apisix:2.13.1-centos \
+  --apisix-image apache/apisix:2.15.0-centos \
   --helm-install-arg --output=table
 
 Congratulations! Your APISIX cluster was deployed successfully on Kubernetes.
@@ -76,7 +76,7 @@ In this command, we:
 1. name the helm release to `my-apisix`;
 2. specify the namespace is `apisix`;
 3. specify the APISIX pods replica is `1`;
-4. specify the APISIX image `apache/apisix:2.13.1-centos`;
+4. specify the APISIX image `apache/apisix:2.15.0-centos`;
 5. prints the output in the table format for helm install command.
 
 And the following operations were done in the above command:
