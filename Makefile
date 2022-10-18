@@ -17,13 +17,15 @@ GITSHA=$(shell git rev-parse --short=7 HEAD)
 
 MAJORSYM="$(shell go list -m)/internal/version._major"
 MINORSYM="$(shell go list -m)/internal/version._minor"
+PATCHSYM="$(shell go list -m)/internal/version._patch"
 BUILDDATESYM="$(shell go list -m)/internal/version._buildDate"
 GITCOMMITSYM="$(shell go list -m)/internal/version._gitCommit"
 VERSION_MAJOR=0
 VERSION_MINOR=19
+VERSION_PATCH=1
 BINDIR=bin
 
-GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
+GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(PATCHSYM)=$(VERSION_PATCH) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
 default: help
 
@@ -69,7 +71,7 @@ build-all: clean create-bin-dir ## Build binary packages
 	@GOARCH=amd64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-amd64 github.com/api7/cloud-cli
 	@GOARCH=arm64 GOOS=windows CGO_ENABLED=0 go build -ldflags $(GO_LDFLAGS) -o $(BINDIR)/cloud-cli-windows-arm64 github.com/api7/cloud-cli
 	@chmod +x $(BINDIR)/*
-	@gzip -f -S -$(VERSION_MAJOR).$(VERSION_MINOR).0.gz $(BINDIR)/*
+	@gzip -f -S -$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH).gz $(BINDIR)/*
 	
 .PHONY: license-check
 license-check:

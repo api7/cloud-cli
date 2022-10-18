@@ -24,6 +24,7 @@ import (
 type Version struct {
 	Major     string `json:"major"`
 	Minor     string `json:"minor"`
+	Patch     string `json:"patch"`
 	GitCommit string `json:"git_commit"`
 	BuildDate string `json:"build_date"`
 	GoVersion string `json:"go_version"`
@@ -34,6 +35,7 @@ type Version struct {
 var (
 	_major     string
 	_minor     string
+	_patch     string
 	_buildDate string
 	_gitCommit string
 
@@ -45,6 +47,7 @@ func init() {
 	V = Version{
 		Major:     _major,
 		Minor:     _minor,
+		Patch:     _patch,
 		BuildDate: _buildDate,
 		GoVersion: runtime.Version(),
 		GitCommit: _gitCommit,
