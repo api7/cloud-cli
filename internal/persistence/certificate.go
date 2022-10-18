@@ -48,11 +48,18 @@ func PrepareCertificate(cpID string) error {
 	if err != nil {
 		return errors.Wrap(err, "save certificate")
 	}
+	// permission in WriteFile is before umask, so we need to chmod it
+	if err = os.Chmod(certFilename, 0644); err != nil {
+		return errors.Wrap(err, "change certificate permission")
+	}
 
 	certKeyFilename := filepath.Join(TLSDir, "tls.key")
 	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
+	}
+	if err = os.Chmod(certKeyFilename, 0644); err != nil {
+		return errors.Wrap(err, "change private key permission")
 	}
 
 	certCAFilename := filepath.Join(TLSDir, "ca.crt")
@@ -60,6 +67,10 @@ func PrepareCertificate(cpID string) error {
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")
 	}
+	if err = os.Chmod(certCAFilename, 0644); err != nil {
+		return errors.Wrap(err, "change ca certificate permission")
+	}
+
 	return nil
 }
 

@@ -15,9 +15,10 @@
 package persistence
 
 import (
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 // User is credential for authentication.
@@ -46,5 +47,9 @@ func Init() error {
 	if err := os.MkdirAll(TLSDir, 0755); err != nil {
 		return errors.Wrap(err, "failed to create tls directory")
 	}
+	if err := os.Chmod(TLSDir, 0755); err != nil {
+		return errors.Wrap(err, "change tls directory permission")
+	}
+
 	return nil
 }
