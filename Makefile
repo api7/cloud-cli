@@ -20,14 +20,18 @@ MINORSYM="$(shell go list -m)/internal/version._minor"
 PATCHSYM="$(shell go list -m)/internal/version._patch"
 BUILDDATESYM="$(shell go list -m)/internal/version._buildDate"
 GITCOMMITSYM="$(shell go list -m)/internal/version._gitCommit"
-VERSION_MAJOR=0
-VERSION_MINOR=19
-VERSION_PATCH=1
+VERSION_MAJOR="$(shell cat VERSION | cut -d'.' -f1)"
+VERSION_MINOR="$(shell cat VERSION | cut -d'.' -f2)"
+VERSION_PATCH="$(shell cat VERSION | cut -d'.' -f3)"
 BINDIR=bin
 
 GO_LDFLAGS ?= "-X=$(MAJORSYM)=$(VERSION_MAJOR) -X=$(MINORSYM)=$(VERSION_MINOR) -X=$(PATCHSYM)=$(VERSION_PATCH) -X=$(BUILDDATESYM)=$(BUILD_DATE) -X=$(GITCOMMITSYM)=$(GITSHA)"
 
 default: help
+
+.PHONY: version
+version:
+	@echo $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 
 .PHONY: help
 help:  ## Display this help
