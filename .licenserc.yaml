@@ -37,5 +37,6 @@ header:
     - 'LICENSE'
     - '.github'
     - '.gitignore'
+    - 'VERSION'
 
   comment: on-failure
