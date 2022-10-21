@@ -15,7 +15,7 @@
 package apisix
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
@@ -49,7 +49,7 @@ func SaveConfig(config map[string]interface{}, pattern string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "marshal config")
 	}
-	tempFile, err := ioutil.TempFile("", pattern)
+	tempFile, err := os.CreateTemp("", pattern)
 	if err != nil {
 		return "", err
 	}

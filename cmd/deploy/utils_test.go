@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -278,7 +277,7 @@ etcd:
 				assert.Equal(t, tc.filledContext.cloudLuaModuleDir, ctx.cloudLuaModuleDir, "check cloud lua module dir")
 				assert.Equal(t, string(tc.filledContext.essentialConfig), string(ctx.essentialConfig), "check essential config")
 
-				id, err := ioutil.ReadFile(filepath.Join(persistence.HomeDir, "apisix.uid"))
+				id, err := os.ReadFile(filepath.Join(persistence.HomeDir, "apisix.uid"))
 				assert.Nil(t, err, "read apisix.uid")
 				// We cannot add an assertion if the ID was generated randomly.
 				if tc.specifiedAPISIXID != "" {

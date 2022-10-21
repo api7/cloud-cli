@@ -17,7 +17,7 @@ package deploy
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -74,7 +74,7 @@ cloud-cli deploy docker \
 			docker.AppendArgs("--detach")
 
 			if options.Global.Deploy.APISIXConfigFile != "" {
-				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
+				data, err = os.ReadFile(options.Global.Deploy.APISIXConfigFile)
 				if err != nil {
 					output.Errorf("invalid --apisix-config-file option: %s", err)
 					return

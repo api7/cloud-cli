@@ -15,7 +15,6 @@
 package persistence
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -85,15 +84,15 @@ func TestPrepareCertificate(t *testing.T) {
 				certKeyFilename := filepath.Join(TLSDir, "tls.key")
 				certCAFilename := filepath.Join(TLSDir, "ca.crt")
 
-				err := ioutil.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
+				err := os.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
 				assert.Nil(t, err, "check if cert is saved")
 				defer os.Remove(certFilename)
 
-				err = ioutil.WriteFile(certKeyFilename, []byte(tc.preparedKey), 0600)
+				err = os.WriteFile(certKeyFilename, []byte(tc.preparedKey), 0600)
 				assert.Nil(t, err, "check if pkey is saved")
 				defer os.Remove(certKeyFilename)
 
-				err = ioutil.WriteFile(certCAFilename, []byte(tc.preparedCACert), 0600)
+				err = os.WriteFile(certCAFilename, []byte(tc.preparedCACert), 0600)
 				assert.Nil(t, err, "check if ca cert is saved")
 				defer os.Remove(certCAFilename)
 			}
@@ -109,11 +108,11 @@ func TestPrepareCertificate(t *testing.T) {
 				defer os.Remove(certFilename)
 				defer os.Remove(certKeyFilename)
 				defer os.Remove(certCAFilename)
-				cert, err := ioutil.ReadFile(certFilename)
+				cert, err := os.ReadFile(certFilename)
 				assert.Nil(t, err, "read cert")
-				pkey, err := ioutil.ReadFile(certKeyFilename)
+				pkey, err := os.ReadFile(certKeyFilename)
 				assert.Nil(t, err, "read pkey")
-				ca, err := ioutil.ReadFile(certCAFilename)
+				ca, err := os.ReadFile(certCAFilename)
 				assert.Nil(t, err, "read ca cert")
 
 				assert.Equal(t, tc.expectedCert, string(cert), "check cert")

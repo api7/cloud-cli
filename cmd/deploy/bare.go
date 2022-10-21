@@ -15,19 +15,15 @@
 package deploy
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"text/template"
 	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/apisix"
-	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -83,7 +79,7 @@ cloud-cli deploy bare \
 			opts := options.Global.Deploy.Bare
 
 			if options.Global.Deploy.APISIXConfigFile != "" {
-				data, err = ioutil.ReadFile(options.Global.Deploy.APISIXConfigFile)
+				data, err = os.ReadFile(options.Global.Deploy.APISIXConfigFile)
 				if err != nil {
 					output.Errorf("invalid --apisix-config-file option: %s", err)
 					return
@@ -104,45 +100,19 @@ cloud-cli deploy bare \
 				}
 			}
 
-			buf := bytes.NewBuffer(nil)
-			err = _installer.Execute(buf, &installContext{
-				APISIXRepoURL: _apisixRepoURL,
-				TLSDir:        ctx.tlsDir,
-				ConfigFile:    configFile,
-				Version:       opts.APISIXVersion,
-				InstanceID:    options.Global.Deploy.APISIXInstanceID,
-			})
-			if err != nil {
-				output.Errorf(err.Error())
-				return
-			}
-			installerPath := filepath.Join(persistence.HomeDir, "scripts")
-			err = os.Mkdir(installerPath, 0755)
-			if err != nil {
-				if !os.IsExist(err) {
+			if options.Global.Deploy.Bare.Reload {
+				if err = apisix.Reload(context); err != nil {
 					output.Errorf(err.Error())
-					return
 				}
-			}
-
-			installerFile := filepath.Join(installerPath, "install.sh")
-			err = os.WriteFile(installerFile, buf.Bytes(), 0755)
-			if err != nil {
-				output.Errorf(err.Error())
 				return
 			}
 
-			bare := commands.New("/usr/bin/bash", options.Global.DryRun)
-			bare.AppendArgs("-C")
-			bare.AppendArgs(installerFile)
-
-			if err = bare.Execute(context); err != nil {
-				output.Errorf(err.Error())
-				return
-			}
+			deployOnBareMetal(context, &ctx, &opts, configFile)
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.15.0", "Specifies the APISIX version, default value is 2.15.0")
+	cmd.PersistentFlags().BoolVar(&options.Global.Deploy.Bare.Reload, "reload", false, "Skip deployment, only update configurations and reload APISIX")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXBinPath, "apisix-bin-path", "/usr/bin/apisix", "APISIX binary file path")
 
 	return cmd
 }

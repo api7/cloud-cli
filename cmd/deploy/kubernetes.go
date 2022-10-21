@@ -16,7 +16,7 @@ package deploy
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -117,7 +117,7 @@ cloud-cli deploy kubernetes \
 				}
 
 				if customizeValues != "" {
-					if data, err = ioutil.ReadFile(customizeValues); err != nil {
+					if data, err = os.ReadFile(customizeValues); err != nil {
 						output.Errorf("invalid --apisix-config-file option: %s", err)
 					}
 				}
