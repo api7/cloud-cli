@@ -125,7 +125,7 @@ cloud-cli deploy kubernetes \
 				if mergedConfig, err = apisix.MergeConfig(data, ctx.essentialConfig); err != nil {
 					output.Errorf(err.Error())
 				}
-				if configFile, err = apisix.SaveConfig(mergedConfig, "helm-values-*.yaml"); err != nil {
+				if configFile, err = apisix.SaveConfigToTemp(mergedConfig, "helm-values-*.yaml"); err != nil {
 					output.Errorf(err.Error())
 				}
 				helm.AppendArgs("--values", configFile)

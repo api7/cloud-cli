@@ -18,6 +18,7 @@ import (
 	"context"
 	_ "embed"
 	"os"
+	"path/filepath"
 	"text/template"
 	"time"
 
@@ -93,8 +94,8 @@ cloud-cli deploy bare \
 
 			var configFile string
 			if len(mergedConfig) > 0 {
-				configFile, err = apisix.SaveConfig(mergedConfig, "apisix-config-*.yaml")
-				if err != nil {
+				path := filepath.Join(os.TempDir(), "apisix-config-cloud.yaml")
+				if err = apisix.SaveConfig(mergedConfig, path); err != nil {
 					output.Errorf(err.Error())
 					return
 				}

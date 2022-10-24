@@ -34,7 +34,7 @@ func TestReload(t *testing.T) {
 	}{
 		{
 			name:          "success",
-			apisixBinPath: "/usr/bin/echo",
+			apisixBinPath: "echo",
 		},
 	}
 

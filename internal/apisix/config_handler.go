@@ -43,8 +43,8 @@ func MergeConfig(config []byte, defaultConfig []byte) (map[string]interface{}, e
 	return data, nil
 }
 
-// SaveConfig saves the config to the temporary file and return its name.
-func SaveConfig(config map[string]interface{}, pattern string) (string, error) {
+// SaveConfigToTemp saves the config to the temporary file and return its name.
+func SaveConfigToTemp(config map[string]interface{}, pattern string) (string, error) {
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return "", errors.Wrap(err, "marshal config")
@@ -63,4 +63,20 @@ func SaveConfig(config map[string]interface{}, pattern string) (string, error) {
 		return "", err
 	}
 	return tempFile.Name(), nil
+}
+
+// SaveConfig saves the config to the specified file.
+func SaveConfig(config map[string]interface{}, filepath string) error {
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return errors.Wrap(err, "marshal config")
+	}
+	if err = os.WriteFile(filepath, data, 0644); err != nil {
+		return err
+	}
+	// Assign permission for other users so that processes inside container can read it.
+	if err = os.Chmod(filepath, 0644); err != nil {
+		return err
+	}
+	return nil
 }
