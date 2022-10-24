@@ -94,8 +94,8 @@ cloud-cli deploy bare \
 
 			var configFile string
 			if len(mergedConfig) > 0 {
-				path := filepath.Join(os.TempDir(), "apisix-config-cloud.yaml")
-				if err = apisix.SaveConfig(mergedConfig, path); err != nil {
+				configFile = filepath.Join(os.TempDir(), "apisix-config-cloud.yaml")
+				if err = apisix.SaveConfig(mergedConfig, configFile); err != nil {
 					output.Errorf(err.Error())
 					return
 				}
