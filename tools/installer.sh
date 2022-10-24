@@ -51,7 +51,7 @@ install_cloud_cli() {
 
 OS=`uname -s | tr A-Z a-z`
 ARCH=`uname -m | tr A-Z a-z`
-CLOUD_CLI_VER="0.19.2"
+CLOUD_CLI_VER=`curl -fsSL https://raw.githubusercontent.com/api7/cloud-cli/main/VERSION`
 
 if [ "$ARCH" = "x86_64" ]; then
   ARCH=amd64
