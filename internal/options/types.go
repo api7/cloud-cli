@@ -129,6 +129,10 @@ type DockerStopOptions struct {
 type BareDeployOptions struct {
 	// APISIXVersion specifies the APISIX version to deploy.
 	APISIXVersion string
+	// APISIXBinPath specifies the APISIX binary file path.
+	APISIXBinPath string
+	// Reload indicates if skip the deployment and just try to reload APISIX.
+	Reload bool
 }
 
 // KubernetesStopOptions contains options for the kubectl or helm command.

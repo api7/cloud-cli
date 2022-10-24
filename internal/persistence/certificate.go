@@ -15,7 +15,6 @@
 package persistence
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -44,7 +43,7 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "download tls bundle")
 	}
 
-	err = ioutil.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
+	err = os.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save certificate")
 	}
@@ -54,7 +53,7 @@ func PrepareCertificate(cpID string) error {
 	}
 
 	certKeyFilename := filepath.Join(TLSDir, "tls.key")
-	err = ioutil.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
+	err = os.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
 	}
@@ -63,7 +62,7 @@ func PrepareCertificate(cpID string) error {
 	}
 
 	certCAFilename := filepath.Join(TLSDir, "ca.crt")
-	err = ioutil.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0644)
+	err = os.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")
 	}
@@ -75,7 +74,7 @@ func PrepareCertificate(cpID string) error {
 }
 
 func checkIfCertificateAvailable(certFilename string) (bool, error) {
-	data, err := ioutil.ReadFile(certFilename)
+	data, err := os.ReadFile(certFilename)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil

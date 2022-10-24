@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -65,11 +64,11 @@ func SaveCloudLuaModule() (string, error) {
 			}
 		} else if hdr.Typeflag == tar.TypeReg {
 			filename := filepath.Join(HomeDir, hdr.Name)
-			buffer, err := ioutil.ReadAll(reader)
+			buffer, err := io.ReadAll(reader)
 			if err != nil {
 				return "", errors.Wrap(err, "failed to read tar")
 			}
-			if err := ioutil.WriteFile(filename, buffer, 0644); err != nil {
+			if err := os.WriteFile(filename, buffer, 0644); err != nil {
 				return "", errors.Wrap(err, "failed to save file")
 			}
 		}

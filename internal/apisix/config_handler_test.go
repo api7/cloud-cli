@@ -16,6 +16,8 @@ package apisix
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"regexp"
 	"testing"
 
@@ -142,7 +144,7 @@ apisix:
 	}
 }
 
-func TestSaveConfig(t *testing.T) {
+func TestSaveConfigToTemp(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -168,13 +170,55 @@ func TestSaveConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			filename, err := SaveConfig(tc.config, "apisix-config-*.yaml")
+			filename, err := SaveConfigToTemp(tc.config, "apisix-config-*.yaml")
 			if tc.errorReason != "" {
 				assert.NotNil(t, err, "check if err is not nil")
 				assert.Equal(t, tc.errorReason, err.Error(), "check error")
 			} else {
 				assert.Nil(t, err, "check if err is nil")
 				assert.Regexp(t, regexp.MustCompile(tc.filenamePattern), filename, "check filename")
+			}
+		})
+	}
+}
+
+func TestSaveConfig(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name        string
+		config      map[string]interface{}
+		filename    string
+		errorReason string
+	}{
+		{
+			name: "success",
+			config: map[string]interface{}{
+				"apisix": map[string]interface{}{
+					"enable_admin": false,
+					"ssl": map[string]interface{}{
+						"ssl_trusted_certificate": "/path/to/ca2.crt",
+					},
+				},
+			},
+			filename: `apisix-config-cloud-test.yaml`,
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			filename := filepath.Join(os.TempDir(), tc.filename)
+			err := SaveConfig(tc.config, filename)
+			if tc.errorReason != "" {
+				assert.NotNil(t, err, "check if err is not nil")
+				assert.Equal(t, tc.errorReason, err.Error(), "check error")
+			} else {
+				assert.Nil(t, err, "check if err is nil")
+
+				info, err := os.Stat(filename)
+				assert.Nil(t, err, "check os stat error")
+				assert.Equal(t, os.FileMode(0644), info.Mode(), "check file mode")
 			}
 		})
 	}

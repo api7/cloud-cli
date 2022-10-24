@@ -19,7 +19,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -105,7 +105,7 @@ func deployPreRunForDocker(ctx *deployContext) error {
 	}
 
 	ctx.apisixIDFile = filepath.Join(persistence.HomeDir, "apisix.uid")
-	if err := ioutil.WriteFile(ctx.apisixIDFile, []byte(ctx.apisixID), 0644); err != nil {
+	if err := os.WriteFile(ctx.apisixIDFile, []byte(ctx.apisixID), 0644); err != nil {
 		return errors.Wrap(err, "failed to save APISIX instance ID")
 	}
 
@@ -324,4 +324,43 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 		return "", fmt.Errorf("get container id: stderr: %s", stderr)
 	}
 	return strings.TrimRight(stdout, "\r\n"), nil
+}
+
+func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *options.BareDeployOptions, configFile string) {
+	buf := bytes.NewBuffer(nil)
+	err := _installer.Execute(buf, &installContext{
+		APISIXRepoURL: _apisixRepoURL,
+		TLSDir:        deployCtx.tlsDir,
+		ConfigFile:    configFile,
+		Version:       opts.APISIXVersion,
+		InstanceID:    options.Global.Deploy.APISIXInstanceID,
+	})
+	if err != nil {
+		output.Errorf(err.Error())
+		return
+	}
+	installerPath := filepath.Join(persistence.HomeDir, "scripts")
+	err = os.Mkdir(installerPath, 0755)
+	if err != nil {
+		if !os.IsExist(err) {
+			output.Errorf(err.Error())
+			return
+		}
+	}
+
+	installerFile := filepath.Join(installerPath, "install.sh")
+	err = os.WriteFile(installerFile, buf.Bytes(), 0755)
+	if err != nil {
+		output.Errorf(err.Error())
+		return
+	}
+
+	bare := commands.New("/usr/bin/bash", options.Global.DryRun)
+	bare.AppendArgs("-C")
+	bare.AppendArgs(installerFile)
+
+	if err = bare.Execute(ctx); err != nil {
+		output.Errorf(err.Error())
+		return
+	}
 }

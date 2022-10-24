@@ -88,6 +88,18 @@ Besides, Apache APISIX service will listen the ports `9080` for HTTP traffic and
 `9443` for HTTPS. Care must be taken here that you may suffer from the "port is
 already in use" issue if these ports were occupied.
 
+Reload Instance
+----------------
+
+Sometimes you may want to just update your custom APISIX configurations and reload APISIX, without
+the deployment step. In this case, you can run the deploy sub-command with `--reload` option.
+
+```shell
+cloud-cli deploy bare --reload
+```
+
+Note that you can use `--apisix-bin-path` to specify the APISIX binary file path, the default path is `/usr/bin/apisix`.
+
 Stop Instance
 -------------
 

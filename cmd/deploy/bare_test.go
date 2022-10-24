@@ -16,7 +16,6 @@ package deploy
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -261,7 +260,7 @@ fi
 			assert.Regexp(t, tc.cmdPattern, string(output), "check if the composed docker command is correct")
 
 			installFile := filepath.Join(persistence.HomeDir, "scripts/install.sh")
-			file, err := ioutil.ReadFile(installFile)
+			file, err := os.ReadFile(installFile)
 			assert.NoError(t, err, "check if dump the install script successful")
 			fmt.Println(string(file))
 			assert.Regexp(t, tc.installScript, string(file), "checking")
