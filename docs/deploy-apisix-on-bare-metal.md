@@ -88,6 +88,15 @@ Besides, Apache APISIX service will listen the ports `9080` for HTTP traffic and
 `9443` for HTTPS. Care must be taken here that you may suffer from the "port is
 already in use" issue if these ports were occupied.
 
+### Cloud Lua Module Mirror
+
+During the deployment, Cloud CLI has to download the [Cloud Lua Module](https://api7.cloud/docs/overview/how-apisix-connects-to-api7-cloud#the-api7-cloud-lua-module)
+, users in China may suffer from the slow network. In such a case, try to export the below environment.
+
+```shell
+export API7_CLOUD_LUA_MODULE_URL=https://api7-cloud-1301662268.cos.ap-nanjing.myqcloud.com/latest/assets/cloud_module_beta.tar.gz
+```
+
 Reload Instance
 ----------------
 

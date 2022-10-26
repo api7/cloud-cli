@@ -83,6 +83,15 @@ APISIX instance on the same machine due to the port conflict.
 
 > Note: we always run the container in the background.
 
+### Cloud Lua Module Mirror
+
+During the deployment, Cloud CLI has to download the [Cloud Lua Module](https://api7.cloud/docs/overview/how-apisix-connects-to-api7-cloud#the-api7-cloud-lua-module)
+, users in China may suffer from the slow network. In such a case, try to export the below environment.
+
+```shell
+export API7_CLOUD_LUA_MODULE_URL=https://api7-cloud-1301662268.cos.ap-nanjing.myqcloud.com/latest/assets/cloud_module_beta.tar.gz
+```
+
 Stop Instance
 -------------
 
