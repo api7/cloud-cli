@@ -64,4 +64,5 @@ if [[ $ARCH = "x86_64" ]]; then ARCH=amd64; fi
 export CLOUD_CLI_FILENAME=cloud-cli-$OS-$ARCH-$VERSION
 curl -O https://api7-cloud-1301662268.cos.ap-nanjing.myqcloud.com/bin/$CLOUD_CLI_FILENAME.gz
 gzip -d $CLOUD_CLI_FILENAME.gz && chmod a+x $CLOUD_CLI_FILENAME
+mv $CLOUD_CLI_FILENAME /tmp/cloud-cli
 ```
