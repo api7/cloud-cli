@@ -50,3 +50,18 @@ go install github.com/api7/cloud-cli@main
 See [Versions](https://go.dev/ref/mod#versions) and
 [Pseudo-versions](https://go.dev/ref/mod#pseudo-versions) for how to format the
 version suffixes.
+
+China Mirror
+-------------
+
+You can also download Cloud CLI binaries through China mirror.
+
+```shell
+export VERSION=0.19.2
+export OS=`uname -s | tr A-Z a-z`
+export ARCH=`uname -m | tr A-Z a-z`
+if [[ $ARCH = "x86_64" ]]; then ARCH=amd64 fi
+export CLOUD_CLI_FILENAME=cloud-cli-$OS-$ARCH-$VERSION
+wget https://api7-cloud-1301662268.cos.ap-nanjing.myqcloud.com/bin/$CLOUD_CLI_FILENAME.gz
+gzip -d $CLOUD_CLI_FILENAME.gz && chmod a+x $CLOUD_CLI_FILENAME
+```
