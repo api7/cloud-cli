@@ -140,10 +140,10 @@ func deployPreRun(ctx *deployContext) error {
 	if err != nil {
 		return fmt.Errorf("Failed to get default control plane: %s", err.Error())
 	}
-	if err := persistence.PrepareCertificate(cp.ID); err != nil {
+	if err := persistence.PrepareCertificate(cp.Name, cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = persistence.TLSDir
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.Name)
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
@@ -171,10 +171,10 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	if err != nil {
 		return fmt.Errorf("Failed to get default control plane: %v", err.Error())
 	}
-	if err = persistence.PrepareCertificate(cp.ID); err != nil {
+	if err = persistence.PrepareCertificate(cp.Name, cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = persistence.TLSDir
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.Name)
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {

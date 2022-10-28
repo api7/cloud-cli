@@ -27,8 +27,10 @@ import (
 
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
-func PrepareCertificate(cpID string) error {
-	certFilename := filepath.Join(TLSDir, "tls.crt")
+func PrepareCertificate(cpName, cpID string) error {
+	cpTLSDir := filepath.Join(TLSDir, cpName)
+
+	certFilename := filepath.Join(cpTLSDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {
 		return errors.Wrap(err, "check certificate availability")
 	} else if available {
@@ -43,6 +45,14 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "download tls bundle")
 	}
 
+	// Make cp tls dir
+	if err = os.MkdirAll(cpTLSDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create tls directory")
+	}
+	if err = os.Chmod(cpTLSDir, 0755); err != nil {
+		return errors.Wrap(err, "change tls directory permission")
+	}
+
 	err = os.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save certificate")
@@ -52,7 +62,7 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "change certificate permission")
 	}
 
-	certKeyFilename := filepath.Join(TLSDir, "tls.key")
+	certKeyFilename := filepath.Join(cpTLSDir, "tls.key")
 	err = os.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
@@ -61,7 +71,7 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "change private key permission")
 	}
 
-	certCAFilename := filepath.Join(TLSDir, "ca.crt")
+	certCAFilename := filepath.Join(cpTLSDir, "ca.crt")
 	err = os.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")
