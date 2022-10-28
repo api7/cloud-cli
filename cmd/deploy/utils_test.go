@@ -258,9 +258,7 @@ etcd:
 			}
 
 			defer func() {
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.crt"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.key"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "ca.crt"))
+				os.RemoveAll(filepath.Join(persistence.HomeDir, "tls"))
 			}()
 			ctx := &deployContext{}
 			tc.mockFn(t)
@@ -421,9 +419,7 @@ etcd:
 			}
 
 			defer func() {
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.crt"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.key"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "ca.crt"))
+				os.RemoveAll(filepath.Join(persistence.HomeDir, "tls"))
 			}()
 			ctx := &deployContext{}
 			tc.mockFn(t)
@@ -712,9 +708,7 @@ etcd:
 			}
 
 			defer func() {
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.crt"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "tls.key"))
-				os.Remove(filepath.Join(persistence.HomeDir, "tls", "ca.crt"))
+				os.RemoveAll(filepath.Join(persistence.HomeDir, "tls"))
 			}()
 
 			ctx := &deployContext{}

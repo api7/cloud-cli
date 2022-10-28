@@ -232,12 +232,7 @@ fi
 
 		t.Run(tc.name, func(t *testing.T) {
 			defer func() {
-				certFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.crt")
-				certKeyFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "tls.key")
-				certCAFilename := filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls", "ca.crt")
-				os.Remove(certFilename)
-				os.Remove(certKeyFilename)
-				os.Remove(certCAFilename)
+				os.RemoveAll(filepath.Join(os.Getenv("HOME"), ".api7cloud", "tls"))
 			}()
 			//Because `os.Exit(-1)` will be triggered in the failure case, so here the test is executed using a subprocess
 			//The method come from: https://talks.golang.org/2014/testing.slide#23

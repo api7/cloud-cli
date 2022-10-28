@@ -143,7 +143,7 @@ func deployPreRun(ctx *deployContext) error {
 	if err := persistence.PrepareCertificate(cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = persistence.TLSDir
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID)
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
@@ -174,7 +174,7 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	if err = persistence.PrepareCertificate(cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = persistence.TLSDir
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID)
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {

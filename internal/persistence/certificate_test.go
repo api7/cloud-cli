@@ -30,6 +30,7 @@ import (
 func TestPrepareCertificate(t *testing.T) {
 	testCases := []struct {
 		name           string
+		cpID           string
 		preparedCert   string
 		preparedKey    string
 		preparedCACert string
@@ -75,14 +76,45 @@ func TestPrepareCertificate(t *testing.T) {
 			expectedKey:    "1",
 			expectedCACert: "1",
 		},
+		{
+			name: "success with cp id",
+			cpID: "123456",
+			mockFn: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+				cloud.DefaultClient = mockClient
+			},
+			expectedCert:   "1",
+			expectedKey:    "1",
+			expectedCACert: "1",
+		},
 	}
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.cpID == "" {
+				tc.cpID = "1"
+			}
+			cpTLSDir := filepath.Join(TLSDir, tc.cpID)
+
 			if tc.preparedCert != "" {
-				certFilename := filepath.Join(TLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(TLSDir, "tls.key")
-				certCAFilename := filepath.Join(TLSDir, "ca.crt")
+				// create cp tls dir
+				if err := os.MkdirAll(cpTLSDir, 0755); err != nil {
+					assert.Nil(t, err, "failed to create tls directory")
+				}
+				if err := os.Chmod(cpTLSDir, 0755); err != nil {
+					assert.Nil(t, err, "change tls directory permission")
+				}
+				defer os.Remove(cpTLSDir)
+
+				certFilename := filepath.Join(cpTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(cpTLSDir, "tls.key")
+				certCAFilename := filepath.Join(cpTLSDir, "ca.crt")
 
 				err := os.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
 				assert.Nil(t, err, "check if cert is saved")
@@ -99,12 +131,13 @@ func TestPrepareCertificate(t *testing.T) {
 
 			tc.mockFn(t)
 
-			err := PrepareCertificate("1")
+			err := PrepareCertificate(tc.cpID)
+			defer os.Remove(cpTLSDir)
 			if tc.errorReason == "" {
 				assert.Nil(t, err, "check if err is nil")
-				certFilename := filepath.Join(TLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(TLSDir, "tls.key")
-				certCAFilename := filepath.Join(TLSDir, "ca.crt")
+				certFilename := filepath.Join(cpTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(cpTLSDir, "tls.key")
+				certCAFilename := filepath.Join(cpTLSDir, "ca.crt")
 				defer os.Remove(certFilename)
 				defer os.Remove(certKeyFilename)
 				defer os.Remove(certCAFilename)
