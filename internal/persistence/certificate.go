@@ -27,8 +27,8 @@ import (
 
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
-func PrepareCertificate(cpName, cpID string) error {
-	cpTLSDir := filepath.Join(TLSDir, cpName)
+func PrepareCertificate(cpID string) error {
+	cpTLSDir := filepath.Join(TLSDir, cpID)
 
 	certFilename := filepath.Join(cpTLSDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {

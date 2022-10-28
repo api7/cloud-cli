@@ -146,13 +146,8 @@ func TestKubernetesDeployCommand(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
-			certFilename := filepath.Join(persistence.HomeDir, "tls", "tls.crt")
-			certKeyFilename := filepath.Join(persistence.HomeDir, "tls", "tls.key")
-			certCAFilename := filepath.Join(persistence.HomeDir, "tls", "ca.crt")
 			defer func() {
-				os.Remove(certFilename)
-				os.Remove(certKeyFilename)
-				os.Remove(certCAFilename)
+				os.RemoveAll(persistence.HomeDir)
 			}()
 			//Because `os.Exit(-1)` will be triggered in the failure case, so here the test is executed using a subprocess
 			//The method come from: https://talks.golang.org/2014/testing.slide#23
@@ -173,6 +168,7 @@ func TestKubernetesDeployCommand(t *testing.T) {
 			assert.NoError(t, err, "check if the command executed successfully")
 
 			for _, pattern := range tc.cmdPatterns {
+				fmt.Println(string(output))
 				assert.Regexp(t, pattern, string(output), "check if the kubectl and helm command is correct")
 			}
 		})

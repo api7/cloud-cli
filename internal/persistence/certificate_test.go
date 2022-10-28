@@ -30,7 +30,6 @@ import (
 func TestPrepareCertificate(t *testing.T) {
 	testCases := []struct {
 		name           string
-		cpName         string
 		cpID           string
 		preparedCert   string
 		preparedKey    string
@@ -78,8 +77,8 @@ func TestPrepareCertificate(t *testing.T) {
 			expectedCACert: "1",
 		},
 		{
-			name:   "success with cp name",
-			cpName: "cpname_success",
+			name: "success with cp id",
+			cpID: "123456",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
@@ -98,13 +97,10 @@ func TestPrepareCertificate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.cpName == "" {
-				tc.cpName = "default"
-			}
 			if tc.cpID == "" {
 				tc.cpID = "1"
 			}
-			cpTLSDir := filepath.Join(TLSDir, tc.cpName)
+			cpTLSDir := filepath.Join(TLSDir, tc.cpID)
 
 			if tc.preparedCert != "" {
 				// create cp tls dir
@@ -135,7 +131,7 @@ func TestPrepareCertificate(t *testing.T) {
 
 			tc.mockFn(t)
 
-			err := PrepareCertificate(tc.cpName, tc.cpID)
+			err := PrepareCertificate(tc.cpID)
 			defer os.Remove(cpTLSDir)
 			if tc.errorReason == "" {
 				assert.Nil(t, err, "check if err is nil")
