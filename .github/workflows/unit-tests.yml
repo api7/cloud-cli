@@ -30,6 +30,7 @@ jobs:
               - 'go.mod'
               - 'go.sum'
               - 'Makefile'
+              - '.github/**'
   run-test:
     needs: changes
     if: |
