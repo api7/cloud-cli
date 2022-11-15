@@ -38,11 +38,12 @@ var (
 )
 
 type installContext struct {
-	APISIXRepoURL string
-	TLSDir        string
-	ConfigFile    string
-	Version       string
-	InstanceID    string
+	APISIXRepoURL     string
+	TLSDir            string
+	APISIXEtcdCertDir string
+	ConfigFile        string
+	Version           string
+	InstanceID        string
 }
 
 func init() {
@@ -102,7 +103,7 @@ cloud-cli deploy bare \
 			}
 
 			if options.Global.Deploy.Bare.Reload {
-				if err = apisix.Reload(context); err != nil {
+				if err = apisix.Reload(context, ctx.tlsDir, ctx.apisixEtcdCertDir); err != nil {
 					output.Errorf(err.Error())
 				}
 				return

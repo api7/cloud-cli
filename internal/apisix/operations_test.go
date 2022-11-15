@@ -44,7 +44,7 @@ func TestReload(t *testing.T) {
 
 			options.Global.Deploy.Bare.APISIXBinPath = tc.apisixBinPath
 
-			err := Reload(context.Background())
+			err := Reload(context.Background(), "")
 			if tc.expectedErrMessage == "" {
 				assert.Nil(t, err, "check reload error")
 			} else {

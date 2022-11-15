@@ -16,17 +16,29 @@ package apisix
 
 import (
 	"context"
+
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 )
 
 // Reload reloads APISIX.
 // This function only supports for APISIX running on bare metal.
-func Reload(ctx context.Context) error {
+func Reload(ctx context.Context, tlsDir, apisixEtcdCertDir string) error {
 	bin := options.Global.Deploy.Bare.APISIXBinPath
 	dryrun := options.Global.DryRun
+
+	rm := commands.New("rm", dryrun)
+	rm.AppendArgs("-rf", apisixEtcdCertDir)
+	if err := rm.Execute(ctx); err != nil {
+		return err
+	}
+	cp := commands.New("cp", dryrun)
+	cp.AppendArgs("-prf", tlsDir, apisixEtcdCertDir)
+	if err := cp.Execute(ctx); err != nil {
+		return err
+	}
+
 	reload := commands.New(bin, dryrun)
 	reload.AppendArgs("reload")
-
 	return reload.Execute(ctx)
 }
