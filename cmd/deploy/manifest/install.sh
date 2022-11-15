@@ -27,7 +27,7 @@ if [[ -z ${installed_version} ]]; then
 fi
 
 # copy certs to apisix directory to avoid permission issue
-cp -prf {{ .TLSDir }} {{ .APISIXEtcdCertDir }}
+cp -prf {{ .TLSDir }} ${apisix_home}/conf/ssl
 
 if [[ -n ${instance_id} ]]; then
   echo "${instance_id}" > ${apisix_home}/conf/apisix.uid

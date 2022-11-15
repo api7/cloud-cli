@@ -21,19 +21,23 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 )
 
+const (
+	_apisixTLSDir = "/usr/local/apisix/conf/ssl"
+)
+
 // Reload reloads APISIX.
 // This function only supports for APISIX running on bare metal.
-func Reload(ctx context.Context, tlsDir, apisixEtcdCertDir string) error {
+func Reload(ctx context.Context, tlsDir string) error {
 	bin := options.Global.Deploy.Bare.APISIXBinPath
 	dryrun := options.Global.DryRun
 
 	rm := commands.New("rm", dryrun)
-	rm.AppendArgs("-rf", apisixEtcdCertDir)
+	rm.AppendArgs("-rf", _apisixTLSDir)
 	if err := rm.Execute(ctx); err != nil {
 		return err
 	}
 	cp := commands.New("cp", dryrun)
-	cp.AppendArgs("-prf", tlsDir, apisixEtcdCertDir)
+	cp.AppendArgs("-prf", tlsDir, _apisixTLSDir)
 	if err := cp.Execute(ctx); err != nil {
 		return err
 	}

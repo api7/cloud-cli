@@ -133,7 +133,6 @@ func deployPreRunForBare(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
-	ctx.apisixEtcdCertDir = "/usr/local/apisix/conf/ssl"
 	return nil
 }
 
@@ -331,12 +330,11 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *options.BareDeployOptions, configFile string) {
 	buf := bytes.NewBuffer(nil)
 	err := _installer.Execute(buf, &installContext{
-		APISIXRepoURL:     _apisixRepoURL,
-		TLSDir:            deployCtx.tlsDir,
-		APISIXEtcdCertDir: deployCtx.apisixEtcdCertDir,
-		ConfigFile:        configFile,
-		Version:           opts.APISIXVersion,
-		InstanceID:        options.Global.Deploy.APISIXInstanceID,
+		APISIXRepoURL: _apisixRepoURL,
+		TLSDir:        deployCtx.tlsDir,
+		ConfigFile:    configFile,
+		Version:       opts.APISIXVersion,
+		InstanceID:    options.Global.Deploy.APISIXInstanceID,
 	})
 	if err != nil {
 		output.Errorf(err.Error())
