@@ -102,7 +102,7 @@ cloud-cli deploy bare \
 			}
 
 			if options.Global.Deploy.Bare.Reload {
-				if err = apisix.Reload(context); err != nil {
+				if err = apisix.Reload(context, ctx.tlsDir); err != nil {
 					output.Errorf(err.Error())
 				}
 				return

@@ -16,6 +16,7 @@ package apisix
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -43,8 +44,10 @@ func TestReload(t *testing.T) {
 			t.Parallel()
 
 			options.Global.Deploy.Bare.APISIXBinPath = tc.apisixBinPath
-
-			err := Reload(context.Background())
+			_ = os.MkdirAll("/tmp/a", os.ModePerm)
+			_ = os.MkdirAll("/tmp/b", os.ModePerm)
+			_apisixTLSDir = "/tmp/a"
+			err := Reload(context.Background(), "/tmp/b")
 			if tc.expectedErrMessage == "" {
 				assert.Nil(t, err, "check reload error")
 			} else {
