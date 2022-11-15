@@ -40,7 +40,6 @@ import (
 type deployContext struct {
 	cloudLuaModuleDir string
 	tlsDir            string
-	apisixEtcdCertDir string
 	essentialConfig   []byte
 	apisixIDFile      string
 	apisixID          string
