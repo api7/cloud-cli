@@ -21,7 +21,7 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 )
 
-const (
+var (
 	_apisixTLSDir = "/usr/local/apisix/conf/ssl"
 )
 

@@ -16,7 +16,6 @@ package apisix
 
 import (
 	"context"
-	"log"
 	"os"
 	"testing"
 
@@ -45,11 +44,10 @@ func TestReload(t *testing.T) {
 			t.Parallel()
 
 			options.Global.Deploy.Bare.APISIXBinPath = tc.apisixBinPath
-
-			if err := os.MkdirAll(_apisixTLSDir, os.ModePerm); err != nil {
-				log.Fatal(err)
-			}
-			err := Reload(context.Background(), "/tmp")
+			_ = os.MkdirAll("/tmp/a", os.ModePerm)
+			_ = os.MkdirAll("/tmp/b", os.ModePerm)
+			_apisixTLSDir = "/tmp/a"
+			err := Reload(context.Background(), "/tmp/b")
 			if tc.expectedErrMessage == "" {
 				assert.Nil(t, err, "check reload error")
 			} else {
