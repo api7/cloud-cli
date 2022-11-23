@@ -87,6 +87,10 @@ func NewCommand() *cobra.Command {
 
 			configuration, err := persistence.LoadConfiguration()
 			if err != nil {
+				if !os.IsNotExist(err) {
+					output.Errorf("failed to load exist configuration: %s", err)
+				}
+
 				output.Verbosef("there is no configuration file, create a new one")
 				configuration = &persistence.CloudConfiguration{}
 				// generate a random profile name if not specified at first time
@@ -94,6 +98,7 @@ func NewCommand() *cobra.Command {
 					profileName = namesgenerator.GetRandomName(0)
 				}
 			} else {
+				// for update default profile
 				if profileName == "" {
 					profileName = configuration.DefaultProfile
 				}
