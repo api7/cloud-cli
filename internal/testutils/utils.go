@@ -22,6 +22,7 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
+// PrepareFakeConfiguration prepares a fake configuration for testing.
 func PrepareFakeConfiguration(t *testing.T) {
 	err := persistence.SaveConfiguration(&persistence.CloudConfiguration{
 		DefaultProfile: "default",
