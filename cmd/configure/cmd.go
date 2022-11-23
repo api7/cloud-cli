@@ -108,6 +108,7 @@ func NewCommand() *cobra.Command {
 			}
 			configuration.ConfigureProfile(newProfile)
 
+			output.Infof("add a new profile: %s", newProfile.Name)
 			if options.Global.Configure.Default || len(configuration.Profiles) == 1 {
 				configuration.DefaultProfile = newProfile.Name
 				output.Infof("profile %s is set as default", configuration.DefaultProfile)
