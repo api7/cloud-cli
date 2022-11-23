@@ -69,6 +69,20 @@ type TypeMeta struct {
 	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at"`
 }
 
+// Organization is the specification of organization.
+type Organization struct {
+	TypeMeta `json:",inline" yaml:",inline"`
+	// PlanID indicates which plan is used by this organization.
+	// PlanID should refer to a valid Plan object.
+	PlanID string `json:"plan_id" yaml:"plan_id"`
+	// PlanExpireTime indicates the binding plan expire time for this organization.
+	PlanExpireTime time.Time `json:"plan_expire_time" yaml:"plan_expire_time"`
+	// SubscriptionStartedAt is the time when the organization subscribed to the plan.
+	SubscriptionStartedAt *time.Time `json:"subscription_started_at" yaml:"subscription_started_at"`
+	// OwnerID indicates who create the organization.
+	OwnerID string `json:"owner_id" yaml:"owner_id"`
+}
+
 // ControlPlane is the specification of control plane.
 type ControlPlane struct {
 	TypeMeta `json:",inline" yaml:",inline"`

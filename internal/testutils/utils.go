@@ -17,6 +17,7 @@ package testutils
 import (
 	"testing"
 
+	"github.com/nsf/jsondiff"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/persistence"
@@ -35,4 +36,11 @@ func PrepareFakeConfiguration(t *testing.T) {
 		},
 	})
 	assert.NoError(t, err, "prepare fake cloud configuration")
+}
+
+// JSONDiffOpts returns the common options for json diff
+func JSONDiffOpts() *jsondiff.Options {
+	opts := jsondiff.DefaultConsoleOptions()
+	opts.PrintTypes = false
+	return &opts
 }

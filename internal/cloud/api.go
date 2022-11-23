@@ -94,6 +94,25 @@ func (a *api) GetStartupConfig(cpID string, configType StartupConfigType) (strin
 	return response.Configuration, nil
 }
 
+func (a *api) GetDefaultOrganization() (*types.Organization, error) {
+	user, err := a.Me()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to access user information")
+	}
+
+	if len(user.OrgIDs) == 0 {
+		return nil, errors.New("incomplete user information, no organization")
+	}
+
+	var org types.Organization
+	if err := a.makeGetRequest(&url.URL{
+		Path: fmt.Sprintf("/api/v1/orgs/%s", user.OrgIDs[0]),
+	}, &org); err != nil {
+		return nil, err
+	}
+	return &org, nil
+}
+
 func (a *api) GetDefaultControlPlane() (*types.ControlPlane, error) {
 	user, err := a.Me()
 	if err != nil {

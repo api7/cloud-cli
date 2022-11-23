@@ -39,6 +39,8 @@ type Options struct {
 	Debug DebugOptions
 	// Configure contains the options for the configure command.
 	Configure ConfigureOptions
+	// Config contains the options for the config command.
+	Config ConfigOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -173,4 +175,16 @@ type ConfigureOptions struct {
 	Default bool
 	// AccessToken is the access token of the API7 Cloud server.
 	AccessToken string
+}
+
+// ConfigOptions contains options for `cloud-cli config` command
+type ConfigOptions struct {
+	// View contains options for `cloud-cli config view` command.
+	View ConfigViewOptions
+}
+
+// ConfigViewOptions contains options for `cloud-cli config view` command
+type ConfigViewOptions struct {
+	// JSON indicates if the output should be in JSON format.
+	JSON bool
 }
