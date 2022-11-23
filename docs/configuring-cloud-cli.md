@@ -52,7 +52,7 @@ After executing the `cloud-cli configure` command, cloud-cli will prompt you to
 enter the Personal Access Token.
 
 ```shell
-cloud-cli configure
+$ cloud-cli configure
 API7 Cloud Access Token: {PASTE YOUR ACCESS TOKEN HARE}
 ```
 
@@ -75,7 +75,7 @@ then you can specify the server address with `-addr` and specify a name for the
 current configuration to distinguish between multiple environments with `-profile`.
 
 ```shell
-cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun
+$ cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun
 ```
 
 By default, the new profile will become the currently used profile (**default profile**),
@@ -83,7 +83,7 @@ if this is not what you want, you can continue to keep the old default profile s
 with `-set-default=false`.
 
 ```shell
-cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default=false
+$ cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default=false
 ```
 
 Switch Between Configured Profiles
@@ -92,7 +92,7 @@ Switch Between Configured Profiles
 Use `cloud-cli config switch <profile>` to switch between multiple profiles.
 
 ```shell
-cloud-cli config switch us-east
+$ cloud-cli config switch us-east
 ```
 
 View Configuration of Cloud CLI
@@ -103,7 +103,7 @@ in use and the corresponding organization and control plane information. In this
 we can use the `cloud-cli config view` command to see the full list of available profiles.
 
 ```shell
-cloud-cli config view
+$ cloud-cli config view
 +--------------+----------------+---------------+------------+----------------------------------+
 | PROFILE NAME |  ORGANIZATION  | CONTROL PLANE | IS DEFAULT |        API7 CLOUD ADDRESS        |
 +--------------+----------------+---------------+------------+----------------------------------+
