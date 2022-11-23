@@ -64,6 +64,6 @@ WARNING: your access token will expire at 2024-01-31T00:03:50+08:00
 successfully configured api7 cloud access token, your account is jack@api7.ai
 ```
 
-> Note Cloud CLI saves the access token to `$HOME/.api7cloud/credentials`.
+> Note Cloud CLI saves the access token to `$HOME/.api7cloud/config`.
 
 Now you can run other protected commands. Enjoy your journey!

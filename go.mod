@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/bitly/go-simplejson v0.5.0
+	github.com/docker/docker v20.10.21+incompatible
 	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/golang/mock v1.6.0

@@ -23,7 +23,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -52,19 +51,6 @@ We'll try to test the credential logic separately
 			successExpected: true,
 			outputExpected:  "token-in-file",
 		},
-		{
-			name:            "credential in environment",
-			env:             fmt.Sprintf("%s=token-in-environment", consts.Api7CloudAccessTokenEnv),
-			successExpected: true,
-			outputExpected:  "token-in-environment",
-		},
-		{
-			name:            "environment have higher priority than file",
-			token:           "token-in-file",
-			env:             fmt.Sprintf("%s=token-in-environment", consts.Api7CloudAccessTokenEnv),
-			successExpected: true,
-			outputExpected:  "token-in-environment",
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -81,12 +67,21 @@ We'll try to test the credential logic separately
 			}
 
 			// remove exist credential created by other cases
-			err := os.RemoveAll(filepath.Join(os.Getenv("HOME"), ".api7cloud/credentials"))
-			assert.NoError(t, err, "remove credential file")
+			err := os.RemoveAll(filepath.Join(os.Getenv("HOME"), ".api7cloud/config"))
+			assert.NoError(t, err, "remove configuration file")
 
 			if tt.token != "" {
-				err := persistence.SaveCredential(&persistence.Credential{User: persistence.User{AccessToken: tt.token}})
-				assert.NoError(t, err, "save credential")
+				err := persistence.SaveConfiguration(&persistence.CloudConfiguration{
+					DefaultProfile: "default",
+					Profiles: []persistence.Profile{
+						{
+							Name:    "default",
+							Address: "https://api.api7.cloud",
+							User:    persistence.User{AccessToken: tt.token},
+						},
+					},
+				})
+				assert.NoError(t, err, "prepare fake cloud configuration")
 			}
 
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))

@@ -29,12 +29,16 @@ type Options struct {
 	Verbose bool
 	// DryRun controls if all the actions should be simulated instead of executed.
 	DryRun bool
+	// Profile is the name of the profile to use.
+	Profile string
 	// Deploy contains the options for the deploy command.
 	Deploy DeployOptions
 	// Stop contains the options for the stop command.
 	Stop StopOptions
 	// Debug contains the options for the debug command.
 	Debug DebugOptions
+	// Configure contains the options for the configure command.
+	Configure ConfigureOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -157,4 +161,16 @@ type DebugOptions struct {
 type DebugShowConfigOptions struct {
 	// ID is the API7 Cloud resource id.
 	ID string
+}
+
+// ConfigureOptions contains options for `cloud-cli configure` command
+type ConfigureOptions struct {
+	// Addr is the address of the API7 Cloud server.
+	Addr string
+	// Profile is the name of the profile to use.
+	Profile string
+	// Default indicates if the profile should be set as default.
+	Default bool
+	// AccessToken is the access token of the API7 Cloud server.
+	AccessToken string
 }

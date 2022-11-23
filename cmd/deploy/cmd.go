@@ -28,12 +28,13 @@ func NewCommand() *cobra.Command {
 		Use:   "deploy [COMMAND] [ARG...]",
 		Short: "Deploy Apache APISIX with being connected to API7 Cloud.",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := persistence.CheckAccessTokenAndInitCloudClient(); err != nil {
+			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
 			}
 		},
 	}
 
+	cmd.PersistentFlags().StringVar(&options.Global.Profile, "profile", "", "The profile of the configuration to use")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Name, "name", "apisix", "The identifier of this deployment, it would be the container name (on Docker), the helm release (on Kubernetes) and it's useless if APISIX is deployed on bare metal")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXConfigFile, "apisix-config", "", "Specify the custom APISIX configuration file")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.APISIXInstanceID, "apisix-id", "", "Specify the custom APISIX instance ID")

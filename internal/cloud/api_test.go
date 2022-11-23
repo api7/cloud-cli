@@ -117,10 +117,7 @@ func TestMe(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
-			assert.NoError(t, err, "checking env setup")
-
-			api, err := newClient("test-token")
+			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.Me()
@@ -203,10 +200,7 @@ func TestListControlPlanes(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
-			assert.NoError(t, err, "checking env setup")
-
-			api, err := newClient("test-token")
+			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.ListControlPlanes(tt.orgID)
@@ -276,10 +270,7 @@ func TestGetTLSBundle(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL)
-			assert.NoError(t, err, "checking env setup")
-
-			api, err := newClient("test-token")
+			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			bundle, err := api.GetTLSBundle(tt.cpID)
@@ -329,7 +320,7 @@ func TestGetCloudLuaModule(t *testing.T) {
 			err := os.Setenv(consts.Api7CloudLuaModuleURL, server.URL+"/")
 			assert.NoError(t, err, "checking env setup")
 
-			api, err := newClient("test-token")
+			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			data, err := api.GetCloudLuaModule()
@@ -413,10 +404,7 @@ func TestGetStartupConfig(t *testing.T) {
 
 			defer server.Close()
 
-			err := os.Setenv(consts.Api7CloudAddrEnv, server.URL+"/")
-			assert.NoError(t, err, "checking env setup")
-
-			api, err := newClient("test-token")
+			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
 			data, err := api.GetStartupConfig("1", tc.configType)

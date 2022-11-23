@@ -17,6 +17,7 @@ package debug
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -27,11 +28,13 @@ func NewCommand() *cobra.Command {
 		Use:   "debug [COMMAND] [ARGS...]",
 		Short: "Debug utility for API7 Cloud & Apache APISIX.",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := persistence.CheckAccessTokenAndInitCloudClient(); err != nil {
+			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
 			}
 		},
 	}
+
+	cmd.PersistentFlags().StringVar(&options.Global.Profile, "profile", "", "The profile of the configuration to use")
 
 	cmd.AddCommand(newShowConfigCommand())
 
