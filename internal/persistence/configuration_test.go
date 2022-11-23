@@ -27,7 +27,7 @@ import (
 
 func TestSaveConfiguration(t *testing.T) {
 	id := uuid.NewString()
-	configPath = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("/tmp/%s/config", id)
 	err := SaveConfiguration(&CloudConfiguration{
 		DefaultProfile: "prod",
 		Profiles: []Profile{
@@ -72,7 +72,7 @@ func TestSaveConfiguration(t *testing.T) {
 	err = os.MkdirAll(fmt.Sprintf("/tmp/%s", id), fs.ModePerm)
 	assert.NoError(t, err, "create dir should be success")
 
-	configPath = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("/tmp/%s/config", id)
 	err = SaveConfiguration(&CloudConfiguration{
 		DefaultProfile: "prod",
 		Profiles: []Profile{
@@ -100,16 +100,16 @@ func TestSaveConfiguration(t *testing.T) {
 
 func TestLoad(t *testing.T) {
 	id := uuid.NewString()
-	configPath = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("/tmp/%s/config", id)
 
 	_, err := LoadConfiguration()
 	assert.Contains(t, err.Error(), "no such file or directory", "load from file should be failed")
 
-	dir := filepath.Dir(configPath)
+	dir := filepath.Dir(configDir)
 	err = os.MkdirAll(dir, 0750)
 	assert.NoError(t, err, "create dir should be success")
 
-	err = os.WriteFile(configPath, []byte("invalid configuration"), fs.ModePerm)
+	err = os.WriteFile(configDir, []byte("invalid configuration"), fs.ModePerm)
 	assert.NoError(t, err, "write fake configuration file should be success")
 
 	_, err = LoadConfiguration()

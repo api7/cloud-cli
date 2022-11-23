@@ -43,7 +43,7 @@ func SaveConfiguration(config *CloudConfiguration) error {
 		panic(err)
 	}
 
-	dir := filepath.Dir(configPath)
+	dir := filepath.Dir(configDir)
 	if _, err = os.Stat(dir); err != nil {
 		err = os.MkdirAll(dir, 0750)
 		if err != nil {
@@ -51,17 +51,17 @@ func SaveConfiguration(config *CloudConfiguration) error {
 		}
 	}
 
-	file, err := os.Create(configPath)
+	file, err := os.Create(configDir)
 	if err != nil {
-		return fmt.Errorf("failed to create file in %s for api7 cloud configuration: %s", configPath, err)
+		return fmt.Errorf("failed to create file in %s for api7 cloud configuration: %s", configDir, err)
 	}
 
 	write, err := file.Write(data)
 	if err != nil {
-		return fmt.Errorf("failed to write configuration to %s, %s", configPath, err)
+		return fmt.Errorf("failed to write configuration to %s, %s", configDir, err)
 	}
 	if write != len(data) {
-		return fmt.Errorf("failed to write configuration to %s", configPath)
+		return fmt.Errorf("failed to write configuration to %s", configDir)
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func SaveConfiguration(config *CloudConfiguration) error {
 
 // LoadConfiguration from file
 func LoadConfiguration() (*CloudConfiguration, error) {
-	file, err := os.Open(configPath)
+	file, err := os.Open(configDir)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func CheckConfigurationAndInitCloudClient() error {
 
 	profile, err := configuration.GetProfile(profileName)
 	if err != nil {
-		return fmt.Errorf("Failed to get %s profile, Please check your configuration file: %s", profileName, configPath)
+		return fmt.Errorf("Failed to get %s profile, Please check your configuration file: %s", profileName, configDir)
 	}
 
 	output.Verbosef("Loaded access token: %s", profile.User.AccessToken)

@@ -87,13 +87,13 @@ var (
 	// HomeDir is the home directory of the api7 cloud.
 	HomeDir = filepath.Join(os.Getenv("HOME"), ".api7cloud")
 	// TLSDir is the directory to store TLS certificates.
-	TLSDir     string
-	configPath string
+	TLSDir    string
+	configDir string
 )
 
 // Init initializes the persistence context.
 func Init() error {
-	configPath = filepath.Join(HomeDir, "config")
+	configDir = filepath.Join(HomeDir, "config")
 
 	TLSDir = filepath.Join(HomeDir, "tls")
 	if err := os.MkdirAll(TLSDir, 0755); err != nil {
