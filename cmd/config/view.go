@@ -15,8 +15,6 @@
 package config
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -24,7 +22,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -46,53 +43,43 @@ func newViewCommand() *cobra.Command {
 				output.Errorf(err.Error())
 			}
 
-			if options.Global.Config.View.JSON {
-				js, err := json.Marshal(config)
-				if err != nil {
-					output.Errorf("Failed to marshal configuration: %s", err.Error())
-				}
-				fmt.Println(string(js))
-			} else {
-				// output as ascii table
-				rows := [][]string{}
-				for _, profile := range config.Profiles {
-					var (
-						orgName = "-"
-						cpName  = "-"
-					)
+			// output as ascii table
+			rows := [][]string{}
+			for _, profile := range config.Profiles {
+				var (
+					orgName = "-"
+					cpName  = "-"
+				)
 
-					if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {
-						output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
+				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {
+					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
+				} else {
+					if cp, err := api.GetDefaultControlPlane(); err != nil {
+						output.Warnf("Failed to get default control plane for profile %s: %s", profile.Name, err.Error())
 					} else {
-						if cp, err := api.GetDefaultControlPlane(); err != nil {
-							output.Warnf("Failed to get default control plane for profile %s: %s", profile.Name, err.Error())
-						} else {
-							cpName = cp.Name
-						}
-
-						if org, err := api.GetDefaultOrganization(); err != nil {
-							output.Warnf("Failed to get default organization for profile %s: %s", profile.Name, err.Error())
-						} else {
-							orgName = org.Name
-						}
+						cpName = cp.Name
 					}
 
-					rows = append(rows, []string{profile.Name, orgName, cpName, strconv.FormatBool(profile.Name == config.DefaultProfile), profile.Address})
+					if org, err := api.GetDefaultOrganization(); err != nil {
+						output.Warnf("Failed to get default organization for profile %s: %s", profile.Name, err.Error())
+					} else {
+						orgName = org.Name
+					}
 				}
 
-				table := tablewriter.NewWriter(os.Stdout)
-
-				table.SetHeader([]string{"Profile Name", "Organization", "Control Plane", "Is Default", "API7 Cloud Address"})
-
-				for _, r := range rows {
-					table.Append(r)
-				}
-				table.Render()
+				rows = append(rows, []string{profile.Name, orgName, cpName, strconv.FormatBool(profile.Name == config.DefaultProfile), profile.Address})
 			}
+
+			table := tablewriter.NewWriter(os.Stdout)
+
+			table.SetHeader([]string{"Profile Name", "Organization", "Control Plane", "Is Default", "API7 Cloud Address"})
+
+			for _, r := range rows {
+				table.Append(r)
+			}
+			table.Render()
 		},
 	}
-
-	cmd.PersistentFlags().BoolVar(&options.Global.Config.View.JSON, "json", false, "Output in JSON format")
 
 	return cmd
 }

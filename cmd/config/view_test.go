@@ -76,30 +76,6 @@ func TestConfigView(t *testing.T) {
 				`},
 		},
 		{
-			name: "two profiles with json output format",
-			config: &persistence.CloudConfiguration{
-				DefaultProfile: "prod",
-				Profiles: []persistence.Profile{
-					{
-						Name:    "prod",
-						Address: "https://prod.api7.ai",
-						User: persistence.User{
-							AccessToken: "prod-token",
-						},
-					},
-					{
-						Name:    "dev",
-						Address: "https://dev.api7.ai",
-						User: persistence.User{
-							AccessToken: "dev-token",
-						},
-					},
-				},
-			},
-			args:    []string{"view", "--json"},
-			outputs: []string{`{"default_profile":"prod","profiles":[{"name":"prod","address":"https://prod.api7.ai","user":{}},{"name":"dev","address":"https://dev.api7.ai","user":{}}]}`},
-		},
-		{
 			name: "two profiles with one bad profile",
 			config: &persistence.CloudConfiguration{
 				DefaultProfile: "prod",
