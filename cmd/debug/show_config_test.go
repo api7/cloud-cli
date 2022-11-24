@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/types"
 )
 
@@ -117,7 +116,7 @@ func TestDebugShowConfig(t *testing.T) {
 			}
 
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
-			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			// Ignore error since it won't be nil if we mock a failed command.
 			output, _ := cmd.CombinedOutput()

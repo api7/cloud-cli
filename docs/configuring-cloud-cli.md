@@ -64,6 +64,27 @@ WARNING: your access token will expire at 2024-01-31T00:03:50+08:00
 successfully configured api7 cloud access token, your account is jack@api7.ai
 ```
 
-> Note Cloud CLI saves the access token to `$HOME/.api7cloud/credentials`.
+> Note Cloud CLI saves the access token to `$HOME/.api7cloud/config`.
 
-Now you can run other protected commands. Enjoy your journey!
+Configure Multiple Profiles for Cloud CLI
+----------------------------------------
+
+`cloud-cli configure` uses `https://api.api7.cloud` as the server address for
+API7 Cloud by default. If your control plane is created on another region,
+then you can specify the server address with `--addr` and specify a name for the
+current configuration to distinguish among multiple environments with `--profile`.
+
+```shell
+cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun
+```
+
+The newly created profile will not become the default profile directly, we need to
+manually switch to the new profile (`cloud-cli config switch <profile>`) before it
+take effect, if you want it to take effect immediately after creation, you can use
+the `-set-default` command to achieve that.
+
+```shell
+cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default
+```
+
+Now you can run other provided commands. Enjoy your journey!

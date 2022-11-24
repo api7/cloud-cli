@@ -29,12 +29,12 @@ var (
 	DefaultClient API
 )
 
-// InitDefaultClient initializes the default client with the given credentials
-func InitDefaultClient(accessToken string) (err error) {
+// InitDefaultClient initializes the default client with the given configuration
+func InitDefaultClient(cloudAddr, accessToken string) (err error) {
 	if DefaultClient != nil {
 		return nil
 	}
-	DefaultClient, err = newClient(accessToken)
+	DefaultClient, err = newClient(cloudAddr, accessToken)
 	return
 }
 
@@ -47,7 +47,6 @@ func Client() API {
 }
 
 const (
-	defaultApi7CloudAddr         = "https://console.api7.cloud"
 	defaultApi7CloudLuaModuleURL = "https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz"
 )
 
@@ -86,12 +85,7 @@ type api struct {
 }
 
 // newClient returns a new API7 Cloud API Client
-func newClient(accessToken string) (API, error) {
-	cloudAddr := os.Getenv(consts.Api7CloudAddrEnv)
-	if cloudAddr == "" {
-		cloudAddr = defaultApi7CloudAddr
-	}
-
+func newClient(cloudAddr, accessToken string) (API, error) {
 	u, err := url.Parse(cloudAddr)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse API7 Cloud server URL")

@@ -22,8 +22,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/testutils"
 )
 
 func TestNewStopDockerCommand(t *testing.T) {
@@ -68,8 +68,9 @@ func TestNewStopDockerCommand(t *testing.T) {
 				return
 			}
 
+			testutils.PrepareFakeConfiguration(t)
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
-			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			output, err := cmd.CombinedOutput()
 			assert.NoError(t, err, "check if the command executed successfully")
