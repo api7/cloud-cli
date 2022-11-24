@@ -70,20 +70,21 @@ Configure Multiple Profiles for Cloud CLI
 ----------------------------------------
 
 `cloud-cli configure` uses `https://api.api7.cloud` as the server address for
-API7 Cloud by default. If your control plane is created on another Cloud server,
-then you can specify the server address with `-addr` and specify a name for the
-current configuration to distinguish between multiple environments with `-profile`.
+API7 Cloud by default. If your control plane is created on another region,
+then you can specify the server address with `--addr` and specify a name for the
+current configuration to distinguish among multiple environments with `--profile`.
 
 ```shell
 cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun
 ```
 
-By default, the new profile will become the currently used profile (**default profile**),
-if this is not what you want, you can continue to keep the old default profile setting
-with `-set-default=false`.
+The newly created profile will not become the default profile directly, we need to
+manually switch to the new profile (`cloud-cli config switch <profile>`) before it
+take effect, if you want it to take effect immediately after creation, you can use
+the `-set-default` command to achieve that.
 
 ```shell
-cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default=false
+cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default
 ```
 
 Now you can run other provided commands. Enjoy your journey!
