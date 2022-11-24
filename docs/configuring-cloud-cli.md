@@ -112,9 +112,6 @@ $ cloud-cli config view
 | eu           | API7 eu center | default       | False      | https://api.api7.cloud           |
 | aliyun       | API7 aliyun    | default       | False      | https://api.aliyun-hk.api7.cloud |
 +--------------+----------------+---------------+------------+----------------------------------+
-=======
-cloud-cli configure --addr https://api.aliyun-hk.api7.cloud --profile aliyun --set-default
->>>>>>> nic/configure-profile
 ```
 
 Now you can run other provided commands. Enjoy your journey!
