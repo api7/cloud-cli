@@ -15,12 +15,13 @@
 package config
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/spf13/cobra"
 )
 
-// NewCommand creates the debug sub-command object.
+// NewCommand creates the config sub-command object.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config [COMMAND] [ARGS...]",
