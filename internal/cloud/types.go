@@ -70,6 +70,8 @@ type API interface {
 	GetCloudLuaModule() ([]byte, error)
 	// GetStartupConfig gets the startup configuration from API7 Cloud for deploy APISIX by specify config type.
 	GetStartupConfig(cpID string, configType StartupConfigType) (string, error)
+	// GetDefaultOrganization returns the default organization for the current user.
+	GetDefaultOrganization() (*types.Organization, error)
 	// GetDefaultControlPlane returns the default control plane for the current organization.
 	GetDefaultControlPlane() (*types.ControlPlane, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
@@ -83,6 +85,11 @@ type api struct {
 	httpClient        *http.Client
 	cloudLuaModuleURL *url.URL
 }
+
+var (
+	// NewClient is a function to create a new API7 Cloud API Client
+	NewClient = newClient
+)
 
 // newClient returns a new API7 Cloud API Client
 func newClient(cloudAddr, accessToken string) (API, error) {

@@ -23,7 +23,7 @@ import (
 
 // User is credential for authentication.
 type User struct {
-	AccessToken string `json:"access_token" yaml:"access_token"`
+	AccessToken string `json:"-" yaml:"access_token"`
 }
 
 // Profile represents a configuration profile.
