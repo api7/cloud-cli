@@ -24,7 +24,7 @@ import (
 func newSwitchCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "switch",
-		Short:   "Switch the Profile used by Cloud CLI by default",
+		Short:   "Switch the default profile used by Cloud CLI",
 		Example: `cloud-cli config switch <profile>`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.Init(); err != nil {

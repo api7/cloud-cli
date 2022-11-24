@@ -25,7 +25,7 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config [COMMAND] [ARGS...]",
-		Short: "Show or change configuration of the CLI",
+		Short: "Configuration management",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
