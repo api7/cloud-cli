@@ -129,7 +129,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&options.Global.Configure.Addr, "addr", "https://api.api7.cloud", "Specify the API7 Cloud server address")
 	cmd.PersistentFlags().StringVar(&options.Global.Configure.Profile, "profile", "", "Specify the profile name")
-	cmd.PersistentFlags().BoolVar(&options.Global.Configure.Default, "set-default", true, "Set the profile as default")
+	cmd.PersistentFlags().BoolVar(&options.Global.Configure.Default, "set-default", false, "Set the profile as default")
 	cmd.PersistentFlags().StringVar(&options.Global.Configure.AccessToken, "token", "", "Specify the access token")
 
 	return cmd

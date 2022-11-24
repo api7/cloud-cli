@@ -24,7 +24,6 @@ import (
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/api7/cloud-cli/internal/output"
 )
 
 func init() {
@@ -61,7 +60,7 @@ func SaveConfiguration(config *CloudConfiguration) error {
 		return fmt.Errorf("failed to write configuration to %s, %s", configDir, err)
 	}
 	if write != len(data) {
-		return fmt.Errorf("failed to write configuration to %s", configDir)
+		return fmt.Errorf("failed to write configuration to %s, truncated write", configDir)
 	}
 
 	return nil
@@ -104,8 +103,6 @@ func CheckConfigurationAndInitCloudClient() error {
 	if err != nil {
 		return fmt.Errorf("Failed to get %s profile, Please check your configuration file: %s", profileName, configDir)
 	}
-
-	output.Verbosef("Loaded access token: %s", profile.User.AccessToken)
 
 	if err := cloud.InitDefaultClient(profile.Address, profile.User.AccessToken); err != nil {
 		return fmt.Errorf("Failed to init api7 cloud client: %s", err)

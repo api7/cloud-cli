@@ -111,8 +111,8 @@ func TestConfigureCommand(t *testing.T) {
 			},
 		},
 		{
-			name:            "configure with command lien flags",
-			args:            []string{"--addr", "https://api.test.api7.cloud", "--profile", "dev", "--token", _neverExpireToken},
+			name:            "configure with command line flags",
+			args:            []string{"--addr", "https://api.test.api7.cloud", "--profile", "dev", "--token", _neverExpireToken, "--set-default"},
 			address:         "https://api.test.api7.cloud",
 			successExpected: true,
 			tokenExpected:   _neverExpireToken,

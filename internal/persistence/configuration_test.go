@@ -27,7 +27,7 @@ import (
 
 func TestSaveConfiguration(t *testing.T) {
 	id := uuid.NewString()
-	configDir = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("%s/%s/config", os.TempDir(), id)
 	err := SaveConfiguration(&CloudConfiguration{
 		DefaultProfile: "prod",
 		Profiles: []Profile{
@@ -69,10 +69,10 @@ func TestSaveConfiguration(t *testing.T) {
 	assert.Equal(t, "dev-token", profile.User.AccessToken, "access token should be dev-token")
 
 	id = uuid.NewString()
-	err = os.MkdirAll(fmt.Sprintf("/tmp/%s", id), fs.ModePerm)
+	err = os.MkdirAll(fmt.Sprintf("%s/%s", os.TempDir(), id), fs.ModePerm)
 	assert.NoError(t, err, "create dir should be success")
 
-	configDir = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("%s/%s/config", os.TempDir(), id)
 	err = SaveConfiguration(&CloudConfiguration{
 		DefaultProfile: "prod",
 		Profiles: []Profile{
@@ -100,7 +100,7 @@ func TestSaveConfiguration(t *testing.T) {
 
 func TestLoad(t *testing.T) {
 	id := uuid.NewString()
-	configDir = fmt.Sprintf("/tmp/%s/config", id)
+	configDir = fmt.Sprintf("%s/%s/config", os.TempDir(), id)
 
 	_, err := LoadConfiguration()
 	assert.Contains(t, err.Error(), "no such file or directory", "load from file should be failed")
