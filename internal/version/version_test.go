@@ -15,12 +15,9 @@
 package version
 
 import (
-	"encoding/json"
+	"github.com/stretchr/testify/assert"
 	"runtime"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestVersion(t *testing.T) {
@@ -28,16 +25,13 @@ func TestVersion(t *testing.T) {
 		Major:     "0",
 		Minor:     "1",
 		GitCommit: "2ad4hz",
-		BuildDate: time.Now().String(),
+		BuildDate: "2022-11-25 10:15:14.230457 +0800 CST m=+0.001464835",
 		GoVersion: runtime.Version(),
 		Compiler:  runtime.Compiler,
 		Platform:  runtime.GOOS + "/" + runtime.GOARCH,
 	}
 	s := ver.String()
-	var (
-		ver2 Version
-	)
-	err := json.Unmarshal([]byte(s), &ver2)
-	assert.Nil(t, err, "unmarshalling version info")
-	assert.Equal(t, ver, ver2, "checking version")
+	res := "version 0.1, git_commit 2ad4hz, build_date 2022-11-25 10:15:14.230457 +0800 CST m=+0.001464835, go_version go1.19.1, compiler gc, platform darwin/arm64"
+	assert.Equal(t, res, s, "checking version")
+
 }
