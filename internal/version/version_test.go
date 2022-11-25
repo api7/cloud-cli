@@ -26,7 +26,7 @@ func TestVersion(t *testing.T) {
 		Minor:     "1",
 		GitCommit: "2ad4hz",
 		BuildDate: "2022-11-25 10:15:14.230457 +0800 CST m=+0.001464835",
-		GoVersion: runtime.Version(),
+		GoVersion: "go1.19.1",
 		Compiler:  runtime.Compiler,
 		Platform:  runtime.GOOS + "/" + runtime.GOARCH,
 	}
