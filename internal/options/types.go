@@ -137,6 +137,9 @@ type BareDeployOptions struct {
 	APISIXBinPath string
 	// Reload indicates if skip the deployment and just try to reload APISIX.
 	Reload bool
+	// Upgrade indicates if the current try is for upgrading Apache APISIX on
+	// bare metal
+	Upgrade bool
 }
 
 // KubernetesStopOptions contains options for the kubectl or helm command.
