@@ -118,6 +118,18 @@ If you want to stop the APISIX instance, just run the command below:
 cloud-cli stop bare
 ```
 
+Upgrade Version
+---------------
+
+If you want to upgrade the APISIX version, just run the command below with
+the desired version you want.
+
+```shell
+cloud-cli deploy bare --upgrade --apisix-version {Your Desired Version}
+```
+
+Note if the target version was already installed, nothing will be done.
+
 Command Option Reference
 ------------------------
 

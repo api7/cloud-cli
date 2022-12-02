@@ -329,6 +329,7 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *options.BareDeployOptions, configFile string) {
 	buf := bytes.NewBuffer(nil)
 	err := _installer.Execute(buf, &installContext{
+		Upgrade:       options.Global.Deploy.Bare.Upgrade,
 		APISIXRepoURL: _apisixRepoURL,
 		TLSDir:        deployCtx.tlsDir,
 		ConfigFile:    configFile,

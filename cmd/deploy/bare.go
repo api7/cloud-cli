@@ -38,6 +38,7 @@ var (
 )
 
 type installContext struct {
+	Upgrade       bool
 	APISIXRepoURL string
 	TLSDir        string
 	ConfigFile    string
@@ -113,6 +114,7 @@ cloud-cli deploy bare \
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXVersion, "apisix-version", "2.15.0", "Specifies the APISIX version, default value is 2.15.0")
 	cmd.PersistentFlags().BoolVar(&options.Global.Deploy.Bare.Reload, "reload", false, "Skip deployment, only update configurations and reload APISIX")
+	cmd.PersistentFlags().BoolVar(&options.Global.Deploy.Bare.Upgrade, "upgrade", false, "Skip deployment, try to upgrade APISIX version")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Bare.APISIXBinPath, "apisix-bin-path", "/usr/bin/apisix", "APISIX binary file path")
 
 	return cmd
