@@ -22,13 +22,13 @@ import (
 	"testing"
 	"time"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 var (
@@ -86,7 +86,7 @@ func TestConfigureCommand(t *testing.T) {
 				"demo@api7.cloud",
 			},
 			mockFn: func(api *cloud.MockAPI) {
-				api.EXPECT().Me().Return(&types.User{
+				api.EXPECT().Me().Return(&sdk.User{
 					Email: "demo@api7.cloud",
 				}, nil)
 
@@ -104,7 +104,7 @@ func TestConfigureCommand(t *testing.T) {
 				"demo@api7.cloud",
 			},
 			mockFn: func(api *cloud.MockAPI) {
-				api.EXPECT().Me().Return(&types.User{
+				api.EXPECT().Me().Return(&sdk.User{
 					Email: "demo@api7.cloud",
 				}, nil)
 
@@ -121,7 +121,7 @@ func TestConfigureCommand(t *testing.T) {
 				"demo@api7.cloud",
 			},
 			mockFn: func(api *cloud.MockAPI) {
-				api.EXPECT().Me().Return(&types.User{
+				api.EXPECT().Me().Return(&sdk.User{
 					Email: "demo@api7.cloud",
 				}, nil)
 			},

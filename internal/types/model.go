@@ -14,7 +14,9 @@
 
 package types
 
-import "time"
+import (
+	"time"
+)
 
 // Status represents an error type, it contains the error code and its
 // description.
@@ -42,19 +44,6 @@ type ResponseWrapper struct {
 	ErrorReason string `json:"error,omitempty"`
 	// Warning attaches a warning message to the response.
 	Warning string `json:"warning,omitempty"`
-}
-
-// User is the user in cloud-console
-type User struct {
-	ID         string    `json:"id"`
-	FirstName  string    `json:"first_name"`
-	LastName   string    `json:"last_name"`
-	Email      string    `json:"email"`
-	OrgIDs     []string  `json:"org_ids"`
-	Connection string    `json:"connection"`
-	AvatarURL  string    `json:"avatar_url"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 // TypeMeta contains some common and basic items, like id, name.

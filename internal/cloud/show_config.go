@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/api7/cloud-go-sdk"
 	"github.com/bitly/go-simplejson"
 	"github.com/pkg/errors"
 )
@@ -32,14 +33,14 @@ var (
 	}
 )
 
-func (a *api) DebugShowConfig(cpID, resource, id string) (string, error) {
+func (a *api) DebugShowConfig(cpID cloud.ID, resource, id string) (string, error) {
 	if _, ok := _validResources[resource]; !ok {
 		return "", fmt.Errorf("invalid resource type: %s", resource)
 	}
 
 	var rawData json.RawMessage
 	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/debug/config/controlplanes/%s/%s/%s", cpID, resource, id),
+		Path: fmt.Sprintf("/api/v1/debug/config/controlplanes/%s/%s/%s", cpID.String(), resource, id),
 	}, &rawData); err != nil {
 		return "", err
 	}

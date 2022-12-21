@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -28,7 +29,6 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/testutils"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestBareMetalDeployCommand(t *testing.T) {
@@ -84,20 +84,20 @@ fi
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 12345,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
-				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
 
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
-				api.EXPECT().GetStartupConfig("12345", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
 				cloud.DefaultClient = api
 			},
@@ -146,20 +146,20 @@ fi
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 12345,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
-				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
 
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
-				api.EXPECT().GetStartupConfig("12345", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
 				cloud.DefaultClient = api
 			},
@@ -208,20 +208,20 @@ fi
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 12345,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
-				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				api.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
 				}, nil)
 
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
-				api.EXPECT().GetStartupConfig("12345", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
 				cloud.DefaultClient = api
 			},

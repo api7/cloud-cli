@@ -21,11 +21,11 @@ import (
 	"os"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestMe(t *testing.T) {
@@ -33,23 +33,25 @@ func TestMe(t *testing.T) {
 		name      string
 		code      int
 		body      string
-		want      *types.User
+		want      *sdk.User
 		wantErr   bool
 		errReason string
 	}{
 		{
 			name:      "server internal error",
 			code:      http.StatusInternalServerError,
+			body:      "internal server error",
 			want:      nil,
 			wantErr:   true,
-			errReason: "Server internal error, please try again later",
+			errReason: "status code: 500, message: internal server error",
 		},
 		{
 			name:      "http not found",
 			code:      http.StatusNotFound,
 			want:      nil,
 			wantErr:   true,
-			errReason: "Resource not found",
+			body:      `{"status": {"code": 4, "message": "not found"}, "error": "deliberated not found"}`,
+			errReason: "status code: 404, error code: 4, error reason: not found, details: deliberated not found",
 		},
 		{
 			name:      "malformed json",
@@ -57,7 +59,7 @@ func TestMe(t *testing.T) {
 			body:      `invalid json`,
 			want:      nil,
 			wantErr:   true,
-			errReason: "Got a malformed response from server",
+			errReason: "decode response body: invalid character 'i' looking for beginning of value",
 		},
 		{
 			name:      "token expired",
@@ -88,12 +90,12 @@ func TestMe(t *testing.T) {
 					"message": "OK"
 				}
 			}`,
-			want: &types.User{
+			want: &sdk.User{
 				ID:         "321",
 				FirstName:  "first",
 				LastName:   "last",
 				Email:      "demo@api7.ai",
-				OrgIDs:     []string{"123"},
+				OrgIDs:     []sdk.ID{123},
 				Connection: "",
 				AvatarURL:  "https://api7.ai/avatar/default.png",
 			},
@@ -135,10 +137,10 @@ func TestMe(t *testing.T) {
 func TestListControlPlanes(t *testing.T) {
 	tests := []struct {
 		name      string
-		orgID     string
+		orgID     sdk.ID
 		code      int
 		body      string
-		want      *types.ControlPlaneSummary
+		want      *sdk.ControlPlane
 		wantErr   bool
 		errReason string
 	}{
@@ -167,19 +169,16 @@ func TestListControlPlanes(t *testing.T) {
 					"message": "OK"
 				}
 			}`,
-			want: &types.ControlPlaneSummary{
-				ControlPlane: types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID:   "392306215415186327",
-						Name: "default",
-					},
-					OrganizationID: "392306215398409111",
-					RegionID:       "56523356",
+			want: &sdk.ControlPlane{
+				ID:   392306215415186327,
+				Name: "default",
+				ControlPlaneSpec: sdk.ControlPlaneSpec{
+					OrganizationID: 392306215398409111,
+					RegionID:       56523356,
 					Status:         3,
 					Domain:         "default.xvlbzgs4bqbjdmybyqk.api7.cloud",
 					ConfigPayload:  "",
 				},
-				OrgName: "XVlBzg",
 			},
 			wantErr: false,
 		},
@@ -187,11 +186,27 @@ func TestListControlPlanes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/orgs/%s/controlplanes", tt.orgID))
+				assert.Contains(t, req.URL.String(), fmt.Sprintf("/api/v1/orgs/%s/controlplanes", tt.orgID))
 				assert.Equal(t, req.Header.Get("Authorization"), "Bearer test-token")
 
 				rw.WriteHeader(tt.code)
-				if tt.body != "" {
+				if req.URL.Query().Get("page") == "2" {
+					// to avoid dead loop, return empty list when reaching page 2.
+					_, err := rw.Write([]byte(
+						`
+			{
+				"payload": {
+					"count": 0,
+					"list": []
+				},
+				"status": {
+					"code": 0,
+					"message": "OK"
+				}
+			}`))
+					assert.NoError(t, err, "send mock response")
+
+				} else if tt.body != "" {
 					write, err := rw.Write([]byte(tt.body))
 					assert.NoError(t, err, "send mock response")
 					assert.Equal(t, len(tt.body), write, "write mock response")
@@ -219,18 +234,18 @@ func TestListControlPlanes(t *testing.T) {
 func TestGetTLSBundle(t *testing.T) {
 	tests := []struct {
 		name      string
-		cpID      string
+		cpID      sdk.ID
 		code      int
 		body      string
-		want      *types.TLSBundle
+		want      *sdk.TLSBundle
 		wantErr   bool
 		errReason string
 	}{
 		{
 			name: "success",
 			code: http.StatusOK,
-			cpID: "1",
-			want: &types.TLSBundle{
+			cpID: 1,
+			want: &sdk.TLSBundle{
 				Certificate:   "1",
 				PrivateKey:    "1",
 				CACertificate: "1",
@@ -249,8 +264,9 @@ func TestGetTLSBundle(t *testing.T) {
 		{
 			name:      "internal server error",
 			code:      http.StatusInternalServerError,
-			cpID:      "1",
-			errReason: "Server internal error, please try again later",
+			cpID:      1,
+			body:      "internal server error",
+			errReason: "status code: 500, message: internal server error",
 			wantErr:   true,
 		},
 	}
@@ -407,7 +423,7 @@ func TestGetStartupConfig(t *testing.T) {
 			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
-			data, err := api.GetStartupConfig("1", tc.configType)
+			data, err := api.GetStartupConfig(1, tc.configType)
 
 			if tc.errorReason != "" {
 				assert.Contains(t, err.Error(), tc.errorReason, "checking error reason")

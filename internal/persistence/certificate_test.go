@@ -19,18 +19,18 @@ import (
 	"path/filepath"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestPrepareCertificate(t *testing.T) {
 	testCases := []struct {
 		name           string
-		cpID           string
+		cpID           sdk.ID
 		preparedCert   string
 		preparedKey    string
 		preparedCACert string
@@ -65,7 +65,7 @@ func TestPrepareCertificate(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -78,11 +78,11 @@ func TestPrepareCertificate(t *testing.T) {
 		},
 		{
 			name: "success with cp id",
-			cpID: "123456",
+			cpID: 123456,
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -97,10 +97,10 @@ func TestPrepareCertificate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.cpID == "" {
-				tc.cpID = "1"
+			if tc.cpID == 0 {
+				tc.cpID = 1
 			}
-			cpTLSDir := filepath.Join(TLSDir, tc.cpID)
+			cpTLSDir := filepath.Join(TLSDir, tc.cpID.String())
 
 			if tc.preparedCert != "" {
 				// create cp tls dir

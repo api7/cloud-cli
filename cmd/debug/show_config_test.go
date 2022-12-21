@@ -21,11 +21,11 @@ import (
 	"os/exec"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestDebugShowConfig(t *testing.T) {
@@ -54,13 +54,13 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 12345,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
-				api.EXPECT().DebugShowConfig("12345", "application", "123").Return("", errors.New("not found"))
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", "123").Return("", errors.New("not found"))
 				cloud.DefaultClient = api
 			},
 		},
@@ -70,11 +70,11 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 12345,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
 				resources := `
 {
@@ -86,7 +86,7 @@ func TestDebugShowConfig(t *testing.T) {
     }
   ]
 }`
-				api.EXPECT().DebugShowConfig("12345", "application", "123").Return(resources, nil)
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", "123").Return(resources, nil)
 				cloud.DefaultClient = api
 			},
 			output: `

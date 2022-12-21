@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/cloud"
@@ -27,8 +28,8 @@ import (
 
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
-func PrepareCertificate(cpID string) error {
-	cpTLSDir := filepath.Join(TLSDir, cpID)
+func PrepareCertificate(cpID sdk.ID) error {
+	cpTLSDir := filepath.Join(TLSDir, cpID.String())
 
 	certFilename := filepath.Join(cpTLSDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {
