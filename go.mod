@@ -1,6 +1,6 @@
 module github.com/api7/cloud-cli
 
-go 1.17
+go 1.19
 
 require (
 	github.com/api7/cloud-go-sdk v0.0.0-20221221010121-c29abb00bc2c
