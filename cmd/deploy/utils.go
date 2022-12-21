@@ -24,6 +24,7 @@ import (
 	"strings"
 	"text/template"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
@@ -44,7 +45,7 @@ type deployContext struct {
 	apisixIDFile      string
 	apisixID          string
 	// ControlPlane is the current control plane.
-	ControlPlane   *types.ControlPlane
+	ControlPlane   *sdk.ControlPlane
 	KubernetesOpts *options.KubernetesDeployOptions
 }
 
@@ -143,7 +144,7 @@ func deployPreRun(ctx *deployContext) error {
 	if err := persistence.PrepareCertificate(cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID)
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID.String())
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
@@ -174,7 +175,7 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	if err = persistence.PrepareCertificate(cp.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID)
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID.String())
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {

@@ -21,7 +21,7 @@ package cloud
 import (
 	reflect "reflect"
 
-	types "github.com/api7/cloud-cli/internal/types"
+	cloud_go_sdk "github.com/api7/cloud-go-sdk"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -49,7 +49,7 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 }
 
 // DebugShowConfig mocks base method.
-func (m *MockAPI) DebugShowConfig(cpID, resource, id string) (string, error) {
+func (m *MockAPI) DebugShowConfig(cpID cloud_go_sdk.ID, resource, id string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DebugShowConfig", cpID, resource, id)
 	ret0, _ := ret[0].(string)
@@ -79,10 +79,10 @@ func (mr *MockAPIMockRecorder) GetCloudLuaModule() *gomock.Call {
 }
 
 // GetDefaultControlPlane mocks base method.
-func (m *MockAPI) GetDefaultControlPlane() (*types.ControlPlane, error) {
+func (m *MockAPI) GetDefaultControlPlane() (*cloud_go_sdk.ControlPlane, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDefaultControlPlane")
-	ret0, _ := ret[0].(*types.ControlPlane)
+	ret0, _ := ret[0].(*cloud_go_sdk.ControlPlane)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,10 +94,10 @@ func (mr *MockAPIMockRecorder) GetDefaultControlPlane() *gomock.Call {
 }
 
 // GetDefaultOrganization mocks base method.
-func (m *MockAPI) GetDefaultOrganization() (*types.Organization, error) {
+func (m *MockAPI) GetDefaultOrganization() (*cloud_go_sdk.Organization, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDefaultOrganization")
-	ret0, _ := ret[0].(*types.Organization)
+	ret0, _ := ret[0].(*cloud_go_sdk.Organization)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -109,7 +109,7 @@ func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 }
 
 // GetStartupConfig mocks base method.
-func (m *MockAPI) GetStartupConfig(cpID string, configType StartupConfigType) (string, error) {
+func (m *MockAPI) GetStartupConfig(cpID cloud_go_sdk.ID, configType StartupConfigType) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStartupConfig", cpID, configType)
 	ret0, _ := ret[0].(string)
@@ -124,10 +124,10 @@ func (mr *MockAPIMockRecorder) GetStartupConfig(cpID, configType interface{}) *g
 }
 
 // GetTLSBundle mocks base method.
-func (m *MockAPI) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
+func (m *MockAPI) GetTLSBundle(cpID cloud_go_sdk.ID) (*cloud_go_sdk.TLSBundle, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTLSBundle", cpID)
-	ret0, _ := ret[0].(*types.TLSBundle)
+	ret0, _ := ret[0].(*cloud_go_sdk.TLSBundle)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -139,10 +139,10 @@ func (mr *MockAPIMockRecorder) GetTLSBundle(cpID interface{}) *gomock.Call {
 }
 
 // ListControlPlanes mocks base method.
-func (m *MockAPI) ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error) {
+func (m *MockAPI) ListControlPlanes(orgID cloud_go_sdk.ID) ([]*cloud_go_sdk.ControlPlane, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListControlPlanes", orgID)
-	ret0, _ := ret[0].([]*types.ControlPlaneSummary)
+	ret0, _ := ret[0].([]*cloud_go_sdk.ControlPlane)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -154,10 +154,10 @@ func (mr *MockAPIMockRecorder) ListControlPlanes(orgID interface{}) *gomock.Call
 }
 
 // Me mocks base method.
-func (m *MockAPI) Me() (*types.User, error) {
+func (m *MockAPI) Me() (*cloud_go_sdk.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Me")
-	ret0, _ := ret[0].(*types.User)
+	ret0, _ := ret[0].(*cloud_go_sdk.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

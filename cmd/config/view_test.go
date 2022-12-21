@@ -22,12 +22,12 @@ import (
 	"strings"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestConfigView(t *testing.T) {
@@ -54,17 +54,13 @@ func TestConfigView(t *testing.T) {
 			},
 			args: []string{"view"},
 			mockCloud: func(api *cloud.MockAPI) {
-				api.EXPECT().GetDefaultOrganization().Return(&types.Organization{
-					TypeMeta: types.TypeMeta{
-						ID:   "123",
-						Name: "API7.AI",
-					},
+				api.EXPECT().GetDefaultOrganization().Return(&sdk.Organization{
+					ID:   123,
+					Name: "API7.AI",
 				}, nil)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID:   "456",
-						Name: "default",
-					},
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID:   456,
+					Name: "default",
 				}, nil)
 			},
 			outputs: []string{`
@@ -100,17 +96,13 @@ func TestConfigView(t *testing.T) {
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultOrganization().Return(nil, errors.New("organization not found"))
 				api.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("control plane not found"))
-				api.EXPECT().GetDefaultOrganization().Return(&types.Organization{
-					TypeMeta: types.TypeMeta{
-						ID:   "321",
-						Name: "APACHE",
-					},
+				api.EXPECT().GetDefaultOrganization().Return(&sdk.Organization{
+					ID:   321,
+					Name: "APACHE",
 				}, nil)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID:   "654",
-						Name: "default",
-					},
+				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID:   654,
+					Name: "default",
 				}, nil)
 			},
 			outputs: []string{`

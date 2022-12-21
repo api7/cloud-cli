@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,6 @@ import (
 	"github.com/api7/cloud-cli/internal/commands"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 var (
@@ -148,10 +148,8 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
@@ -163,12 +161,10 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -183,13 +179,13 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -197,7 +193,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return("", errors.New("mock error"))
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.APISIX).Return("", errors.New("mock error"))
 
 				cloud.DefaultClient = mockClient
 			},
@@ -208,13 +204,13 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -222,7 +218,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
@@ -309,10 +305,8 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
@@ -324,12 +318,10 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -344,13 +336,13 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -358,7 +350,7 @@ func TestDeployPreRunForBare(t *testing.T) {
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return("", errors.New("mock error"))
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.APISIX).Return("", errors.New("mock error"))
 
 				cloud.DefaultClient = mockClient
 			},
@@ -368,13 +360,13 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -382,7 +374,7 @@ func TestDeployPreRunForBare(t *testing.T) {
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
 				cloud.DefaultClient = mockClient
 			},
@@ -508,10 +500,8 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
@@ -523,12 +513,10 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
-					},
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -543,13 +531,13 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -557,7 +545,7 @@ etcd:
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return("", errors.New("mock error"))
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.HELM).Return("", errors.New("mock error"))
 
 				cloud.DefaultClient = mockClient
 			},
@@ -567,13 +555,13 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -581,7 +569,7 @@ etcd:
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				mockCmd := commands.NewMockCmd(ctrl)
@@ -607,13 +595,13 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -621,7 +609,7 @@ etcd:
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				mockCmd := commands.NewMockCmd(ctrl)
@@ -656,13 +644,13 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "3",
+				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+					ID: 3,
+					ControlPlaneSpec: sdk.ControlPlaneSpec{
+						Domain: "foo.com",
 					},
-					Domain: "foo.com",
 				}, nil)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -670,7 +658,7 @@ etcd:
 
 				mockClient.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 
-				mockClient.EXPECT().GetStartupConfig("3", cloud.HELM).Return(_helmStartupConfigTpl, nil)
+				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.HELM).Return(_helmStartupConfigTpl, nil)
 				cloud.DefaultClient = mockClient
 
 				test.kubectl = commands.New("kubectl", test.globalOptions.DryRun)
