@@ -87,8 +87,10 @@ var (
 	// HomeDir is the home directory of the api7 cloud.
 	HomeDir = filepath.Join(os.Getenv("HOME"), ".api7cloud")
 	// TLSDir is the directory to store TLS certificates.
-	TLSDir    string
-	configDir string
+	TLSDir string
+	// APISIXConfigDir is the directory to store APISIX configuration file.
+	APISIXConfigDir string
+	configDir       string
 )
 
 // Init initializes the persistence context.
@@ -101,6 +103,14 @@ func Init() error {
 	}
 	if err := os.Chmod(TLSDir, 0755); err != nil {
 		return errors.Wrap(err, "change tls directory permission")
+	}
+
+	APISIXConfigDir = filepath.Join(HomeDir, "apisix")
+	if err := os.MkdirAll(APISIXConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create apisix config directory")
+	}
+	if err := os.Chmod(APISIXConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "change apisix config directory permission")
 	}
 
 	return nil
