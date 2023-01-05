@@ -41,6 +41,7 @@ import (
 type deployContext struct {
 	cloudLuaModuleDir string
 	tlsDir            string
+	apisixConfigDir   string
 	essentialConfig   []byte
 	apisixIDFile      string
 	apisixID          string
@@ -145,6 +146,14 @@ func deployPreRun(ctx *deployContext) error {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
 	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID.String())
+
+	ctx.apisixConfigDir = filepath.Join(persistence.APISIXConfigDir, cp.ID.String())
+	if err = os.MkdirAll(ctx.apisixConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create apisix config directory")
+	}
+	if err = os.Chmod(ctx.apisixConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "change apisix config directory permission")
+	}
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
