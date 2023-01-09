@@ -30,7 +30,7 @@ import (
 func TestPrepareCertificate(t *testing.T) {
 	testCases := []struct {
 		name           string
-		cpID           sdk.ID
+		clusterID      sdk.ID
 		preparedCert   string
 		preparedKey    string
 		preparedCACert string
@@ -77,8 +77,8 @@ func TestPrepareCertificate(t *testing.T) {
 			expectedCACert: "1",
 		},
 		{
-			name: "success with cp id",
-			cpID: 123456,
+			name:      "success with cluster id",
+			clusterID: 123456,
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
@@ -97,24 +97,24 @@ func TestPrepareCertificate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.cpID == 0 {
-				tc.cpID = 1
+			if tc.clusterID == 0 {
+				tc.clusterID = 1
 			}
-			cpTLSDir := filepath.Join(TLSDir, tc.cpID.String())
+			clusterTLSDir := filepath.Join(TLSDir, tc.clusterID.String())
 
 			if tc.preparedCert != "" {
-				// create cp tls dir
-				if err := os.MkdirAll(cpTLSDir, 0755); err != nil {
+				// create cluster tls dir
+				if err := os.MkdirAll(clusterTLSDir, 0755); err != nil {
 					assert.Nil(t, err, "failed to create tls directory")
 				}
-				if err := os.Chmod(cpTLSDir, 0755); err != nil {
+				if err := os.Chmod(clusterTLSDir, 0755); err != nil {
 					assert.Nil(t, err, "change tls directory permission")
 				}
-				defer os.Remove(cpTLSDir)
+				defer os.Remove(clusterTLSDir)
 
-				certFilename := filepath.Join(cpTLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(cpTLSDir, "tls.key")
-				certCAFilename := filepath.Join(cpTLSDir, "ca.crt")
+				certFilename := filepath.Join(clusterTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(clusterTLSDir, "tls.key")
+				certCAFilename := filepath.Join(clusterTLSDir, "ca.crt")
 
 				err := os.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
 				assert.Nil(t, err, "check if cert is saved")
@@ -131,13 +131,13 @@ func TestPrepareCertificate(t *testing.T) {
 
 			tc.mockFn(t)
 
-			err := PrepareCertificate(tc.cpID)
-			defer os.Remove(cpTLSDir)
+			err := PrepareCertificate(tc.clusterID)
+			defer os.Remove(clusterTLSDir)
 			if tc.errorReason == "" {
 				assert.Nil(t, err, "check if err is nil")
-				certFilename := filepath.Join(cpTLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(cpTLSDir, "tls.key")
-				certCAFilename := filepath.Join(cpTLSDir, "ca.crt")
+				certFilename := filepath.Join(clusterTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(clusterTLSDir, "tls.key")
+				certCAFilename := filepath.Join(clusterTLSDir, "ca.crt")
 				defer os.Remove(certFilename)
 				defer os.Remove(certKeyFilename)
 				defer os.Remove(certCAFilename)

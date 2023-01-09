@@ -133,12 +133,12 @@ func TestDeployPreRunForDocker(t *testing.T) {
 		filledContext     deployContext
 	}{
 		{
-			name:        "failed to get default control plane",
-			errorReason: "Failed to get default control plane: mock error",
+			name:        "failed to get default cluster",
+			errorReason: "Failed to get default cluster: mock error",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("mock error"))
+				mockClient.EXPECT().GetDefaultCluster().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
 			},
 		},
@@ -148,7 +148,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
@@ -161,7 +161,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
@@ -179,9 +179,9 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -204,9 +204,9 @@ func TestDeployPreRunForDocker(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -290,12 +290,12 @@ func TestDeployPreRunForBare(t *testing.T) {
 		filledContext deployContext
 	}{
 		{
-			name:        "failed to get default control plane",
-			errorReason: "Failed to get default control plane: mock error",
+			name:        "failed to get default cluster",
+			errorReason: "Failed to get default cluster: mock error",
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("mock error"))
+				mockClient.EXPECT().GetDefaultCluster().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
 			},
 		},
@@ -305,7 +305,7 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
@@ -318,7 +318,7 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
@@ -336,9 +336,9 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -360,9 +360,9 @@ func TestDeployPreRunForBare(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -485,12 +485,12 @@ etcd:
 
 	testCases := []testCase{
 		{
-			name:        "failed to get default control plane",
-			errorReason: "Failed to get default control plane: mock error",
+			name:        "failed to get default cluster",
+			errorReason: "Failed to get default cluster: mock error",
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("mock error"))
+				mockClient.EXPECT().GetDefaultCluster().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = mockClient
 			},
 		},
@@ -500,7 +500,7 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(nil, errors.New("mock error"))
@@ -513,7 +513,7 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
 				}, nil)
 				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
@@ -531,9 +531,9 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -555,9 +555,9 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -595,9 +595,9 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)
@@ -644,9 +644,9 @@ etcd:
 			mockFn: func(t *testing.T, test *testCase) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				mockClient.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 3,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						Domain: "foo.com",
 					},
 				}, nil)

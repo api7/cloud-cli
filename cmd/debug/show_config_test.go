@@ -37,13 +37,13 @@ func TestDebugShowConfig(t *testing.T) {
 		mockCloud    func(t *testing.T)
 	}{
 		{
-			name:         "invalid control plane",
+			name:         "invalid cluster",
 			args:         []string{"show-config", "api", "--id", "123"},
 			errorMessage: "ERROR: mock error\n",
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("mock error"))
+				api.EXPECT().GetDefaultCluster().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = api
 			},
 		},
@@ -54,9 +54,9 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
@@ -70,9 +70,9 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
