@@ -93,7 +93,7 @@ type ControlPlane struct {
 	// Domain is the domain assigned by APISEVEN Cloud and has correct
 	// records so that DP instances can access APISEVEN Cloud by it.
 	Domain string `json:"domain" yaml:"domain"`
-	// ConfigPayload is the customize data plane config for specific control plane
+	// ConfigPayload is the customize gateway config for specific control plane
 	ConfigPayload string `json:"config_payload" yaml:"config_payload"`
 }
 

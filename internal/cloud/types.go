@@ -51,7 +51,7 @@ const (
 	defaultApi7CloudLuaModuleURL = "https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz"
 )
 
-// StartupConfigType is type of data plane startup config
+// StartupConfigType is type of gateway startup config
 type StartupConfigType string
 
 const (
