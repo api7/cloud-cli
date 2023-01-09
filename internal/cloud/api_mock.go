@@ -133,9 +133,9 @@ func (m *MockAPI) GetTLSBundle(clusterID cloud_go_sdk.ID) (*cloud_go_sdk.TLSBund
 }
 
 // GetTLSBundle indicates an expected call of GetTLSBundle.
-func (mr *MockAPIMockRecorder) GetTLSBundle(clusterID interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) GetTLSBundle(cpID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), clusterID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), cpID)
 }
 
 // ListClusters mocks base method.

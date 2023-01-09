@@ -47,8 +47,8 @@ func newViewCommand() *cobra.Command {
 			rows := [][]string{}
 			for _, profile := range config.Profiles {
 				var (
-					orgName     = "-"
 					clusterName = "-"
+					orgName     = "-"
 				)
 
 				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {

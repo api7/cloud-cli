@@ -67,7 +67,7 @@ func TestConfigView(t *testing.T) {
 +--------------+--------------+---------------+------------+----------------------+
 | PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
 +--------------+--------------+---------------+------------+----------------------+
-| prod         | API7.AI      | default       | true       | https://prod.api7.ai |
+| prod         | API7.AI      | default  | true       | https://prod.api7.ai |
 +--------------+--------------+---------------+------------+----------------------+
 				`},
 		},
@@ -111,7 +111,7 @@ func TestConfigView(t *testing.T) {
 | PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
 +--------------+--------------+---------------+------------+----------------------+
 | prod         | -            | -             | true       | https://prod.api7.ai |
-| dev          | APACHE       | default       | false      | https://dev.api7.ai  |
+| dev          | APACHE       | default | false      | https://dev.api7.ai  |
 +--------------+--------------+---------------+------------+----------------------+
 			`,
 				"WARNING: Failed to get default cluster for profile prod: cluster not found",
