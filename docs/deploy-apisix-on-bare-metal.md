@@ -48,7 +48,7 @@ Cloud CLI will copy TLS Bundle into installation directory of Apache APISIX to
 avoid permission issue.
 
 > See the
-> [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/Clusters_operation/getCertificates)
+> [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/clusters_operation/getCertificates)
 > to learn the details.
 
 * The APISIX Configuration Template
