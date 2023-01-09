@@ -33,14 +33,14 @@ var (
 	}
 )
 
-func (a *api) DebugShowConfig(cpID cloud.ID, resource, id string) (string, error) {
+func (a *api) DebugShowConfig(clusterID cloud.ID, resource, id string) (string, error) {
 	if _, ok := _validResources[resource]; !ok {
 		return "", fmt.Errorf("invalid resource type: %s", resource)
 	}
 
 	var rawData json.RawMessage
 	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/debug/config/controlplanes/%s/%s/%s", cpID.String(), resource, id),
+		Path: fmt.Sprintf("/api/v1/debug/config/clusters/%s/%s/%s", clusterID.String(), resource, id),
 	}, &rawData); err != nil {
 		return "", err
 	}

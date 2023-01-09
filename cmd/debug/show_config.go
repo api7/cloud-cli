@@ -47,12 +47,12 @@ cloud-cli debug show-config api \
 				output.Errorf("Empty resource ID, please specify --id option")
 			}
 
-			defaultCP, err := cloud.DefaultClient.GetDefaultControlPlane()
+			defaultCluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf(err.Error())
 			}
 
-			data, err := cloud.DefaultClient.DebugShowConfig(defaultCP.ID, args[0], id)
+			data, err := cloud.DefaultClient.DebugShowConfig(defaultCluster.ID, args[0], id)
 			if err != nil {
 				output.Errorf("Failed to show config: %s", err.Error())
 			}

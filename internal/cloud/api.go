@@ -34,32 +34,32 @@ func (a *api) Me() (*cloud.User, error) {
 	return a.sdk.Me(context.TODO())
 }
 
-func (a *api) ListControlPlanes(orgID cloud.ID) ([]*cloud.ControlPlane, error) {
-	var controlPlanes []*cloud.ControlPlane
+func (a *api) ListClusters(orgID cloud.ID) ([]*cloud.Cluster, error) {
+	var clusters []*cloud.Cluster
 
-	iter, err := a.sdk.ListControlPlanes(context.TODO(), &cloud.ResourceListOptions{
+	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
 		Organization: &cloud.Organization{
 			ID: orgID,
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create control plane iterator")
+		return nil, errors.Wrap(err, "failed to create cluster iterator")
 	}
 
 	for {
-		cp, err := iter.Next()
+		cluster, err := iter.Next()
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get next control plane")
+			return nil, errors.Wrap(err, "failed to get next cluster")
 		}
-		if cp == nil {
-			return controlPlanes, nil
+		if cluster == nil {
+			return clusters, nil
 		}
-		controlPlanes = append(controlPlanes, cp)
+		clusters = append(clusters, cluster)
 	}
 }
 
-func (a *api) GetTLSBundle(cpID cloud.ID) (*cloud.TLSBundle, error) {
-	return a.sdk.GenerateGatewaySideCertificate(context.TODO(), cpID, nil)
+func (a *api) GetTLSBundle(clusterID cloud.ID) (*cloud.TLSBundle, error) {
+	return a.sdk.GenerateGatewaySideCertificate(context.TODO(), clusterID, nil)
 }
 
 func (a *api) GetCloudLuaModule() ([]byte, error) {
@@ -82,11 +82,11 @@ func (a *api) GetCloudLuaModule() ([]byte, error) {
 	return data, nil
 }
 
-func (a *api) GetStartupConfig(cpID cloud.ID, configType StartupConfigType) (string, error) {
-	var response types.ControlPlaneStartupConfigResponsePayload
+func (a *api) GetStartupConfig(clusterID cloud.ID, configType StartupConfigType) (string, error) {
+	var response types.ClusterStartupConfigResponsePayload
 
 	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/controlplanes/%s/startup_config_tpl/%s", cpID.String(), configType),
+		Path: fmt.Sprintf("/api/v1/clusters/%s/startup_config_tpl/%s", clusterID.String(), configType),
 	}, &response); err != nil {
 		return "", err
 	}
@@ -106,7 +106,7 @@ func (a *api) GetDefaultOrganization() (*cloud.Organization, error) {
 	return a.sdk.GetOrganization(context.TODO(), user.OrgIDs[0], nil)
 }
 
-func (a *api) GetDefaultControlPlane() (*cloud.ControlPlane, error) {
+func (a *api) GetDefaultCluster() (*cloud.Cluster, error) {
 	user, err := a.Me()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to access user information")
@@ -115,25 +115,25 @@ func (a *api) GetDefaultControlPlane() (*cloud.ControlPlane, error) {
 	if len(user.OrgIDs) == 0 {
 		return nil, errors.New("incomplete user information, no organization")
 	}
-	iter, err := a.sdk.ListControlPlanes(context.TODO(), &cloud.ResourceListOptions{
+	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
 		Organization: &cloud.Organization{
 			ID: user.OrgIDs[0],
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create control plane iterator")
+		return nil, errors.Wrap(err, "failed to create cluster iterator")
 	}
 
-	// Let's just fetch the first control plane.
-	cp, err := iter.Next()
+	// Let's just fetch the first cluster.
+	cluster, err := iter.Next()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get default control plane")
+		return nil, errors.Wrap(err, "failed to get default cluster")
 	}
-	if cp == nil {
-		return nil, errors.New("no control plane available")
+	if cluster == nil {
+		return nil, errors.New("no cluster available")
 	}
 
-	return cp, nil
+	return cluster, nil
 }
 
 func (a *api) makeGetRequest(u *url.URL, response interface{}) error {

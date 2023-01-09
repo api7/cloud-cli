@@ -45,8 +45,8 @@ type deployContext struct {
 	essentialConfig   []byte
 	apisixIDFile      string
 	apisixID          string
-	// ControlPlane is the current control plane.
-	ControlPlane   *sdk.ControlPlane
+	// Cluster is the current cluster.
+	Cluster        *sdk.Cluster
 	KubernetesOpts *options.KubernetesDeployOptions
 }
 
@@ -62,7 +62,7 @@ type helmConfig struct {
 }
 
 func getEssentialConfigTpl(ctx *deployContext, configType cloud.StartupConfigType) (*template.Template, error) {
-	config, err := cloud.DefaultClient.GetStartupConfig(ctx.ControlPlane.ID, configType)
+	config, err := cloud.DefaultClient.GetStartupConfig(ctx.Cluster.ID, configType)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get startup config: %s", err.Error())
 	}
@@ -138,16 +138,16 @@ func deployPreRunForBare(ctx *deployContext) error {
 }
 
 func deployPreRun(ctx *deployContext) error {
-	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
+	cluster, err := cloud.DefaultClient.GetDefaultCluster()
 	if err != nil {
-		return fmt.Errorf("Failed to get default control plane: %s", err.Error())
+		return fmt.Errorf("Failed to get default cluster: %s", err.Error())
 	}
-	if err := persistence.PrepareCertificate(cp.ID); err != nil {
+	if err := persistence.PrepareCertificate(cluster.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID.String())
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cluster.ID.String())
 
-	ctx.apisixConfigDir = filepath.Join(persistence.APISIXConfigDir, cp.ID.String())
+	ctx.apisixConfigDir = filepath.Join(persistence.APISIXConfigDir, cluster.ID.String())
 	if err = os.MkdirAll(ctx.apisixConfigDir, 0755); err != nil {
 		return errors.Wrap(err, "failed to create apisix config directory")
 	}
@@ -162,7 +162,7 @@ func deployPreRun(ctx *deployContext) error {
 	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
 
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
-	ctx.ControlPlane = cp
+	ctx.Cluster = cluster
 	return nil
 }
 
@@ -177,14 +177,14 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	}
 	ctx.KubernetesOpts = opts
 
-	cp, err := cloud.DefaultClient.GetDefaultControlPlane()
+	cluster, err := cloud.DefaultClient.GetDefaultCluster()
 	if err != nil {
-		return fmt.Errorf("Failed to get default control plane: %v", err.Error())
+		return fmt.Errorf("Failed to get default cluster: %v", err.Error())
 	}
-	if err = persistence.PrepareCertificate(cp.ID); err != nil {
+	if err = persistence.PrepareCertificate(cluster.ID); err != nil {
 		return fmt.Errorf("Failed to prepare certificate: %s", err.Error())
 	}
-	ctx.tlsDir = filepath.Join(persistence.TLSDir, cp.ID.String())
+	ctx.tlsDir = filepath.Join(persistence.TLSDir, cluster.ID.String())
 
 	cloudLuaModuleDir, err := persistence.SaveCloudLuaModule()
 	if err != nil {
@@ -193,7 +193,7 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 	output.Verbosef("Saved cloud lua module to: %s", cloudLuaModuleDir)
 	ctx.cloudLuaModuleDir = cloudLuaModuleDir
 
-	ctx.ControlPlane = cp
+	ctx.Cluster = cluster
 
 	helmEssentialConfigTemplate, err := getEssentialConfigTpl(ctx, cloud.HELM)
 	if err != nil {

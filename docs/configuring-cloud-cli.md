@@ -70,7 +70,7 @@ Configure Multiple Profiles for Cloud CLI
 ----------------------------------------
 
 `cloud-cli configure` uses `https://api.api7.cloud` as the server address for
-API7 Cloud by default. If your control plane is created on another region,
+API7 Cloud by default. If your cluster is created on another region,
 then you can specify the server address with `--addr` and specify a name for the
 current configuration to distinguish among multiple environments with `--profile`.
 
@@ -100,13 +100,13 @@ View Configuration of Cloud CLI
 ------------------------------
 
 When we configure multiple profiles, we will want to know which profile is currently
-in use and the corresponding organization and control plane information. In this case,
+in use and the corresponding organization and cluster information. In this case,
 we can use the `cloud-cli config view` command to see the full list of available profiles.
 
 ```shell
 cloud-cli config view
 +--------------+----------------+---------------+------------+----------------------------------+
-| PROFILE NAME |  ORGANIZATION  | CONTROL PLANE | IS DEFAULT |        API7 CLOUD ADDRESS        |
+| PROFILE NAME |  ORGANIZATION  | CLUSTER | IS DEFAULT |        API7 CLOUD ADDRESS        |
 +--------------+----------------+---------------+------------+----------------------------------+
 | dev          | API7 dev       | default       | True       | https://dev.api7.cloud           |
 | eu           | API7 eu center | default       | False      | https://api.api7.cloud           |

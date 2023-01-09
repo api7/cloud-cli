@@ -46,9 +46,9 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
@@ -71,9 +71,9 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
@@ -96,9 +96,9 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
@@ -120,9 +120,9 @@ func TestDockerDeployCommand(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 12345,
-					ControlPlaneSpec: sdk.ControlPlaneSpec{
+					ClusterSpec: sdk.ClusterSpec{
 						OrganizationID: 1,
 					},
 				}, nil)
