@@ -47,17 +47,17 @@ func newViewCommand() *cobra.Command {
 			rows := [][]string{}
 			for _, profile := range config.Profiles {
 				var (
-					orgName = "-"
-					cpName  = "-"
+					orgName     = "-"
+					clusterName = "-"
 				)
 
 				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {
 					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
 				} else {
-					if cp, err := api.GetDefaultControlPlane(); err != nil {
-						output.Warnf("Failed to get default control plane for profile %s: %s", profile.Name, err.Error())
+					if cluster, err := api.GetDefaultCluster(); err != nil {
+						output.Warnf("Failed to get default cluster for profile %s: %s", profile.Name, err.Error())
 					} else {
-						cpName = cp.Name
+						clusterName = cluster.Name
 					}
 
 					if org, err := api.GetDefaultOrganization(); err != nil {
@@ -67,12 +67,12 @@ func newViewCommand() *cobra.Command {
 					}
 				}
 
-				rows = append(rows, []string{profile.Name, orgName, cpName, strconv.FormatBool(profile.Name == config.DefaultProfile), profile.Address})
+				rows = append(rows, []string{profile.Name, orgName, clusterName, strconv.FormatBool(profile.Name == config.DefaultProfile), profile.Address})
 			}
 
 			table := tablewriter.NewWriter(os.Stdout)
 
-			table.SetHeader([]string{"Profile Name", "Organization", "Control Plane", "Is Default", "API7 Cloud Address"})
+			table.SetHeader([]string{"Profile Name", "Organization", "Cluster", "Is Default", "API7 Cloud Address"})
 
 			for _, r := range rows {
 				table.Append(r)

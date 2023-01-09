@@ -63,20 +63,20 @@ const (
 type API interface {
 	// Me returns the current user information
 	Me() (*cloud.User, error)
-	// ListControlPlanes returns the list of control planes in organization
-	ListControlPlanes(orgID cloud.ID) ([]*cloud.ControlPlane, error)
-	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the control plane with the given ID
-	GetTLSBundle(cpID cloud.ID) (*cloud.TLSBundle, error)
+	// ListClusters returns the list of clusters in organization
+	ListClusters(orgID cloud.ID) ([]*cloud.Cluster, error)
+	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the cluster with the given ID
+	GetTLSBundle(clusterID cloud.ID) (*cloud.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)
 	GetCloudLuaModule() ([]byte, error)
 	// GetStartupConfig gets the startup configuration from API7 Cloud for deploy APISIX by specify config type.
-	GetStartupConfig(cpID cloud.ID, configType StartupConfigType) (string, error)
+	GetStartupConfig(clusterID cloud.ID, configType StartupConfigType) (string, error)
 	// GetDefaultOrganization returns the default organization for the current user.
 	GetDefaultOrganization() (*cloud.Organization, error)
-	// GetDefaultControlPlane returns the default control plane for the current organization.
-	GetDefaultControlPlane() (*cloud.ControlPlane, error)
+	// GetDefaultCluster returns the default cluster for the current organization.
+	GetDefaultCluster() (*cloud.Cluster, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
-	DebugShowConfig(cpID cloud.ID, resource string, id string) (string, error)
+	DebugShowConfig(clusterID cloud.ID, resource string, id string) (string, error)
 }
 
 type api struct {

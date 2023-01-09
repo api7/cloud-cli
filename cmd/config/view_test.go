@@ -58,14 +58,14 @@ func TestConfigView(t *testing.T) {
 					ID:   123,
 					Name: "API7.AI",
 				}, nil)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID:   456,
 					Name: "default",
 				}, nil)
 			},
 			outputs: []string{`
 +--------------+--------------+---------------+------------+----------------------+
-| PROFILE NAME | ORGANIZATION | CONTROL PLANE | IS DEFAULT |  API7 CLOUD ADDRESS  |
+| PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
 +--------------+--------------+---------------+------------+----------------------+
 | prod         | API7.AI      | default       | true       | https://prod.api7.ai |
 +--------------+--------------+---------------+------------+----------------------+
@@ -95,12 +95,12 @@ func TestConfigView(t *testing.T) {
 			args: []string{"view"},
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultOrganization().Return(nil, errors.New("organization not found"))
-				api.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("control plane not found"))
+				api.EXPECT().GetDefaultCluster().Return(nil, errors.New("cluster not found"))
 				api.EXPECT().GetDefaultOrganization().Return(&sdk.Organization{
 					ID:   321,
 					Name: "APACHE",
 				}, nil)
-				api.EXPECT().GetDefaultControlPlane().Return(&sdk.ControlPlane{
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID:   654,
 					Name: "default",
 				}, nil)
@@ -108,13 +108,13 @@ func TestConfigView(t *testing.T) {
 			outputs: []string{`
 
 +--------------+--------------+---------------+------------+----------------------+
-| PROFILE NAME | ORGANIZATION | CONTROL PLANE | IS DEFAULT |  API7 CLOUD ADDRESS  |
+| PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
 +--------------+--------------+---------------+------------+----------------------+
 | prod         | -            | -             | true       | https://prod.api7.ai |
 | dev          | APACHE       | default       | false      | https://dev.api7.ai  |
 +--------------+--------------+---------------+------------+----------------------+
 			`,
-				"WARNING: Failed to get default control plane for profile prod: control plane not found",
+				"WARNING: Failed to get default cluster for profile prod: cluster not found",
 				"WARNING: Failed to get default organization for profile prod: organization not found",
 			},
 		},

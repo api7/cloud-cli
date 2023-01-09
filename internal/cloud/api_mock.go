@@ -49,18 +49,18 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 }
 
 // DebugShowConfig mocks base method.
-func (m *MockAPI) DebugShowConfig(cpID cloud_go_sdk.ID, resource, id string) (string, error) {
+func (m *MockAPI) DebugShowConfig(clusterID cloud_go_sdk.ID, resource, id string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DebugShowConfig", cpID, resource, id)
+	ret := m.ctrl.Call(m, "DebugShowConfig", clusterID, resource, id)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // DebugShowConfig indicates an expected call of DebugShowConfig.
-func (mr *MockAPIMockRecorder) DebugShowConfig(cpID, resource, id interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) DebugShowConfig(clusterID, resource, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), cpID, resource, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), clusterID, resource, id)
 }
 
 // GetCloudLuaModule mocks base method.
@@ -78,19 +78,19 @@ func (mr *MockAPIMockRecorder) GetCloudLuaModule() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCloudLuaModule", reflect.TypeOf((*MockAPI)(nil).GetCloudLuaModule))
 }
 
-// GetDefaultControlPlane mocks base method.
-func (m *MockAPI) GetDefaultControlPlane() (*cloud_go_sdk.ControlPlane, error) {
+// GetDefaultCluster mocks base method.
+func (m *MockAPI) GetDefaultCluster() (*cloud_go_sdk.Cluster, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDefaultControlPlane")
-	ret0, _ := ret[0].(*cloud_go_sdk.ControlPlane)
+	ret := m.ctrl.Call(m, "GetDefaultCluster")
+	ret0, _ := ret[0].(*cloud_go_sdk.Cluster)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDefaultControlPlane indicates an expected call of GetDefaultControlPlane.
-func (mr *MockAPIMockRecorder) GetDefaultControlPlane() *gomock.Call {
+// GetDefaultCluster indicates an expected call of GetDefaultCluster.
+func (mr *MockAPIMockRecorder) GetDefaultCluster() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultControlPlane", reflect.TypeOf((*MockAPI)(nil).GetDefaultControlPlane))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultCluster", reflect.TypeOf((*MockAPI)(nil).GetDefaultCluster))
 }
 
 // GetDefaultOrganization mocks base method.
@@ -109,48 +109,48 @@ func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 }
 
 // GetStartupConfig mocks base method.
-func (m *MockAPI) GetStartupConfig(cpID cloud_go_sdk.ID, configType StartupConfigType) (string, error) {
+func (m *MockAPI) GetStartupConfig(clusterID cloud_go_sdk.ID, configType StartupConfigType) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetStartupConfig", cpID, configType)
+	ret := m.ctrl.Call(m, "GetStartupConfig", clusterID, configType)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetStartupConfig indicates an expected call of GetStartupConfig.
-func (mr *MockAPIMockRecorder) GetStartupConfig(cpID, configType interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) GetStartupConfig(clusterID, configType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStartupConfig", reflect.TypeOf((*MockAPI)(nil).GetStartupConfig), cpID, configType)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStartupConfig", reflect.TypeOf((*MockAPI)(nil).GetStartupConfig), clusterID, configType)
 }
 
 // GetTLSBundle mocks base method.
-func (m *MockAPI) GetTLSBundle(cpID cloud_go_sdk.ID) (*cloud_go_sdk.TLSBundle, error) {
+func (m *MockAPI) GetTLSBundle(clusterID cloud_go_sdk.ID) (*cloud_go_sdk.TLSBundle, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTLSBundle", cpID)
+	ret := m.ctrl.Call(m, "GetTLSBundle", clusterID)
 	ret0, _ := ret[0].(*cloud_go_sdk.TLSBundle)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetTLSBundle indicates an expected call of GetTLSBundle.
-func (mr *MockAPIMockRecorder) GetTLSBundle(cpID interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) GetTLSBundle(clusterID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), cpID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), clusterID)
 }
 
-// ListControlPlanes mocks base method.
-func (m *MockAPI) ListControlPlanes(orgID cloud_go_sdk.ID) ([]*cloud_go_sdk.ControlPlane, error) {
+// ListClusters mocks base method.
+func (m *MockAPI) ListClusters(orgID cloud_go_sdk.ID) ([]*cloud_go_sdk.Cluster, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListControlPlanes", orgID)
-	ret0, _ := ret[0].([]*cloud_go_sdk.ControlPlane)
+	ret := m.ctrl.Call(m, "ListClusters", orgID)
+	ret0, _ := ret[0].([]*cloud_go_sdk.Cluster)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListControlPlanes indicates an expected call of ListControlPlanes.
-func (mr *MockAPIMockRecorder) ListControlPlanes(orgID interface{}) *gomock.Call {
+// ListClusters indicates an expected call of ListClusters.
+func (mr *MockAPIMockRecorder) ListClusters(orgID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListControlPlanes", reflect.TypeOf((*MockAPI)(nil).ListControlPlanes), orgID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockAPI)(nil).ListClusters), orgID)
 }
 
 // Me mocks base method.

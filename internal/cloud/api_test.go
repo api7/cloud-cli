@@ -134,13 +134,13 @@ func TestMe(t *testing.T) {
 	}
 }
 
-func TestListControlPlanes(t *testing.T) {
+func TestClusters(t *testing.T) {
 	tests := []struct {
 		name      string
 		orgID     sdk.ID
 		code      int
 		body      string
-		want      *sdk.ControlPlane
+		want      *sdk.Cluster
 		wantErr   bool
 		errReason string
 	}{
@@ -169,10 +169,10 @@ func TestListControlPlanes(t *testing.T) {
 					"message": "OK"
 				}
 			}`,
-			want: &sdk.ControlPlane{
+			want: &sdk.Cluster{
 				ID:   392306215415186327,
 				Name: "default",
-				ControlPlaneSpec: sdk.ControlPlaneSpec{
+				ClusterSpec: sdk.ClusterSpec{
 					OrganizationID: 392306215398409111,
 					RegionID:       56523356,
 					Status:         3,
@@ -186,7 +186,7 @@ func TestListControlPlanes(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-				assert.Contains(t, req.URL.String(), fmt.Sprintf("/api/v1/orgs/%s/controlplanes", tt.orgID))
+				assert.Contains(t, req.URL.String(), fmt.Sprintf("/api/v1/orgs/%s/clusters", tt.orgID))
 				assert.Equal(t, req.Header.Get("Authorization"), "Bearer test-token")
 
 				rw.WriteHeader(tt.code)
@@ -218,13 +218,13 @@ func TestListControlPlanes(t *testing.T) {
 			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
-			result, err := api.ListControlPlanes(tt.orgID)
+			result, err := api.ListClusters(tt.orgID)
 
 			if tt.wantErr {
 				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")
 			} else {
 				assert.NoError(t, err, "checking error")
-				assert.Len(t, result, 1, "checking control planes count")
+				assert.Len(t, result, 1, "checking clusters count")
 				assert.Equal(t, tt.want, result[0], "checking result")
 			}
 		})
@@ -234,7 +234,7 @@ func TestListControlPlanes(t *testing.T) {
 func TestGetTLSBundle(t *testing.T) {
 	tests := []struct {
 		name      string
-		cpID      sdk.ID
+		clusterID sdk.ID
 		code      int
 		body      string
 		want      *sdk.TLSBundle
@@ -242,9 +242,9 @@ func TestGetTLSBundle(t *testing.T) {
 		errReason string
 	}{
 		{
-			name: "success",
-			code: http.StatusOK,
-			cpID: 1,
+			name:      "success",
+			code:      http.StatusOK,
+			clusterID: 1,
 			want: &sdk.TLSBundle{
 				Certificate:   "1",
 				PrivateKey:    "1",
@@ -264,7 +264,7 @@ func TestGetTLSBundle(t *testing.T) {
 		{
 			name:      "internal server error",
 			code:      http.StatusInternalServerError,
-			cpID:      1,
+			clusterID: 1,
 			body:      "internal server error",
 			errReason: "status code: 500, message: internal server error",
 			wantErr:   true,
@@ -273,7 +273,7 @@ func TestGetTLSBundle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificate", tt.cpID))
+				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/clusters/%s/dp_certificate", tt.clusterID))
 				assert.Equal(t, req.Header.Get("Authorization"), "Bearer test-token")
 
 				rw.WriteHeader(tt.code)
@@ -289,7 +289,7 @@ func TestGetTLSBundle(t *testing.T) {
 			api, err := newClient(server.URL, "test-token")
 			assert.NoError(t, err, "checking new cloud api client")
 
-			bundle, err := api.GetTLSBundle(tt.cpID)
+			bundle, err := api.GetTLSBundle(tt.clusterID)
 
 			if tt.wantErr {
 				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")
@@ -410,7 +410,7 @@ func TestGetStartupConfig(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/controlplanes/%s/startup_config_tpl/%s", "1", tc.configType))
+				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/clusters/%s/startup_config_tpl/%s", "1", tc.configType))
 				rw.WriteHeader(tc.code)
 				if tc.body != "" {
 					_, err := rw.Write([]byte(tc.body))
