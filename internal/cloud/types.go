@@ -76,7 +76,7 @@ type API interface {
 	// GetDefaultCluster returns the default cluster for the current organization.
 	GetDefaultCluster() (*cloud.Cluster, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
-	DebugShowConfig(clusterID cloud.ID, resource string, id string) (string, error)
+	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 }
 
 type api struct {

@@ -3,7 +3,7 @@ module github.com/api7/cloud-cli
 go 1.19
 
 require (
-	github.com/api7/cloud-go-sdk v0.0.0-20230106080229-d5859164f989
+	github.com/api7/cloud-go-sdk v0.0.0-20230111081227-8cba958cc0b3
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/docker/docker v20.10.22+incompatible
 	github.com/fatih/color v1.13.0

@@ -49,7 +49,7 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 }
 
 // DebugShowConfig mocks base method.
-func (m *MockAPI) DebugShowConfig(clusterID cloud_go_sdk.ID, resource, id string) (string, error) {
+func (m *MockAPI) DebugShowConfig(clusterID cloud_go_sdk.ID, resource string, id cloud_go_sdk.ID) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DebugShowConfig", clusterID, resource, id)
 	ret0, _ := ret[0].(string)
@@ -133,9 +133,9 @@ func (m *MockAPI) GetTLSBundle(clusterID cloud_go_sdk.ID) (*cloud_go_sdk.TLSBund
 }
 
 // GetTLSBundle indicates an expected call of GetTLSBundle.
-func (mr *MockAPIMockRecorder) GetTLSBundle(cpID interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) GetTLSBundle(clusterID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), cpID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTLSBundle", reflect.TypeOf((*MockAPI)(nil).GetTLSBundle), clusterID)
 }
 
 // ListClusters mocks base method.

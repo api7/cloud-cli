@@ -16,6 +16,7 @@ package debug
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
@@ -43,7 +44,7 @@ cloud-cli debug show-config api \
 			}
 
 			id := options.Global.Debug.ShowConfig.ID
-			if id == "" {
+			if id == 0 {
 				output.Errorf("Empty resource ID, please specify --id option")
 			}
 
@@ -60,7 +61,7 @@ cloud-cli debug show-config api \
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&options.Global.Debug.ShowConfig.ID, "id", "", "Specify the API7 Cloud resource ID")
+	cmd.PersistentFlags().Uint64Var((*uint64)(&options.Global.Debug.ShowConfig.ID), "id", 0, "Specify the API7 Cloud resource ID")
 
 	return cmd
 }
