@@ -16,7 +16,6 @@ package cloud
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,7 +26,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/output"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func (a *api) Me() (*cloud.User, error) {
@@ -83,14 +81,11 @@ func (a *api) GetCloudLuaModule() ([]byte, error) {
 }
 
 func (a *api) GetStartupConfig(clusterID cloud.ID, configType StartupConfigType) (string, error) {
-	var response types.ClusterStartupConfigResponsePayload
-
-	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/clusters/%s/startup_config_tpl/%s", clusterID.String(), configType),
-	}, &response); err != nil {
+	config, err := a.sdk.GetGatewayInstanceStartupConfigTemplate(context.TODO(), clusterID, string(configType), nil)
+	if err != nil {
 		return "", err
 	}
-	return response.Configuration, nil
+	return config, nil
 }
 
 func (a *api) GetDefaultOrganization() (*cloud.Organization, error) {
@@ -136,20 +131,6 @@ func (a *api) GetDefaultCluster() (*cloud.Cluster, error) {
 	return cluster, nil
 }
 
-func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
-	req, err := a.newRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return err
-	}
-
-	resp, err := a.httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	return decodeResponse(resp, response)
-}
-
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {
@@ -173,51 +154,4 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.accessToken))
 
 	return request, nil
-}
-
-func decodeResponse(resp *http.Response, v interface{}) error {
-	defer resp.Body.Close()
-
-	responseDump, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return err
-	}
-	output.Verbosef("Receiving response:\n%s", responseDump)
-
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode >= http.StatusInternalServerError {
-			return errors.New("Server internal error, please try again later")
-		}
-
-		if resp.StatusCode == http.StatusNotFound {
-			return errors.New("Resource not found")
-		}
-
-		var rw types.ResponseWrapper
-		err := json.NewDecoder(resp.Body).Decode(&rw)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-		return errors.New(fmt.Sprintf("Error Code: %d, Error Reason: %s", rw.Status.Code, rw.ErrorReason))
-	}
-	var rw types.ResponseWrapper
-	dec := json.NewDecoder(resp.Body)
-	dec.UseNumber()
-	err = dec.Decode(&rw)
-	if err != nil {
-		return errors.Wrap(err, "Got a malformed response from server")
-	}
-
-	if v != nil {
-		data, err := json.Marshal(rw.Payload)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-
-		err = json.Unmarshal(data, v)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-	}
-	return nil
 }

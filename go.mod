@@ -3,8 +3,7 @@ module github.com/api7/cloud-cli
 go 1.19
 
 require (
-	github.com/api7/cloud-go-sdk v0.0.0-20230111081227-8cba958cc0b3
-	github.com/bitly/go-simplejson v0.5.0
+	github.com/api7/cloud-go-sdk v0.0.0-20230111085020-f347c92de578
 	github.com/docker/docker v20.10.22+incompatible
 	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
@@ -18,6 +17,7 @@ require (
 )
 
 require (
+	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
