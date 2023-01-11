@@ -16,6 +16,8 @@ package options
 
 import (
 	"errors"
+
+	"github.com/api7/cloud-go-sdk"
 )
 
 var (
@@ -163,7 +165,7 @@ type DebugOptions struct {
 // DebugShowConfigOptions contains options for `cloud-cli debug show-config` command.
 type DebugShowConfigOptions struct {
 	// ID is the API7 Cloud resource id.
-	ID string
+	ID cloud.ID
 }
 
 // ConfigureOptions contains options for `cloud-cli configure` command

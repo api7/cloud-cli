@@ -60,7 +60,7 @@ func TestDebugShowConfig(t *testing.T) {
 						OrganizationID: 1,
 					},
 				}, nil)
-				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", "123").Return("", errors.New("not found"))
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", sdk.ID(123)).Return("", errors.New("not found"))
 				cloud.DefaultClient = api
 			},
 		},
@@ -86,7 +86,7 @@ func TestDebugShowConfig(t *testing.T) {
     }
   ]
 }`
-				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", "123").Return(resources, nil)
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", sdk.ID(123)).Return(resources, nil)
 				cloud.DefaultClient = api
 			},
 			output: `

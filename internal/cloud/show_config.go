@@ -15,13 +15,9 @@
 package cloud
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/url"
-
 	"github.com/api7/cloud-go-sdk"
-	"github.com/bitly/go-simplejson"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -33,49 +29,44 @@ var (
 	}
 )
 
-func (a *api) DebugShowConfig(clusterID cloud.ID, resource, id string) (string, error) {
+func (a *api) DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error) {
 	if _, ok := _validResources[resource]; !ok {
 		return "", fmt.Errorf("invalid resource type: %s", resource)
 	}
 
-	var rawData json.RawMessage
-	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/debug/config/clusters/%s/%s/%s", clusterID.String(), resource, id),
-	}, &rawData); err != nil {
-		return "", err
+	var (
+		data string
+		err  error
+	)
+
+	switch resource {
+	case "application":
+		data, err = a.sdk.DebugApplicationResources(context.TODO(), id, &cloud.ResourceGetOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	case "api":
+		data, err = a.sdk.DebugAPIResources(context.TODO(), id, &cloud.ResourceGetOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	case "consumer":
+		data, err = a.sdk.DebugConsumerResources(context.TODO(), id, &cloud.ResourceGetOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	case "certificate":
+		data, err = a.sdk.DebugCertificateResources(context.TODO(), id, &cloud.ResourceGetOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
 	}
-
-	return formatJSONData(rawData)
-}
-
-func formatJSONData(raw []byte) (string, error) {
-	js, err := simplejson.NewJson(raw)
-	if err != nil {
-		return "", errors.Wrap(err, "invalid json")
-	}
-
-	for _, resName := range []string{"routes", "services", "upstreams", "certificates", "consumers"} {
-		res, ok := js.CheckGet(resName)
-		if !ok {
-			continue
-		}
-
-		for i := 0; i < len(res.MustArray()); i++ {
-			var structualValue map[string]interface{}
-			value := res.GetIndex(i).Get("value").MustString()
-
-			// value is a JSON string, and we want to show it structurally, so
-			// here we unmarshal and reset it.
-			if err := json.Unmarshal([]byte(value), &structualValue); err != nil {
-				return "", errors.Wrap(err, fmt.Sprintf("unmarshal %s", value))
-			}
-
-			res.GetIndex(i).Set("value", structualValue)
-		}
-	}
-	newData, err := js.MarshalJSON()
 	if err != nil {
 		return "", err
 	}
-	return string(newData), nil
+	return data, nil
 }
