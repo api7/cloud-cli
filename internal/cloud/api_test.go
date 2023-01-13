@@ -273,7 +273,7 @@ func TestGetTLSBundle(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/clusters/%s/dp_certificate", tt.clusterID))
+				assert.Equal(t, req.URL.String(), fmt.Sprintf("/api/v1/clusters/%s/gateway_certificate", tt.clusterID))
 				assert.Equal(t, req.Header.Get("Authorization"), "Bearer test-token")
 
 				rw.WriteHeader(tt.code)
