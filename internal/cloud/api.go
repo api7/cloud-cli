@@ -15,69 +15,53 @@
 package cloud
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"strconv"
 
+	"github.com/api7/cloud-go-sdk"
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/output"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
-func (a *api) Me() (*types.User, error) {
-	var user types.User
-
-	if err := a.makeGetRequest(&url.URL{
-		Path: "/api/v1/user/me",
-	}, &user); err != nil {
-		return nil, err
-	}
-
-	return &user, nil
+func (a *api) Me() (*cloud.User, error) {
+	return a.sdk.Me(context.TODO())
 }
 
-func (a *api) ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error) {
-	var response types.GetOrganizationControlPlanesResponsePayload
+func (a *api) ListClusters(orgID cloud.ID, count int, skip int) ([]*cloud.Cluster, error) {
+	var clusters []*cloud.Cluster
 
-	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/orgs/%s/controlplanes", orgID),
-	}, &response); err != nil {
-		return nil, err
+	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
+		Organization: &cloud.Organization{
+			ID: orgID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     skip,
+			PageSize: count,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create cluster iterator")
 	}
 
-	return response.List, nil
+	for {
+		cluster, err := iter.Next()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get next cluster")
+		}
+		if cluster == nil {
+			return clusters, nil
+		}
+		clusters = append(clusters, cluster)
+	}
 }
 
-func (a *api) ListClusters(orgID string, count int, skip int) ([]*types.ControlPlaneSummary, error) {
-	var response types.GetOrganizationControlPlanesResponsePayload
-	q := &url.Values{}
-	q.Add("page", strconv.Itoa(skip))
-	q.Add("page_size", strconv.Itoa(count))
-
-	if err := a.makeGetRequest(&url.URL{
-		Path:     fmt.Sprintf("/api/v1/orgs/%s/clusters", orgID),
-		RawQuery: q.Encode(),
-	}, &response); err != nil {
-		return nil, err
-	}
-
-	return response.List, nil
-}
-
-func (a *api) GetTLSBundle(cpID string) (*types.TLSBundle, error) {
-	var bundle types.TLSBundle
-
-	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/controlplanes/%s/dp_certificate", cpID),
-	}, &bundle); err != nil {
-		return nil, err
-	}
-	return &bundle, nil
+func (a *api) GetTLSBundle(clusterID cloud.ID) (*cloud.TLSBundle, error) {
+	return a.sdk.GenerateGatewaySideCertificate(context.TODO(), clusterID, nil)
 }
 
 func (a *api) GetCloudLuaModule() ([]byte, error) {
@@ -100,18 +84,15 @@ func (a *api) GetCloudLuaModule() ([]byte, error) {
 	return data, nil
 }
 
-func (a *api) GetStartupConfig(cpID string, configType StartupConfigType) (string, error) {
-	var response types.ControlPlaneStartupConfigResponsePayload
-
-	if err := a.makeGetRequest(&url.URL{
-		Path: fmt.Sprintf("/api/v1/controlplanes/%s/startup_config_tpl/%s", cpID, configType),
-	}, &response); err != nil {
+func (a *api) GetStartupConfig(clusterID cloud.ID, configType StartupConfigType) (string, error) {
+	config, err := a.sdk.GetGatewayInstanceStartupConfigTemplate(context.TODO(), clusterID, string(configType), nil)
+	if err != nil {
 		return "", err
 	}
-	return response.Configuration, nil
+	return config, nil
 }
 
-func (a *api) GetDefaultControlPlane() (*types.ControlPlane, error) {
+func (a *api) GetDefaultOrganization() (*cloud.Organization, error) {
 	user, err := a.Me()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to access user information")
@@ -120,28 +101,38 @@ func (a *api) GetDefaultControlPlane() (*types.ControlPlane, error) {
 	if len(user.OrgIDs) == 0 {
 		return nil, errors.New("incomplete user information, no organization")
 	}
-	controlPlanes, err := a.ListControlPlanes(user.OrgIDs[0])
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to list control planes")
-	}
-	if len(controlPlanes) == 0 {
-		return nil, errors.New("no control plane available")
-	}
-	return &controlPlanes[0].ControlPlane, nil
+
+	return a.sdk.GetOrganization(context.TODO(), user.OrgIDs[0], nil)
 }
 
-func (a *api) makeGetRequest(u *url.URL, response interface{}) error {
-	req, err := a.newRequest(http.MethodGet, u, nil)
+func (a *api) GetDefaultCluster() (*cloud.Cluster, error) {
+	user, err := a.Me()
 	if err != nil {
-		return err
+		return nil, errors.Wrap(err, "failed to access user information")
 	}
 
-	resp, err := a.httpClient.Do(req)
+	if len(user.OrgIDs) == 0 {
+		return nil, errors.New("incomplete user information, no organization")
+	}
+	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
+		Organization: &cloud.Organization{
+			ID: user.OrgIDs[0],
+		},
+	})
 	if err != nil {
-		return err
+		return nil, errors.Wrap(err, "failed to create cluster iterator")
 	}
 
-	return decodeResponse(resp, response)
+	// Let's just fetch the first cluster.
+	cluster, err := iter.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get default cluster")
+	}
+	if cluster == nil {
+		return nil, errors.New("no cluster available")
+	}
+
+	return cluster, nil
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
@@ -167,51 +158,4 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.accessToken))
 
 	return request, nil
-}
-
-func decodeResponse(resp *http.Response, v interface{}) error {
-	defer resp.Body.Close()
-
-	responseDump, err := httputil.DumpResponse(resp, true)
-	if err != nil {
-		return err
-	}
-	output.Verbosef("Receiving response:\n%s", responseDump)
-
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode >= http.StatusInternalServerError {
-			return errors.New("Server internal error, please try again later")
-		}
-
-		if resp.StatusCode == http.StatusNotFound {
-			return errors.New("Resource not found")
-		}
-
-		var rw types.ResponseWrapper
-		err := json.NewDecoder(resp.Body).Decode(&rw)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-		return errors.New(fmt.Sprintf("Error Code: %d, Error Reason: %s", rw.Status.Code, rw.ErrorReason))
-	}
-	var rw types.ResponseWrapper
-	dec := json.NewDecoder(resp.Body)
-	dec.UseNumber()
-	err = dec.Decode(&rw)
-	if err != nil {
-		return errors.Wrap(err, "Got a malformed response from server")
-	}
-
-	if v != nil {
-		data, err := json.Marshal(rw.Payload)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-
-		err = json.Unmarshal(data, v)
-		if err != nil {
-			return errors.Wrap(err, "Got a malformed response from server")
-		}
-	}
-	return nil
 }

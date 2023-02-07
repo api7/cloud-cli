@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/cloud"
@@ -27,8 +28,10 @@ import (
 
 // PrepareCertificate downloads the client certificate and key from API7 Cloud.
 // This certificate is used for the communication between APISIX and API7 Cloud.
-func PrepareCertificate(cpID string) error {
-	certFilename := filepath.Join(TLSDir, "tls.crt")
+func PrepareCertificate(clusterID sdk.ID) error {
+	clusterTLSDir := filepath.Join(TLSDir, clusterID.String())
+
+	certFilename := filepath.Join(clusterTLSDir, "tls.crt")
 	if available, err := checkIfCertificateAvailable(certFilename); err != nil {
 		return errors.Wrap(err, "check certificate availability")
 	} else if available {
@@ -37,10 +40,18 @@ func PrepareCertificate(cpID string) error {
 
 	output.Verbosef("Downloading tls bundle from API7 Cloud")
 
-	// Currently, only one control plane is supported for an organization.
-	bundle, err := cloud.DefaultClient.GetTLSBundle(cpID)
+	// Currently, only one cluster is supported for an organization.
+	bundle, err := cloud.DefaultClient.GetTLSBundle(clusterID)
 	if err != nil {
 		return errors.Wrap(err, "download tls bundle")
+	}
+
+	// Make cluster tls dir
+	if err = os.MkdirAll(clusterTLSDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create tls directory")
+	}
+	if err = os.Chmod(clusterTLSDir, 0755); err != nil {
+		return errors.Wrap(err, "change tls directory permission")
 	}
 
 	err = os.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
@@ -52,7 +63,7 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "change certificate permission")
 	}
 
-	certKeyFilename := filepath.Join(TLSDir, "tls.key")
+	certKeyFilename := filepath.Join(clusterTLSDir, "tls.key")
 	err = os.WriteFile(certKeyFilename, []byte(bundle.PrivateKey), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save private key")
@@ -61,7 +72,7 @@ func PrepareCertificate(cpID string) error {
 		return errors.Wrap(err, "change private key permission")
 	}
 
-	certCAFilename := filepath.Join(TLSDir, "ca.crt")
+	certCAFilename := filepath.Join(clusterTLSDir, "ca.crt")
 	err = os.WriteFile(certCAFilename, []byte(bundle.CACertificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save ca certificate")

@@ -21,12 +21,11 @@ import (
 	"os/exec"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/consts"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestDebugShowConfig(t *testing.T) {
@@ -38,13 +37,13 @@ func TestDebugShowConfig(t *testing.T) {
 		mockCloud    func(t *testing.T)
 	}{
 		{
-			name:         "invalid control plane",
+			name:         "invalid cluster",
 			args:         []string{"show-config", "api", "--id", "123"},
 			errorMessage: "ERROR: mock error\n",
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(nil, errors.New("mock error"))
+				api.EXPECT().GetDefaultCluster().Return(nil, errors.New("mock error"))
 				cloud.DefaultClient = api
 			},
 		},
@@ -55,13 +54,13 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 12345,
+					ClusterSpec: sdk.ClusterSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
-				api.EXPECT().DebugShowConfig("12345", "application", "123").Return("", errors.New("not found"))
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", sdk.ID(123)).Return("", errors.New("not found"))
 				cloud.DefaultClient = api
 			},
 		},
@@ -71,11 +70,11 @@ func TestDebugShowConfig(t *testing.T) {
 			mockCloud: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				api := cloud.NewMockAPI(ctrl)
-				api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-					TypeMeta: types.TypeMeta{
-						ID: "12345",
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 12345,
+					ClusterSpec: sdk.ClusterSpec{
+						OrganizationID: 1,
 					},
-					OrganizationID: "org1",
 				}, nil)
 				resources := `
 {
@@ -87,7 +86,7 @@ func TestDebugShowConfig(t *testing.T) {
     }
   ]
 }`
-				api.EXPECT().DebugShowConfig("12345", "application", "123").Return(resources, nil)
+				api.EXPECT().DebugShowConfig(sdk.ID(12345), "application", sdk.ID(123)).Return(resources, nil)
 				cloud.DefaultClient = api
 			},
 			output: `
@@ -117,7 +116,7 @@ func TestDebugShowConfig(t *testing.T) {
 			}
 
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
-			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			// Ignore error since it won't be nil if we mock a failed command.
 			output, _ := cmd.CombinedOutput()

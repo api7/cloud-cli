@@ -18,23 +18,24 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 
+	"github.com/api7/cloud-go-sdk"
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/consts"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 var (
 	DefaultClient API
 )
 
-// InitDefaultClient initializes the default client with the given credentials
-func InitDefaultClient(accessToken string) (err error) {
+// InitDefaultClient initializes the default client with the given configuration
+func InitDefaultClient(cloudAddr, accessToken string) (err error) {
 	if DefaultClient != nil {
 		return nil
 	}
-	DefaultClient, err = newClient(accessToken)
+	DefaultClient, err = newClient(cloudAddr, accessToken)
 	return
 }
 
@@ -47,11 +48,10 @@ func Client() API {
 }
 
 const (
-	defaultApi7CloudAddr         = "https://console.api7.cloud"
 	defaultApi7CloudLuaModuleURL = "https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz"
 )
 
-// StartupConfigType is type of data plane startup config
+// StartupConfigType is type of gateway startup config
 type StartupConfigType string
 
 const (
@@ -62,24 +62,25 @@ const (
 // API warp API7 Cloud REST API
 type API interface {
 	// Me returns the current user information
-	Me() (*types.User, error)
-	// ListControlPlanes returns the list of control planes in organization
-	ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error)
-	// ListControlPlanes returns the list of clusters in organization
-	ListClusters(orgID string, count int, skip int) ([]*types.ControlPlaneSummary, error)
-	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the control plane with the given ID
-	GetTLSBundle(cpID string) (*types.TLSBundle, error)
+	Me() (*cloud.User, error)
+	// ListClusters returns the list of clusters in organization
+	ListClusters(orgID cloud.ID, count int, skip int) ([]*cloud.Cluster, error)
+	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the cluster with the given ID
+	GetTLSBundle(clusterID cloud.ID) (*cloud.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)
 	GetCloudLuaModule() ([]byte, error)
 	// GetStartupConfig gets the startup configuration from API7 Cloud for deploy APISIX by specify config type.
-	GetStartupConfig(cpID string, configType StartupConfigType) (string, error)
-	// GetDefaultControlPlane returns the default control plane for the current organization.
-	GetDefaultControlPlane() (*types.ControlPlane, error)
+	GetStartupConfig(clusterID cloud.ID, configType StartupConfigType) (string, error)
+	// GetDefaultOrganization returns the default organization for the current user.
+	GetDefaultOrganization() (*cloud.Organization, error)
+	// GetDefaultCluster returns the default cluster for the current organization.
+	GetDefaultCluster() (*cloud.Cluster, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
-	DebugShowConfig(cpID string, resource string, id string) (string, error)
+	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 }
 
 type api struct {
+	sdk               cloud.Interface
 	host              string
 	scheme            string
 	accessToken       string
@@ -87,13 +88,13 @@ type api struct {
 	cloudLuaModuleURL *url.URL
 }
 
-// newClient returns a new API7 Cloud API Client
-func newClient(accessToken string) (API, error) {
-	cloudAddr := os.Getenv(consts.Api7CloudAddrEnv)
-	if cloudAddr == "" {
-		cloudAddr = defaultApi7CloudAddr
-	}
+var (
+	// NewClient is a function to create a new API7 Cloud API Client
+	NewClient = newClient
+)
 
+// newClient returns a new API7 Cloud API Client
+func newClient(cloudAddr, accessToken string) (API, error) {
 	u, err := url.Parse(cloudAddr)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse API7 Cloud server URL")
@@ -115,7 +116,17 @@ func newClient(accessToken string) (API, error) {
 		return nil, errors.New("invalid API7 Cloud Lua Module URL")
 	}
 
+	sdk, err := cloud.NewInterface(&cloud.Options{
+		ServerAddr:  cloudAddr,
+		Token:       accessToken,
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "initialize cloud go sdk")
+	}
+
 	return &api{
+		sdk:               sdk,
 		host:              u.Host,
 		scheme:            u.Scheme,
 		cloudLuaModuleURL: cloudModuleURL,

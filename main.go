@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/cmd/config"
 	"github.com/api7/cloud-cli/cmd/configure"
 	"github.com/api7/cloud-cli/cmd/debug"
 	"github.com/api7/cloud-cli/cmd/deploy"
@@ -42,6 +43,7 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(stop.NewStopCommand())
 	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(list.NewCommand())
+	cmd.AddCommand(config.NewCommand())
 
 	return cmd
 }

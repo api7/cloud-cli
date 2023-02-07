@@ -15,9 +15,10 @@
 package list
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/spf13/cobra"
 )
 
 // NewCommand creates the list sub-command object.
@@ -26,7 +27,7 @@ func NewCommand() *cobra.Command {
 		Use:   "list [COMMAND] [ARG...]",
 		Short: "List the resources obtained from the API7 Cloud.",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			if err := persistence.CheckAccessTokenAndInitCloudClient(); err != nil {
+			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
 			}
 		},

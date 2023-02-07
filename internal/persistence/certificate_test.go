@@ -19,17 +19,18 @@ import (
 	"path/filepath"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/types"
 )
 
 func TestPrepareCertificate(t *testing.T) {
 	testCases := []struct {
 		name           string
+		clusterID      sdk.ID
 		preparedCert   string
 		preparedKey    string
 		preparedCACert string
@@ -64,7 +65,24 @@ func TestPrepareCertificate(t *testing.T) {
 			mockFn: func(t *testing.T) {
 				ctrl := gomock.NewController(t)
 				mockClient := cloud.NewMockAPI(ctrl)
-				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
+					Certificate:   "1",
+					PrivateKey:    "1",
+					CACertificate: "1",
+				}, nil)
+				cloud.DefaultClient = mockClient
+			},
+			expectedCert:   "1",
+			expectedKey:    "1",
+			expectedCACert: "1",
+		},
+		{
+			name:      "success with cluster id",
+			clusterID: 123456,
+			mockFn: func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				mockClient := cloud.NewMockAPI(ctrl)
+				mockClient.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 					Certificate:   "1",
 					PrivateKey:    "1",
 					CACertificate: "1",
@@ -79,10 +97,24 @@ func TestPrepareCertificate(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.clusterID == 0 {
+				tc.clusterID = 1
+			}
+			clusterTLSDir := filepath.Join(TLSDir, tc.clusterID.String())
+
 			if tc.preparedCert != "" {
-				certFilename := filepath.Join(TLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(TLSDir, "tls.key")
-				certCAFilename := filepath.Join(TLSDir, "ca.crt")
+				// create cluster tls dir
+				if err := os.MkdirAll(clusterTLSDir, 0755); err != nil {
+					assert.Nil(t, err, "failed to create tls directory")
+				}
+				if err := os.Chmod(clusterTLSDir, 0755); err != nil {
+					assert.Nil(t, err, "change tls directory permission")
+				}
+				defer os.Remove(clusterTLSDir)
+
+				certFilename := filepath.Join(clusterTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(clusterTLSDir, "tls.key")
+				certCAFilename := filepath.Join(clusterTLSDir, "ca.crt")
 
 				err := os.WriteFile(certFilename, []byte(tc.preparedCert), 0600)
 				assert.Nil(t, err, "check if cert is saved")
@@ -99,12 +131,13 @@ func TestPrepareCertificate(t *testing.T) {
 
 			tc.mockFn(t)
 
-			err := PrepareCertificate("1")
+			err := PrepareCertificate(tc.clusterID)
+			defer os.Remove(clusterTLSDir)
 			if tc.errorReason == "" {
 				assert.Nil(t, err, "check if err is nil")
-				certFilename := filepath.Join(TLSDir, "tls.crt")
-				certKeyFilename := filepath.Join(TLSDir, "tls.key")
-				certCAFilename := filepath.Join(TLSDir, "ca.crt")
+				certFilename := filepath.Join(clusterTLSDir, "tls.crt")
+				certKeyFilename := filepath.Join(clusterTLSDir, "tls.key")
+				certCAFilename := filepath.Join(clusterTLSDir, "ca.crt")
 				defer os.Remove(certFilename)
 				defer os.Remove(certKeyFilename)
 				defer os.Remove(certCAFilename)

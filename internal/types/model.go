@@ -14,7 +14,9 @@
 
 package types
 
-import "time"
+import (
+	"time"
+)
 
 // Status represents an error type, it contains the error code and its
 // description.
@@ -44,19 +46,6 @@ type ResponseWrapper struct {
 	Warning string `json:"warning,omitempty"`
 }
 
-// User is the user in cloud-console
-type User struct {
-	ID         string    `json:"id"`
-	FirstName  string    `json:"first_name"`
-	LastName   string    `json:"last_name"`
-	Email      string    `json:"email"`
-	OrgIDs     []string  `json:"org_ids"`
-	Connection string    `json:"connection"`
-	AvatarURL  string    `json:"avatar_url"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-}
-
 // TypeMeta contains some common and basic items, like id, name.
 type TypeMeta struct {
 	// ID is the unique identify to mark an object.
@@ -69,49 +58,63 @@ type TypeMeta struct {
 	UpdatedAt time.Time `json:"updated_at" yaml:"updated_at"`
 }
 
-// ControlPlane is the specification of control plane.
-type ControlPlane struct {
+// Organization is the specification of organization.
+type Organization struct {
+	TypeMeta `json:",inline" yaml:",inline"`
+	// PlanID indicates which plan is used by this organization.
+	// PlanID should refer to a valid Plan object.
+	PlanID string `json:"plan_id" yaml:"plan_id"`
+	// PlanExpireTime indicates the binding plan expire time for this organization.
+	PlanExpireTime time.Time `json:"plan_expire_time" yaml:"plan_expire_time"`
+	// SubscriptionStartedAt is the time when the organization subscribed to the plan.
+	SubscriptionStartedAt *time.Time `json:"subscription_started_at" yaml:"subscription_started_at"`
+	// OwnerID indicates who create the organization.
+	OwnerID string `json:"owner_id" yaml:"owner_id"`
+}
+
+// Cluster is the specification of cluster.
+type Cluster struct {
 	TypeMeta `json:",inline" yaml:",inline"`
 	// OrganizationID refers to an Organization object, which
-	// indicates the belonged organization for this control plane.
+	// indicates the belonged organization for this cluster.
 	OrganizationID string `json:"org_id" yaml:"org_id"`
 	// RegionID refers to a Region object, which indicates the
 	// region that the Cloud Plane resides.
 	RegionID string `json:"region_id" yaml:"region_id"`
-	// Status indicates the control plane status, candidate values are:
-	// * ControlPlaneBuildInProgress: the control plane is being created.
-	// * ControlPlaneCreating means a control plane is being created.
-	// * ControlPlaneNormal: the control plane is built, and can be used normally.
-	// * ControlPlaneCreateFailed means a control plane was not created successfully.
-	// * ControlPlaneDeleting means a control plane is being deleted.
-	// * ControlPlaneDeleted means a control plane was deleted.
-	// enum: ControlPlaneBuildInProgress:1,ControlPlaneNormal:2,ControlPlaneCreateFailed:3,ControlPlaneDeleting:4,ControlPlaneDeleted:5
+	// Status indicates the cluster status, candidate values are:
+	// * ClusterBuildInProgress: the cluster is being created.
+	// * ClusterCreating means a cluster is being created.
+	// * ClusterNormal: the cluster is built, and can be used normally.
+	// * ClusterCreateFailed means a cluster was not created successfully.
+	// * ClusterDeleting means a cluster is being deleted.
+	// * ClusterDeleted means a cluster was deleted.
+	// enum: ClusterBuildInProgress:1,ClusterNormal:2,ClusterCreateFailed:3,ClusterDeleting:4,ClusterDeleted:5
 	Status int `json:"status" yaml:"status"`
 	// Domain is the domain assigned by APISEVEN Cloud and has correct
 	// records so that DP instances can access APISEVEN Cloud by it.
 	Domain string `json:"domain" yaml:"domain"`
-	// ConfigPayload is the customize data plane config for specific control plane
+	// ConfigPayload is the customize gateway config for specific cluster
 	ConfigPayload string `json:"config_payload" yaml:"config_payload"`
 }
 
-// GetOrganizationControlPlanesResponsePayload contains list control planes request
-type GetOrganizationControlPlanesResponsePayload struct {
-	// Count is total count of control planes
+// GetOrganizationClusterResponsePayload contains list clusters request
+type GetOrganizationClusterResponsePayload struct {
+	// Count is total count of clusters
 	Count uint64 `json:"count" uri:"count"`
-	// List is array of control planes
-	List []*ControlPlaneSummary `json:"list"`
+	// List is array of clusters
+	List []*ClusterSummary `json:"list"`
 }
 
-// ControlPlaneStartupConfigResponsePayload contains APISIX startup config.
-type ControlPlaneStartupConfigResponsePayload struct {
+// ClusterStartupConfigResponsePayload contains APISIX startup config.
+type ClusterStartupConfigResponsePayload struct {
 	// Configuration is the startup config
 	Configuration string `json:"configuration"`
 }
 
-// ControlPlaneSummary is control plane with region and org summary
-type ControlPlaneSummary struct {
-	ControlPlane `json:",inline" yaml:",inline"`
-	// OrgName is the org name of the control plane
+// ClusterSummary is cluster with region and org summary
+type ClusterSummary struct {
+	Cluster `json:",inline" yaml:",inline"`
+	// OrgName is the org name of the cluster
 	OrgName string `json:"org_name" yaml:"org_name"`
 }
 

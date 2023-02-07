@@ -23,25 +23,79 @@ import (
 
 // User is credential for authentication.
 type User struct {
-	AccessToken string `json:"access_token" yaml:"access_token"`
+	AccessToken string `json:"-" yaml:"access_token"`
 }
 
-// Credential is the top-level credential for the cloud cli.
-type Credential struct {
+// Profile represents a configuration profile.
+type Profile struct {
+	// Name is the name of the profile.
+	Name string `json:"name" yaml:"name"`
+	// Address is the address of API7 Cloud server.
+	Address string `json:"address" yaml:"address"`
+	// User is the user credential.
 	User User `json:"user" yaml:"user"`
+}
+
+// CloudConfiguration is the configuration for the cloud cli.
+type CloudConfiguration struct {
+	// DefaultProfile is the active profile.
+	DefaultProfile string `json:"default_profile" yaml:"default_profile"`
+	// Profiles is the list of profiles.
+	Profiles []Profile `json:"profiles" yaml:"profiles"`
+}
+
+// ConfigureProfile adds a profile to the configuration if not exists, otherwise update profile by name.
+func (c *CloudConfiguration) ConfigureProfile(profile Profile) {
+	for i, p := range c.Profiles {
+		if p.Name == profile.Name {
+			c.Profiles[i] = profile
+			return
+		}
+	}
+	c.Profiles = append(c.Profiles, profile)
+}
+
+// GetProfile returns the profile by name.
+func (c *CloudConfiguration) GetProfile(name string) (*Profile, error) {
+	for _, p := range c.Profiles {
+		if p.Name == name {
+			return &p, nil
+		}
+	}
+	return nil, errors.Errorf("profile %s not found", name)
+}
+
+// GetDefaultProfile returns the default profile.
+func (c *CloudConfiguration) GetDefaultProfile() (*Profile, error) {
+	profile, err := c.GetProfile(c.DefaultProfile)
+	if err != nil {
+		return nil, errors.New("default profile not found")
+	}
+	return profile, nil
+}
+
+// Validate validates the configuration.
+func (c *CloudConfiguration) Validate() error {
+	if _, err := c.GetDefaultProfile(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 var (
 	// HomeDir is the home directory of the api7 cloud.
 	HomeDir = filepath.Join(os.Getenv("HOME"), ".api7cloud")
 	// TLSDir is the directory to store TLS certificates.
-	TLSDir        string
-	credentialDir string
+	TLSDir string
+	// APISIXConfigDir is the directory to store APISIX configuration file.
+	APISIXConfigDir string
+	configDir       string
 )
 
 // Init initializes the persistence context.
 func Init() error {
-	credentialDir = filepath.Join(HomeDir, "credentials")
+	configDir = filepath.Join(HomeDir, "config")
 
 	TLSDir = filepath.Join(HomeDir, "tls")
 	if err := os.MkdirAll(TLSDir, 0755); err != nil {
@@ -49,6 +103,14 @@ func Init() error {
 	}
 	if err := os.Chmod(TLSDir, 0755); err != nil {
 		return errors.Wrap(err, "change tls directory permission")
+	}
+
+	APISIXConfigDir = filepath.Join(HomeDir, "apisix")
+	if err := os.MkdirAll(APISIXConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "failed to create apisix config directory")
+	}
+	if err := os.Chmod(APISIXConfigDir, 0755); err != nil {
+		return errors.Wrap(err, "change apisix config directory permission")
 	}
 
 	return nil

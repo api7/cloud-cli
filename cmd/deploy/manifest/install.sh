@@ -20,6 +20,11 @@ version="{{ .Version }}"
 instance_id="{{ .InstanceID }}"
 apisix_home="/usr/local/apisix"
 
+if [[ "{{ .Upgrade }}" == "true" ]]; then
+  yum install -y apisix-$version
+  exit 0
+fi
+
 installed_version=$(apisix version 2>/dev/null) || true
 if [[ -z ${installed_version} ]]; then
   yum install -y {{ .APISIXRepoURL }}

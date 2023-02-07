@@ -24,7 +24,7 @@ is supported**) through Cloud CLI.
 > [How to Configure Cloud CLI](./configuring-cloud-cli.md)
 
 Cloud CLI will help you to install Apache APISIX, Cloud Lua Module, and generate
-configuration (to communicate with Control Plane).
+configuration (to communicate with cluster).
 
 * Apache APISIX
 
@@ -48,7 +48,7 @@ Cloud CLI will copy TLS Bundle into installation directory of Apache APISIX to
 avoid permission issue.
 
 > See the
-> [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/controlplanes_operation/getCertificates)
+> [DP Certificate API](https://docs.az-staging.api7.cloud/swagger/#/clusters_operation/getCertificates)
 > to learn the details.
 
 * The APISIX Configuration Template
@@ -117,6 +117,18 @@ If you want to stop the APISIX instance, just run the command below:
 ```shell
 cloud-cli stop bare
 ```
+
+Upgrade Version
+---------------
+
+If you want to upgrade the APISIX version, just run the command below with
+the desired version you want.
+
+```shell
+cloud-cli deploy bare --upgrade --apisix-version {Your Desired Version}
+```
+
+Note if the target version was already installed, nothing will be done.
 
 Command Option Reference
 ------------------------

@@ -15,7 +15,6 @@
 package version
 
 import (
-	"encoding/json"
 	"fmt"
 	"runtime"
 )
@@ -58,9 +57,5 @@ func init() {
 
 // String shows the version info.
 func (v Version) String() string {
-	data, err := json.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
+	return fmt.Sprintf("version %s.%s, git_commit %s, build_date %s, go_version %s, compiler %s, platform %s", v.Major, v.Minor, v.GitCommit, v.BuildDate, v.GoVersion, v.Compiler, v.Platform)
 }

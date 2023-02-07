@@ -12,26 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package debug
+package config
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
-	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-func newShowConfigCommand() *cobra.Command {
+func newSwitchCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-config [RESOURCE] [ARG...]",
-		Short: "Show translated Apache APISIX configurations related to the specify API7 Cloud resource.",
-		Example: `
-cloud-cli debug show-config api \
-	--id 0e3851a5f4a7`,
+		Use:     "switch",
+		Short:   "Switch the default profile used by Cloud CLI",
+		Example: `cloud-cli config switch <profile>`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
@@ -40,28 +34,31 @@ cloud-cli debug show-config api \
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			if len(args) != 1 {
-				output.Errorf("Please specify an API7 Cloud resource. Resource can be application, api, consumer and certificate.")
+				output.Errorf("please specify the profile name")
+				return
 			}
+			profileName := args[0]
 
-			id := options.Global.Debug.ShowConfig.ID
-			if id == 0 {
-				output.Errorf("Empty resource ID, please specify --id option")
-			}
-
-			defaultCluster, err := cloud.DefaultClient.GetDefaultCluster()
+			config, err := persistence.LoadConfiguration()
 			if err != nil {
 				output.Errorf(err.Error())
 			}
 
-			data, err := cloud.DefaultClient.DebugShowConfig(defaultCluster.ID, args[0], id)
+			_, err = config.GetProfile(profileName)
 			if err != nil {
-				output.Errorf("Failed to show config: %s", err.Error())
+				output.Errorf(err.Error())
+				return
 			}
-			fmt.Println(data)
+
+			config.DefaultProfile = profileName
+			if err := persistence.SaveConfiguration(config); err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
+			output.Infof("switched to profile: %s", profileName)
 		},
 	}
-
-	cmd.PersistentFlags().Uint64Var((*uint64)(&options.Global.Debug.ShowConfig.ID), "id", 0, "Specify the API7 Cloud resource ID")
 
 	return cmd
 }

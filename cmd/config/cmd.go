@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package debug
+package config
 
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-// NewCommand creates the debug sub-command object.
+// NewCommand creates the config sub-command object.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "debug [COMMAND] [ARGS...]",
-		Short: "Debug utility for API7 Cloud & Apache APISIX.",
+		Use:   "config [COMMAND] [ARGS...]",
+		Short: "Configuration management",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
@@ -34,9 +33,8 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&options.Global.Profile, "profile", "", "The profile of the configuration to use")
-
-	cmd.AddCommand(newShowConfigCommand())
+	cmd.AddCommand(newViewCommand())
+	cmd.AddCommand(newSwitchCommand())
 
 	return cmd
 }

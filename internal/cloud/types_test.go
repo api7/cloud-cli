@@ -15,12 +15,9 @@
 package cloud
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/api7/cloud-cli/internal/consts"
 )
 
 func TestNew(t *testing.T) {
@@ -48,27 +45,10 @@ func TestNew(t *testing.T) {
 				accessToken: "access-token",
 			},
 		},
-		{
-			name:    "default api server",
-			wantErr: false,
-			want: &api{
-				host:        "console.api7.cloud",
-				scheme:      "https",
-				accessToken: "access-token",
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.apiServer != "" {
-				err := os.Setenv(consts.Api7CloudAddrEnv, tt.apiServer)
-				assert.NoError(t, err, "set cloud api server env")
-			} else {
-				err := os.Unsetenv(consts.Api7CloudAddrEnv)
-				assert.NoError(t, err, "unset cloud api server env")
-			}
-
-			a, err := newClient("access-token")
+			a, err := newClient(tt.apiServer, "access-token")
 			if tt.wantErr {
 				assert.Error(t, err, "checking error")
 				assert.Equal(t, tt.errorReason, err.Error(), "checking error reason")

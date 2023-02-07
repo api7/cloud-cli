@@ -17,15 +17,12 @@ package consts
 import "time"
 
 const (
-	// Api7CloudAddrEnv is the environment variable used to specify the API7 Cloud address,
-	// e.g. https://console.api7.cloud
-	Api7CloudAddrEnv = "API7_CLOUD_ADDR"
-	// Api7CloudAccessTokenEnv is environment variable used to specify the access token for API7 Cloud.
-	Api7CloudAccessTokenEnv = "API7_CLOUD_ACCESS_TOKEN"
 	// Api7CloudLuaModuleURL is the environment variable used to specify the API7 Cloud Lua module address.
 	// e.g. https://github.com/api7/cloud-scripts/raw/main/assets/cloud_module_beta.tar.gz.
 	// Note this variable should be deprecated once we can download the module from API7 Cloud.
 	Api7CloudLuaModuleURL = "API7_CLOUD_LUA_MODULE_URL"
+	// Api7CloudProfile is the environment variable used to specify the API7 Cloud profile.
+	Api7CloudProfile = "API7_CLOUD_PROFILE"
 )
 
 const (

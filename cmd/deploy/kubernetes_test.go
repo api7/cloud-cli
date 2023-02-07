@@ -21,34 +21,34 @@ import (
 	"path/filepath"
 	"testing"
 
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/api7/cloud-cli/internal/types"
+	"github.com/api7/cloud-cli/internal/testutils"
 )
 
 func TestKubernetesDeployCommand(t *testing.T) {
 	defaultMockCloud := func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		api := cloud.NewMockAPI(ctrl)
-		api.EXPECT().GetDefaultControlPlane().Return(&types.ControlPlane{
-			TypeMeta: types.TypeMeta{
-				ID: "12345",
+		api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+			ID: 12345,
+			ClusterSpec: sdk.ClusterSpec{
+				OrganizationID: 1,
 			},
-			OrganizationID: "org1",
 		}, nil)
-		api.EXPECT().GetTLSBundle(gomock.Any()).Return(&types.TLSBundle{
+		api.EXPECT().GetTLSBundle(gomock.Any()).Return(&sdk.TLSBundle{
 			Certificate:   "1",
 			PrivateKey:    "1",
 			CACertificate: "1",
 		}, nil)
 
 		api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
-		api.EXPECT().GetStartupConfig("12345", cloud.HELM).Return(_helmStartupConfigTpl, nil)
+		api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.HELM).Return(_helmStartupConfigTpl, nil)
 
 		cloud.DefaultClient = api
 	}
@@ -146,13 +146,8 @@ func TestKubernetesDeployCommand(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			persistence.HomeDir = filepath.Join(os.TempDir(), ".api7cloud")
-			certFilename := filepath.Join(persistence.HomeDir, "tls", "tls.crt")
-			certKeyFilename := filepath.Join(persistence.HomeDir, "tls", "tls.key")
-			certCAFilename := filepath.Join(persistence.HomeDir, "tls", "ca.crt")
 			defer func() {
-				os.Remove(certFilename)
-				os.Remove(certKeyFilename)
-				os.Remove(certCAFilename)
+				os.RemoveAll(persistence.HomeDir)
 			}()
 			//Because `os.Exit(-1)` will be triggered in the failure case, so here the test is executed using a subprocess
 			//The method come from: https://talks.golang.org/2014/testing.slide#23
@@ -166,8 +161,9 @@ func TestKubernetesDeployCommand(t *testing.T) {
 				return
 			}
 
+			testutils.PrepareFakeConfiguration(t)
 			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
-			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1", fmt.Sprintf("%s=test-token", consts.Api7CloudAccessTokenEnv))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			output, err := cmd.CombinedOutput()
 			assert.NoError(t, err, "check if the command executed successfully")

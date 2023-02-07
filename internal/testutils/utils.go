@@ -12,27 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package version
+// only for testing
+package testutils
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-func TestVersion(t *testing.T) {
-	ver := Version{
-		Major:     "0",
-		Minor:     "1",
-		GitCommit: "2ad4hz",
-		BuildDate: "2022-11-25 10:15:14.230457 +0800 CST m=+0.001464835",
-		GoVersion: "go1.19.1",
-		Compiler:  runtime.Compiler,
-		Platform:  "darwin/arm64",
-	}
-	s := ver.String()
-	res := "version 0.1, git_commit 2ad4hz, build_date 2022-11-25 10:15:14.230457 +0800 CST m=+0.001464835, go_version go1.19.1, compiler gc, platform darwin/arm64"
-	assert.Equal(t, res, s, "checking version")
-
+// PrepareFakeConfiguration prepares a fake configuration for testing.
+func PrepareFakeConfiguration(t *testing.T) {
+	err := persistence.SaveConfiguration(&persistence.CloudConfiguration{
+		DefaultProfile: "default",
+		Profiles: []persistence.Profile{
+			{
+				Name:    "default",
+				Address: "https://api.api7.cloud",
+				User:    persistence.User{AccessToken: "test-token"},
+			},
+		},
+	})
+	assert.NoError(t, err, "prepare fake cloud configuration")
 }

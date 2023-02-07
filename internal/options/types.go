@@ -16,6 +16,8 @@ package options
 
 import (
 	"errors"
+
+	"github.com/api7/cloud-go-sdk"
 )
 
 var (
@@ -29,6 +31,8 @@ type Options struct {
 	Verbose bool
 	// DryRun controls if all the actions should be simulated instead of executed.
 	DryRun bool
+	// Profile is the name of the profile to use.
+	Profile string
 	// Deploy contains the options for the deploy command.
 	Deploy DeployOptions
 	// Stop contains the options for the stop command.
@@ -37,6 +41,8 @@ type Options struct {
 	Debug DebugOptions
 	// List contains the options for the list command.
 	List ListOptions
+	// Configure contains the options for the configure command.
+	Configure ConfigureOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -135,6 +141,9 @@ type BareDeployOptions struct {
 	APISIXBinPath string
 	// Reload indicates if skip the deployment and just try to reload APISIX.
 	Reload bool
+	// Upgrade indicates if the current try is for upgrading Apache APISIX on
+	// bare metal
+	Upgrade bool
 }
 
 // KubernetesStopOptions contains options for the kubectl or helm command.
@@ -158,7 +167,19 @@ type DebugOptions struct {
 // DebugShowConfigOptions contains options for `cloud-cli debug show-config` command.
 type DebugShowConfigOptions struct {
 	// ID is the API7 Cloud resource id.
-	ID string
+	ID cloud.ID
+}
+
+// ConfigureOptions contains options for `cloud-cli configure` command
+type ConfigureOptions struct {
+	// Addr is the address of the API7 Cloud server.
+	Addr string
+	// Profile is the name of the profile to use.
+	Profile string
+	// Default indicates if the profile should be set as default.
+	Default bool
+	// AccessToken is the access token of the API7 Cloud server.
+	AccessToken string
 }
 
 type ListOptions struct {
