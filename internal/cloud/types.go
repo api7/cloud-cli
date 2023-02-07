@@ -65,6 +65,8 @@ type API interface {
 	Me() (*types.User, error)
 	// ListControlPlanes returns the list of control planes in organization
 	ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, error)
+	// ListControlPlanes returns the list of clusters in organization
+	ListClusters(orgID string, count int, skip int) ([]*types.ControlPlaneSummary, error)
 	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the control plane with the given ID
 	GetTLSBundle(cpID string) (*types.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)

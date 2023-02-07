@@ -35,6 +35,8 @@ type Options struct {
 	Stop StopOptions
 	// Debug contains the options for the debug command.
 	Debug DebugOptions
+	// List contains the options for the list command.
+	List ListOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -157,4 +159,17 @@ type DebugOptions struct {
 type DebugShowConfigOptions struct {
 	// ID is the API7 Cloud resource id.
 	ID string
+}
+
+type ListOptions struct {
+	// Clusters specifies that the resources in the Clusters are obtained.
+	Clusters ListClustersOption
+}
+
+// ListClustersOption contains options for `cloud-cli list cluster` command.
+type ListClustersOption struct {
+	// Specify the amount of data to be listed
+	Count int
+	// Specifies how much data to skip ahead
+	Skip int
 }

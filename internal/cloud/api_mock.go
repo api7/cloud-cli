@@ -138,6 +138,21 @@ func (mr *MockAPIMockRecorder) ListControlPlanes(orgID interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListControlPlanes", reflect.TypeOf((*MockAPI)(nil).ListControlPlanes), orgID)
 }
 
+// ListControlPlanes mocks base method.
+func (m *MockAPI) ListClusters(orgID string, count int , skip int) ([]*types.ControlPlaneSummary, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListClusters", orgID, count, skip)
+	ret0, _ := ret[0].([]*types.ControlPlaneSummary)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListClusters indicates an expected call of ListClusters.
+func (mr *MockAPIMockRecorder) ListClusters(orgID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockAPI)(nil).ListControlPlanes), orgID)
+}
+
 // Me mocks base method.
 func (m *MockAPI) Me() (*types.User, error) {
 	m.ctrl.T.Helper()

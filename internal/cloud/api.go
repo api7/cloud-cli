@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -45,6 +46,22 @@ func (a *api) ListControlPlanes(orgID string) ([]*types.ControlPlaneSummary, err
 
 	if err := a.makeGetRequest(&url.URL{
 		Path: fmt.Sprintf("/api/v1/orgs/%s/controlplanes", orgID),
+	}, &response); err != nil {
+		return nil, err
+	}
+
+	return response.List, nil
+}
+
+func (a *api) ListClusters(orgID string, count int, skip int) ([]*types.ControlPlaneSummary, error) {
+	var response types.GetOrganizationControlPlanesResponsePayload
+	q := &url.Values{}
+	q.Add("page", strconv.Itoa(skip))
+	q.Add("page_size", strconv.Itoa(count))
+
+	if err := a.makeGetRequest(&url.URL{
+		Path:     fmt.Sprintf("/api/v1/orgs/%s/clusters", orgID),
+		RawQuery: q.Encode(),
 	}, &response); err != nil {
 		return nil, err
 	}
