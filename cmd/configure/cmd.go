@@ -73,7 +73,7 @@ func NewCommand() *cobra.Command {
 				output.Warnf("You are using a token that has no expiration time, please note the security risk")
 			}
 
-			err = cloud.InitDefaultClient(options.Global.Configure.Addr, options.Global.Configure.AccessToken)
+			err = cloud.InitDefaultClient(options.Global.Configure.Addr, options.Global.Configure.AccessToken, options.Global.Verbose)
 			if err != nil {
 				output.Errorf("failed to initialize api7 cloud client: %s", err)
 			}
