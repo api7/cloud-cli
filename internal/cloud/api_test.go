@@ -15,20 +15,20 @@
 package cloud
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	sdk "github.com/api7/cloud-go-sdk"
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 
-	"bytes"
 	"github.com/api7/cloud-cli/internal/consts"
 	"github.com/api7/cloud-cli/internal/options"
-	"github.com/fatih/color"
-	"time"
 )
 
 func TestMe(t *testing.T) {
