@@ -55,7 +55,6 @@ func main() {
 		// waiting for trace logger done
 		utils.WantExit = true
 		utils.VerboseWg.Wait()
-		return
 	}()
 
 	cmd := newCommand()
