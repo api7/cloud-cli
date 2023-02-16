@@ -15,28 +15,37 @@
 package utils
 
 import (
-	"github.com/api7/cloud-cli/internal/output"
-	"github.com/api7/cloud-go-sdk"
+	"context"
 	"sync"
-	"time"
+
+	"github.com/api7/cloud-go-sdk"
+
+	"github.com/api7/cloud-cli/internal/output"
 )
 
-var WantExit bool
-var VerboseWg sync.WaitGroup
+type traceVerbose struct {
+	ctx  context.Context
+	Exit context.CancelFunc
+	Wg   sync.WaitGroup
+}
+
+var TraceVerbose traceVerbose
+
+func init() {
+	TraceVerbose.Wg = sync.WaitGroup{}
+	TraceVerbose.ctx, TraceVerbose.Exit = context.WithCancel(context.Background())
+}
 
 func VerboseGoroutine(traceChan <-chan *cloud.TraceSeries) {
-	VerboseWg.Add(1)
-	defer VerboseWg.Done()
+	TraceVerbose.Wg.Add(1)
+	defer TraceVerbose.Wg.Done()
 
 	for {
 		select {
 		case data := <-traceChan:
 			DumpTrace(data)
-		default:
-			if WantExit {
-				return
-			}
-			time.Sleep(500 * time.Millisecond)
+		case <-TraceVerbose.ctx.Done():
+			return
 		}
 	}
 }
