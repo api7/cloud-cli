@@ -25,6 +25,7 @@ import (
 	"github.com/api7/cloud-cli/cmd/deploy"
 	"github.com/api7/cloud-cli/cmd/stop"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/utils"
 	"github.com/api7/cloud-cli/internal/version"
 )
 
@@ -47,6 +48,15 @@ func newCommand() *cobra.Command {
 }
 
 func main() {
+	defer func() {
+		if !options.Global.Verbose {
+			return
+		}
+		// waiting for trace logger done
+		utils.TraceVerbose.Exit()
+		utils.TraceVerbose.Wg.Wait()
+	}()
+
 	cmd := newCommand()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(-1)

@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/consts"
-	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
@@ -128,26 +128,7 @@ func newClient(cloudAddr, accessToken string, trace bool) (API, error) {
 	}
 
 	if trace {
-		go func() {
-			traceChan := sdk.TraceChan()
-			for {
-				data := <-traceChan
-				req := data.Request
-				output.Verbosef("[%v] Send a %v request to %v", data.ID, req.Method, req.URL.String())
-				if len(data.RequestBody) != 0 {
-					output.Verbosef("[%v] Send a request body: %s", data.ID, string(data.RequestBody))
-				}
-				output.Verbosef("[%v] Receive a response with status: %v", data.ID, data.Response.StatusCode)
-				if len(data.ResponseBody) != 0 {
-					output.Verbosef("[%v] Receive a response body: %s", data.ID, string(data.ResponseBody))
-				}
-
-				evts := data.Events
-				for _, evt := range evts {
-					output.Verbosef("[%v] Event %s : %s", data.ID, evt.HappenedAt.Format("2006-01-02 15:04:05"), evt.Message)
-				}
-			}
-		}()
+		go utils.VerboseGoroutine(sdk.TraceChan())
 	}
 
 	return &api{
