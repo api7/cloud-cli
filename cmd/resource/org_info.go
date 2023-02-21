@@ -42,21 +42,28 @@ func newOrgInfoCommand() *cobra.Command {
 			}
 
 			for _, profile := range config.Profiles {
-
-				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken, false); err != nil {
-					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
-				} else {
-					if org, err := api.GetDefaultOrganization(); err != nil {
-						output.Warnf("Failed to get default organization for profile %s: %s", profile.Name, err.Error())
-					} else {
-						out, err := json.Marshal(org)
-						if err != nil {
-							output.Warnf("Failed to parse organization info %s", err.Error())
-							return
-						}
-						output.Infof(string(out))
-					}
+				if profile.Name != config.DefaultProfile {
+					continue
 				}
+
+				api, err := cloud.NewClient(profile.Address, profile.User.AccessToken, false)
+				if err != nil {
+					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
+					return
+				}
+
+				org, err := api.GetDefaultOrganization()
+				if err != nil {
+					output.Warnf("Failed to get default organization for profile %s: %s", profile.Name, err.Error())
+					return
+				}
+
+				out, err := json.Marshal(org)
+				if err != nil {
+					output.Warnf("Failed to parse organization info %s", err.Error())
+					return
+				}
+				output.Infof(string(out))
 			}
 		},
 	}
