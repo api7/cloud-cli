@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
@@ -51,7 +52,7 @@ func newViewCommand() *cobra.Command {
 					orgName     = "-"
 				)
 
-				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {
+				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken, options.Global.Verbose); err != nil {
 					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
 				} else {
 					if cluster, err := api.GetDefaultCluster(); err != nil {

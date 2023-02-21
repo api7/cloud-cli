@@ -15,13 +15,16 @@
 package cloud
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	sdk "github.com/api7/cloud-go-sdk"
+	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/consts"
@@ -30,28 +33,31 @@ import (
 
 func TestMe(t *testing.T) {
 	tests := []struct {
-		name      string
-		code      int
-		body      string
-		want      *sdk.User
-		wantErr   bool
-		errReason string
+		name            string
+		code            int
+		body            string
+		want            *sdk.User
+		wantErr         bool
+		errReason       string
+		wantOutputMatch string
 	}{
 		{
-			name:      "server internal error",
-			code:      http.StatusInternalServerError,
-			body:      "internal server error",
-			want:      nil,
-			wantErr:   true,
-			errReason: "status code: 500, message: internal server error",
+			name:            "server internal error",
+			code:            http.StatusInternalServerError,
+			body:            "internal server error",
+			want:            nil,
+			wantErr:         true,
+			errReason:       "status code: 500, message: internal server error",
+			wantOutputMatch: "Receive a response with status: 500",
 		},
 		{
-			name:      "http not found",
-			code:      http.StatusNotFound,
-			want:      nil,
-			wantErr:   true,
-			body:      `{"status": {"code": 4, "message": "not found"}, "error": "deliberated not found"}`,
-			errReason: "status code: 404, error code: 4, error reason: not found, details: deliberated not found",
+			name:            "http not found",
+			code:            http.StatusNotFound,
+			want:            nil,
+			wantErr:         true,
+			body:            `{"status": {"code": 4, "message": "not found"}, "error": "deliberated not found"}`,
+			errReason:       "status code: 404, error code: 4, error reason: not found, details: deliberated not found",
+			wantOutputMatch: `Receive a response body: {"status": {"code": 4, "message": "not found"}, "error": "deliberated not found"}`,
 		},
 		{
 			name:      "malformed json",
@@ -102,6 +108,8 @@ func TestMe(t *testing.T) {
 			wantErr: false,
 		},
 	}
+	buf := bytes.NewBufferString("")
+	color.Output = buf
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			options.Global.Verbose = true
@@ -119,7 +127,7 @@ func TestMe(t *testing.T) {
 
 			defer server.Close()
 
-			api, err := newClient(server.URL, "test-token")
+			api, err := newClient(server.URL, "test-token", options.Global.Verbose)
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.Me()
@@ -129,6 +137,13 @@ func TestMe(t *testing.T) {
 			} else {
 				assert.NoError(t, err, "checking error")
 				assert.Equal(t, tt.want, result, "checking result")
+			}
+
+			// waiting to receive trace output from chan
+			if tt.wantOutputMatch != "" {
+				time.Sleep(1 * time.Second)
+				assert.Contains(t, buf.String(), tt.wantOutputMatch, "checking output")
+				buf.Reset()
 			}
 		})
 	}
@@ -215,7 +230,7 @@ func TestClusters(t *testing.T) {
 
 			defer server.Close()
 
-			api, err := newClient(server.URL, "test-token")
+			api, err := newClient(server.URL, "test-token", false)
 			assert.NoError(t, err, "checking new cloud api client")
 
 			result, err := api.ListClusters(tt.orgID)
@@ -286,7 +301,7 @@ func TestGetTLSBundle(t *testing.T) {
 
 			defer server.Close()
 
-			api, err := newClient(server.URL, "test-token")
+			api, err := newClient(server.URL, "test-token", false)
 			assert.NoError(t, err, "checking new cloud api client")
 
 			bundle, err := api.GetTLSBundle(tt.clusterID)
@@ -336,7 +351,7 @@ func TestGetCloudLuaModule(t *testing.T) {
 			err := os.Setenv(consts.Api7CloudLuaModuleURL, server.URL+"/")
 			assert.NoError(t, err, "checking env setup")
 
-			api, err := newClient(server.URL, "test-token")
+			api, err := newClient(server.URL, "test-token", false)
 			assert.NoError(t, err, "checking new cloud api client")
 
 			data, err := api.GetCloudLuaModule()
@@ -420,7 +435,7 @@ func TestGetStartupConfig(t *testing.T) {
 
 			defer server.Close()
 
-			api, err := newClient(server.URL, "test-token")
+			api, err := newClient(server.URL, "test-token", false)
 			assert.NoError(t, err, "checking new cloud api client")
 
 			data, err := api.GetStartupConfig(1, tc.configType)

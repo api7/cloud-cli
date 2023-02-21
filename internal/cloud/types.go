@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/consts"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
@@ -31,11 +32,11 @@ var (
 )
 
 // InitDefaultClient initializes the default client with the given configuration
-func InitDefaultClient(cloudAddr, accessToken string) (err error) {
+func InitDefaultClient(cloudAddr, accessToken string, trace bool) (err error) {
 	if DefaultClient != nil {
 		return nil
 	}
-	DefaultClient, err = newClient(cloudAddr, accessToken)
+	DefaultClient, err = newClient(cloudAddr, accessToken, trace)
 	return
 }
 
@@ -94,7 +95,7 @@ var (
 )
 
 // newClient returns a new API7 Cloud API Client
-func newClient(cloudAddr, accessToken string) (API, error) {
+func newClient(cloudAddr, accessToken string, trace bool) (API, error) {
 	u, err := url.Parse(cloudAddr)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse API7 Cloud server URL")
@@ -117,12 +118,17 @@ func newClient(cloudAddr, accessToken string) (API, error) {
 	}
 
 	sdk, err := cloud.NewInterface(&cloud.Options{
-		ServerAddr:  cloudAddr,
-		Token:       accessToken,
-		DialTimeout: 5 * time.Second,
+		ServerAddr:      cloudAddr,
+		Token:           accessToken,
+		DialTimeout:     5 * time.Second,
+		EnableHTTPTrace: trace,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "initialize cloud go sdk")
+	}
+
+	if trace {
+		go utils.VerboseGoroutine(sdk.TraceChan())
 	}
 
 	return &api{

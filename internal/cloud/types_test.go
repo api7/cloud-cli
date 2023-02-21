@@ -48,7 +48,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			a, err := newClient(tt.apiServer, "access-token")
+			a, err := newClient(tt.apiServer, "access-token", false)
 			if tt.wantErr {
 				assert.Error(t, err, "checking error")
 				assert.Equal(t, tt.errorReason, err.Error(), "checking error reason")
