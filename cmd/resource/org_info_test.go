@@ -69,7 +69,7 @@ func TestResourceOrgInfo(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 			api := cloud.NewMockAPI(ctrl)
-			cloud.NewClient = func(_ string, _ string) (cloud.API, error) {
+			cloud.NewClient = func(_ string, _ string, _ bool) (cloud.API, error) {
 				return api, nil
 			}
 			if os.Getenv("GO_TEST_SUBPROCESS") == "1" {

@@ -43,7 +43,7 @@ func newOrgInfoCommand() *cobra.Command {
 
 			for _, profile := range config.Profiles {
 
-				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken); err != nil {
+				if api, err := cloud.NewClient(profile.Address, profile.User.AccessToken, false); err != nil {
 					output.Warnf("Failed to create API7 Cloud client for profile %s: %s", profile.Name, err.Error())
 				} else {
 					if org, err := api.GetDefaultOrganization(); err != nil {
