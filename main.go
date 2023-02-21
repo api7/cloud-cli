@@ -15,6 +15,7 @@
 package main
 
 import (
+	"github.com/api7/cloud-cli/cmd/resource"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -42,6 +43,7 @@ func newCommand() *cobra.Command {
 	cmd.AddCommand(stop.NewStopCommand())
 	cmd.AddCommand(debug.NewCommand())
 	cmd.AddCommand(config.NewCommand())
+	cmd.AddCommand(resource.NewCommand())
 
 	return cmd
 }

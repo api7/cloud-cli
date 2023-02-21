@@ -21,7 +21,7 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-// NewCommand creates the config sub-command object.
+// NewCommand creates the resource sub-command object.
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "resource [COMMAND] [ARGS...]",

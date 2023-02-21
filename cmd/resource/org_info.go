@@ -16,6 +16,7 @@ package resource
 
 import (
 	"encoding/json"
+
 	"github.com/spf13/cobra"
 
 	"github.com/api7/cloud-cli/internal/cloud"
@@ -25,7 +26,7 @@ import (
 
 func newOrgInfoCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "resource",
+		Use:     "org-info",
 		Short:   "Show the resource details by the Cloud CLI",
 		Example: `cloud-cli resource org-info`,
 		PreRun: func(cmd *cobra.Command, args []string) {
@@ -51,6 +52,7 @@ func newOrgInfoCommand() *cobra.Command {
 						out, err := json.Marshal(org)
 						if err != nil {
 							output.Warnf("Failed to parse organization info %s", err.Error())
+							return
 						}
 						output.Infof(string(out))
 					}
