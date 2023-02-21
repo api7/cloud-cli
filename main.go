@@ -15,7 +15,6 @@
 package main
 
 import (
-	"github.com/api7/cloud-cli/cmd/resource"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -24,6 +23,7 @@ import (
 	"github.com/api7/cloud-cli/cmd/configure"
 	"github.com/api7/cloud-cli/cmd/debug"
 	"github.com/api7/cloud-cli/cmd/deploy"
+	"github.com/api7/cloud-cli/cmd/resource"
 	"github.com/api7/cloud-cli/cmd/stop"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/utils"
