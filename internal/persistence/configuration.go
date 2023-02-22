@@ -104,7 +104,7 @@ func CheckConfigurationAndInitCloudClient() error {
 		return fmt.Errorf("Failed to get %s profile, Please check your configuration file: %s", profileName, configDir)
 	}
 
-	if err := cloud.InitDefaultClient(profile.Address, profile.User.AccessToken); err != nil {
+	if err := cloud.InitDefaultClient(profile.Address, profile.User.AccessToken, options.Global.Verbose); err != nil {
 		return fmt.Errorf("Failed to init api7 cloud client: %s", err)
 	}
 	return nil

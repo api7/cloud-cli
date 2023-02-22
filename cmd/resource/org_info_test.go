@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package resource
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -30,7 +29,7 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-func TestConfigView(t *testing.T) {
+func TestResourceOrgInfo(t *testing.T) {
 	testCases := []struct {
 		name      string
 		config    *persistence.CloudConfiguration
@@ -39,7 +38,7 @@ func TestConfigView(t *testing.T) {
 		outputs   []string
 	}{
 		{
-			name: "one profile with default output format",
+			name: "get default org info",
 			config: &persistence.CloudConfiguration{
 				DefaultProfile: "prod",
 				Profiles: []persistence.Profile{
@@ -52,71 +51,14 @@ func TestConfigView(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"view"},
+			args: []string{"org-info"},
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultOrganization().Return(&sdk.Organization{
 					ID:   123,
 					Name: "API7.AI",
 				}, nil)
-				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
-					ID:   456,
-					Name: "default",
-				}, nil)
 			},
-			outputs: []string{`
-+--------------+--------------+---------+------------+----------------------+
-| PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
-+--------------+--------------+---------+------------+----------------------+
-| prod         | API7.AI      | default | true       | https://prod.api7.ai |
-+--------------+--------------+---------+------------+----------------------+
-				`},
-		},
-		{
-			name: "two profiles with one bad profile",
-			config: &persistence.CloudConfiguration{
-				DefaultProfile: "prod",
-				Profiles: []persistence.Profile{
-					{
-						Name:    "prod",
-						Address: "https://prod.api7.ai",
-						User: persistence.User{
-							AccessToken: "prod-token",
-						},
-					},
-					{
-						Name:    "dev",
-						Address: "https://dev.api7.ai",
-						User: persistence.User{
-							AccessToken: "dev-token",
-						},
-					},
-				},
-			},
-			args: []string{"view"},
-			mockCloud: func(api *cloud.MockAPI) {
-				api.EXPECT().GetDefaultOrganization().Return(nil, errors.New("organization not found"))
-				api.EXPECT().GetDefaultCluster().Return(nil, errors.New("cluster not found"))
-				api.EXPECT().GetDefaultOrganization().Return(&sdk.Organization{
-					ID:   321,
-					Name: "APACHE",
-				}, nil)
-				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
-					ID:   654,
-					Name: "default",
-				}, nil)
-			},
-			outputs: []string{`
-
-+--------------+--------------+---------+------------+----------------------+
-| PROFILE NAME | ORGANIZATION | CLUSTER | IS DEFAULT |  API7 CLOUD ADDRESS  |
-+--------------+--------------+---------+------------+----------------------+
-| prod         | -            | -       | true       | https://prod.api7.ai |
-| dev          | APACHE       | default | false      | https://dev.api7.ai  |
-+--------------+--------------+---------+------------+----------------------+
-			`,
-				"WARNING: Failed to get default cluster for profile prod: cluster not found",
-				"WARNING: Failed to get default organization for profile prod: organization not found",
-			},
+			outputs: []string{`{"id":"123","name":"API7.AI","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z","plan_id":"0","plan_expire_time":"0001-01-01T00:00:00Z","subscription_started_at":null,"owner_id":""}`},
 		},
 	}
 	for _, tc := range testCases {
@@ -146,6 +88,7 @@ func TestConfigView(t *testing.T) {
 
 			output, _ := cmd.CombinedOutput()
 
+			fmt.Println(string(output))
 			for _, o := range tc.outputs {
 				assert.Contains(t, string(output), strings.TrimSpace(o), "check output")
 			}
