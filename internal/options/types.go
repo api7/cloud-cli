@@ -39,8 +39,8 @@ type Options struct {
 	Stop StopOptions
 	// Debug contains the options for the debug command.
 	Debug DebugOptions
-	// List contains the options for the list command.
-	List ListOptions
+	// Resource contains the options for the resource command.
+	Resource ResourceOptions
 	// Configure contains the options for the configure command.
 	Configure ConfigureOptions
 }
@@ -182,15 +182,30 @@ type ConfigureOptions struct {
 	AccessToken string
 }
 
-type ListOptions struct {
-	// Clusters specifies that the resources in the Clusters are obtained.
-	Clusters ListClustersOption
+type ResourceOptions struct {
+	// List specifies that list the resource.
+	List ListOption
 }
 
-// ListClustersOption contains options for `cloud-cli list cluster` command.
-type ListClustersOption struct {
+// ListOption contains options for `cloud-cli resource list` command.
+type ListOption struct {
+	// Specify the kind of resource
+	Kind string
 	// Specify the amount of data to be listed
-	Count int
+	Limit int
 	// Specifies how much data to skip ahead
 	Skip int
+}
+
+// Validate validates the docker deploy options.
+func (o *ListOption) Validate() error {
+	if o.Limit <= 0 {
+		return errors.New("invalid limit number")
+	}
+
+	if o.Skip < 0 {
+		return errors.New("invalid skip number")
+	}
+
+	return nil
 }

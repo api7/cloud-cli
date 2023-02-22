@@ -139,7 +139,7 @@ func (mr *MockAPIMockRecorder) GetTLSBundle(clusterID interface{}) *gomock.Call 
 }
 
 // ListClusters mocks base method.
-func (m *MockAPI) ListClusters(orgID cloud_go_sdk.ID, count int,skip int) ([]*cloud_go_sdk.Cluster, error) {
+func (m *MockAPI) ListClusters(orgID cloud_go_sdk.ID, limit int, skip int) ([]*cloud_go_sdk.Cluster, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListClusters", orgID)
 	ret0, _ := ret[0].([]*cloud_go_sdk.Cluster)

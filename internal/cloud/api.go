@@ -33,12 +33,12 @@ func (a *api) Me() (*cloud.User, error) {
 	return a.sdk.Me(context.TODO())
 }
 
-func (a *api) ListClusters(orgID cloud.ID, count int, skip int) ([]*cloud.Cluster, error) {
+func (a *api) ListClusters(orgID cloud.ID, limit int, skip int) ([]*cloud.Cluster, error) {
 	var clusters []*cloud.Cluster
-	pageSize := count
-	page := int(math.Floor(float64(skip)/float64(count))) + 1
-	start := skip % count
-	end := skip%count + count
+	pageSize := limit
+	page := int(math.Floor(float64(skip)/float64(limit))) + 1
+	start := skip % limit
+	end := skip%limit + limit
 
 	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
 		Organization: &cloud.Organization{
