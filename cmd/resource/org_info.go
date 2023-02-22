@@ -16,6 +16,7 @@ package resource
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -63,7 +64,7 @@ func newOrgInfoCommand() *cobra.Command {
 					output.Warnf("Failed to parse organization info %s", err.Error())
 					return
 				}
-				output.Infof(string(out))
+				fmt.Println(string(out))
 			}
 		},
 	}
