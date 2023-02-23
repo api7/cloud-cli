@@ -52,6 +52,10 @@ func TestResourceList(t *testing.T) {
 			},
 			args: []string{"list", "--kind", "cluster"},
 			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().Me().Return(&sdk.User{
+					Email:  "demo@api7.cloud",
+					OrgIDs: []sdk.ID{123},
+				}, nil)
 				api.EXPECT().ListClusters(sdk.ID(123)).Return([]*sdk.Cluster{
 					{
 						ID:   123,
@@ -59,7 +63,7 @@ func TestResourceList(t *testing.T) {
 					},
 				}, nil)
 			},
-			outputs: []string{`{"id":"123","name":"API7.AI","created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`},
+			outputs: []string{"[\n\t{\n\t\t\"org_id\": \"0\",\n\t\t\"region_id\": \"0\",\n\t\t\"status\": 0,\n\t\t\"domain\": \"\",\n\t\t\"settings\": {\n\t\t\t\"client_settings\": {\n\t\t\t\t\"client_real_ip\": {\n\t\t\t\t\t\"replace_from\": {},\n\t\t\t\t\t\"recursive_search\": false,\n\t\t\t\t\t\"enabled\": false\n\t\t\t\t},\n\t\t\t\t\"maximum_request_body_size\": 0\n\t\t\t},\n\t\t\t\"observability_settings\": {\n\t\t\t\t\"metrics\": {\n\t\t\t\t\t\"enabled\": false\n\t\t\t\t},\n\t\t\t\t\"show_upstream_status_in_response_header\": false,\n\t\t\t\t\"access_log_rotate\": {\n\t\t\t\t\t\"enabled\": false,\n\t\t\t\t\t\"enable_compression\": false\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"api_proxy_settings\": {\n\t\t\t\t\"enable_request_buffering\": false,\n\t\t\t\t\"url_handling_options\": null\n\t\t\t}\n\t\t},\n\t\t\"config_version\": 0,\n\t\t\"id\": \"123\",\n\t\t\"name\": \"API7.AI\",\n\t\t\"created_at\": \"0001-01-01T00:00:00Z\",\n\t\t\"updated_at\": \"0001-01-01T00:00:00Z\"\n\t}\n]"},
 		},
 	}
 	for _, tc := range testCases {
@@ -77,6 +81,7 @@ func TestResourceList(t *testing.T) {
 				if tc.mockCloud != nil {
 					tc.mockCloud(api)
 				}
+				cloud.DefaultClient = api
 				cmd := NewCommand()
 				cmd.SetArgs(tc.args)
 				err := cmd.Execute()
