@@ -65,7 +65,7 @@ type API interface {
 	// Me returns the current user information
 	Me() (*cloud.User, error)
 	// ListClusters returns the list of clusters in organization
-	ListClusters(orgID cloud.ID) ([]*cloud.Cluster, error)
+	ListClusters(orgID cloud.ID, limit int, skip int) ([]*cloud.Cluster, error)
 	// GetTLSBundle gets the tls bundle used to communicate with API7 Cloud. returns the cluster with the given ID
 	GetTLSBundle(clusterID cloud.ID) (*cloud.TLSBundle, error)
 	// GetCloudLuaModule returns the Cloud Lua code (in the tar.gz format)

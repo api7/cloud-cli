@@ -233,7 +233,7 @@ func TestClusters(t *testing.T) {
 			api, err := newClient(server.URL, "test-token", false)
 			assert.NoError(t, err, "checking new cloud api client")
 
-			result, err := api.ListClusters(tt.orgID)
+			result, err := api.ListClusters(tt.orgID, 10, 1)
 
 			if tt.wantErr {
 				assert.Contains(t, err.Error(), tt.errReason, "checking error reason")

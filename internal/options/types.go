@@ -39,6 +39,8 @@ type Options struct {
 	Stop StopOptions
 	// Debug contains the options for the debug command.
 	Debug DebugOptions
+	// Resource contains the options for the resource command.
+	Resource ResourceOptions
 	// Configure contains the options for the configure command.
 	Configure ConfigureOptions
 }
@@ -178,4 +180,32 @@ type ConfigureOptions struct {
 	Default bool
 	// AccessToken is the access token of the API7 Cloud server.
 	AccessToken string
+}
+
+type ResourceOptions struct {
+	// List specifies that list the resource.
+	List ListOption
+}
+
+// ListOption contains options for `cloud-cli resource list` command.
+type ListOption struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the amount of data to be listed
+	Limit int
+	// Specifies how much data to skip ahead
+	Skip int
+}
+
+// Validate validates the docker deploy options.
+func (o *ListOption) Validate() error {
+	if o.Limit <= 0 {
+		return errors.New("invalid limit number")
+	}
+
+	if o.Skip < 0 {
+		return errors.New("invalid skip number")
+	}
+
+	return nil
 }

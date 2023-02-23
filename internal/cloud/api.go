@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -32,12 +33,20 @@ func (a *api) Me() (*cloud.User, error) {
 	return a.sdk.Me(context.TODO())
 }
 
-func (a *api) ListClusters(orgID cloud.ID) ([]*cloud.Cluster, error) {
+func (a *api) ListClusters(orgID cloud.ID, limit int, skip int) ([]*cloud.Cluster, error) {
 	var clusters []*cloud.Cluster
+	pageSize := limit
+	page := int(math.Floor(float64(skip)/float64(limit))) + 1
+	start := skip % limit
+	end := skip%limit + limit
 
 	iter, err := a.sdk.ListClusters(context.TODO(), &cloud.ResourceListOptions{
 		Organization: &cloud.Organization{
 			ID: orgID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     page,
+			PageSize: pageSize,
 		},
 	})
 	if err != nil {
@@ -49,9 +58,13 @@ func (a *api) ListClusters(orgID cloud.ID) ([]*cloud.Cluster, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get next cluster")
 		}
-		if cluster == nil {
-			return clusters, nil
+		if cluster == nil || len(clusters) == end {
+			if len(clusters) <= start {
+				return clusters, nil
+			}
+			return clusters[start:], nil
 		}
+
 		clusters = append(clusters, cluster)
 	}
 }
