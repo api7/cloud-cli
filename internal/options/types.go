@@ -185,6 +185,8 @@ type ConfigureOptions struct {
 type ResourceOptions struct {
 	// List specifies that list the resource.
 	List ListOption
+	// Get specifies resource.
+	Get GetOption
 }
 
 // ListOption contains options for `cloud-cli resource list` command.
@@ -195,6 +197,13 @@ type ListOption struct {
 	Limit int
 	// Specifies how much data to skip ahead
 	Skip int
+}
+
+type GetOption struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the ID of resource
+	ID string
 }
 
 // Validate validates the docker deploy options.

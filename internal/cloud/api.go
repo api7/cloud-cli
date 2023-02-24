@@ -144,6 +144,23 @@ func (a *api) GetDefaultCluster() (*cloud.Cluster, error) {
 	return cluster, nil
 }
 
+func (a *api) GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error) {
+	user, err := a.Me()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to access user information")
+	}
+	cluster, err := a.sdk.GetCluster(context.TODO(), clusterID, &cloud.ResourceGetOptions{
+		Organization: &cloud.Organization{
+			ID: user.OrgIDs[0],
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get cluster detail")
+	}
+
+	return cluster, nil
+}
+
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {

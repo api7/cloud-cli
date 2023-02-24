@@ -93,6 +93,21 @@ func (mr *MockAPIMockRecorder) GetDefaultCluster() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultCluster", reflect.TypeOf((*MockAPI)(nil).GetDefaultCluster))
 }
 
+// GetClusterDetail mocks base method.
+func (m *MockAPI) GetClusterDetail(clusterID cloud_go_sdk.ID) (*cloud_go_sdk.Cluster, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClusterDetail")
+	ret0, _ := ret[0].(*cloud_go_sdk.Cluster)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClusterDetail indicates an expected call of GetClusterDetail.
+func (mr *MockAPIMockRecorder) GetClusterDetail(clusterID cloud_go_sdk.ID) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClusterDetail", reflect.TypeOf((*MockAPI)(nil).GetClusterDetail))
+}
+
 // GetDefaultOrganization mocks base method.
 func (m *MockAPI) GetDefaultOrganization() (*cloud_go_sdk.Organization, error) {
 	m.ctrl.T.Helper()
