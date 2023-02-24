@@ -16,15 +16,16 @@ package resource
 
 import (
 	"fmt"
-	sdk "github.com/api7/cloud-go-sdk"
 	"os"
 	"os/exec"
 	"testing"
 
-	"github.com/api7/cloud-cli/internal/cloud"
-	"github.com/api7/cloud-cli/internal/persistence"
+	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/api7/cloud-cli/internal/cloud"
+	"github.com/api7/cloud-cli/internal/persistence"
 )
 
 func TestResourceGet(t *testing.T) {

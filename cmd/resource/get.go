@@ -17,13 +17,15 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+
+	sdk "github.com/api7/cloud-go-sdk"
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
-	sdk "github.com/api7/cloud-go-sdk"
-	"github.com/spf13/cobra"
-	"strconv"
 )
 
 func newGetCommand() *cobra.Command {
