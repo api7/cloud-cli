@@ -35,6 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(newOrgInfoCommand())
 	cmd.AddCommand(newListCommand())
+	cmd.AddCommand(newGetCommand())
 
 	return cmd
 }
