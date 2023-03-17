@@ -40,6 +40,22 @@ func PrepareCertificate(clusterID sdk.ID) error {
 
 	output.Verbosef("Downloading tls bundle from API7 Cloud")
 
+	if err := DownloadNewCertificate(clusterID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DownloadNewCertificate downloads the new TLS bundle for communicating
+// with API7 Cloud.
+// Note this function doesn't restore the old TLS bundle if the new one
+// is not saved normally on disk. Try to recall this function multiple
+// times to eliminate the corrupted TLS bundle files.
+func DownloadNewCertificate(clusterID sdk.ID) error {
+	output.Verbosef("Downloading tls bundle from API7 Cloud")
+
+	clusterTLSDir := filepath.Join(TLSDir, clusterID.String())
+
 	// Currently, only one cluster is supported for an organization.
 	bundle, err := cloud.DefaultClient.GetTLSBundle(clusterID)
 	if err != nil {
@@ -54,6 +70,7 @@ func PrepareCertificate(clusterID sdk.ID) error {
 		return errors.Wrap(err, "change tls directory permission")
 	}
 
+	certFilename := filepath.Join(clusterTLSDir, "tls.crt")
 	err = os.WriteFile(certFilename, []byte(bundle.Certificate), 0644)
 	if err != nil {
 		return errors.Wrap(err, "save certificate")

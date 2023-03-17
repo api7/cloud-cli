@@ -17,25 +17,37 @@ package config
 import (
 	"github.com/spf13/cobra"
 
+	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
-// NewCommand creates the config sub-command object.
-func NewCommand() *cobra.Command {
+func newRenewCertificateCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "config [COMMAND] [ARGS...]",
-		Short: "Configuration management",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		Use:   "renew-cert",
+		Short: "Renew the Certificate for communicating with API7 Cloud",
+		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
 			}
 		},
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := persistence.Init(); err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
+			defaultCluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+
+			if err = persistence.DownloadNewCertificate(defaultCluster.ID); err != nil {
+				output.Errorf(err.Error())
+				return
+			}
+		},
 	}
-
-	cmd.AddCommand(newViewCommand())
-	cmd.AddCommand(newSwitchCommand())
-	cmd.AddCommand(newRenewCertificateCommand())
-
 	return cmd
 }
