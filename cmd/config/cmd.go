@@ -35,6 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.AddCommand(newViewCommand())
 	cmd.AddCommand(newSwitchCommand())
+	cmd.AddCommand(newRenewCertificateCommand())
 
 	return cmd
 }
