@@ -32,6 +32,7 @@ if [[ -z ${installed_version} ]]; then
 fi
 
 # copy certs to apisix directory to avoid permission issue
+rm -rf ${apisix_home}/conf/ssl
 cp -prf {{ .TLSDir }} ${apisix_home}/conf/ssl
 
 if [[ -n ${instance_id} ]]; then
