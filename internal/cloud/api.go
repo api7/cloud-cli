@@ -16,7 +16,6 @@ package cloud
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"math"
 	"net/http"
@@ -180,8 +179,6 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 		return nil, err
 	}
 	output.Verbosef("Sending request:\n%s", requestDump)
-
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.accessToken))
 
 	return request, nil
 }
