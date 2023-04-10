@@ -101,7 +101,7 @@ cloud-cli deploy kubernetes \
 			{
 				helm = commands.New(ctx.KubernetesOpts.HelmCLIPath, options.Global.DryRun)
 				helm.AppendArgs("install", options.Global.Deploy.Name, "apisix/apisix")
-				helm.AppendArgs("--namespace", ctx.KubernetesOpts.NameSpace)
+				helm.AppendArgs("--namespace", ctx.KubernetesOpts.Namespace)
 
 				var customizeValues string
 				for _, args := range ctx.KubernetesOpts.HelmInstallArgs {
@@ -136,12 +136,13 @@ cloud-cli deploy kubernetes \
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.NameSpace, "namespace", "apisix", "Specify the Kubernetes name space")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.Namespace, "namespace", "apisix", "Specify the Kubernetes name space")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.APISIXImage, "apisix-image", "apache/apisix:2.15.0-centos", "Specify the Apache APISIX image")
 	cmd.PersistentFlags().UintVar(&options.Global.Deploy.Kubernetes.ReplicaCount, "replica-count", 1, "Specify the pod replica count")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Kubernetes.HelmInstallArgs, "helm-install-arg", []string{}, "Specify the arguments (in the format of name=value, e.g. --set=apisix.image.tag=2.15.0-centos) for the helm install command")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.KubectlCLIPath, "kubectl-cli-path", "", "Specify the filepath of the kubectl command")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.HelmCLIPath, "helm-cli-path", "", "Specify the filepath of the helm command")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Kubernetes.LocalCachePVC, "local-cache-pvc", "", "Specify the name of the PVC for local configuration cache")
 
 	return cmd
 }
