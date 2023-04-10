@@ -92,6 +92,20 @@ During the deployment, Cloud CLI has to download the [Cloud Lua Module](https://
 export API7_CLOUD_LUA_MODULE_URL=https://api7-cloud-1301662268.cos.ap-nanjing.myqcloud.com/latest/assets/cloud_module_beta.tar.gz
 ```
 
+### Persistent Local Configuration Cache
+
+Apache APISIX will save the configuration to the local file (`/usr/local/apisix/conf/apisix.data`), however, this
+file will disappear if the container is removed. To avoid this, you can mount a host file to the container with the `--local-cache-bind-path` option.
+
+```shell
+cloud-cli deploy docker \
+--apisix-image apache/apisix:2.15.0-centos \
+--name my-apisix \
+--local-cache-bind-path /path/to/apisix.data
+```
+
+Now the local configuration cache will be saved to the host file `/path/to/apisix.data`. 
+
 Stop Instance
 -------------
 

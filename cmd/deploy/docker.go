@@ -97,6 +97,10 @@ cloud-cli deploy docker \
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.tlsDir+",target=/cloud/tls,readonly")
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.apisixIDFile+",target=/usr/local/apisix/conf/apisix.uid,readonly")
 
+			if options.Global.Deploy.Docker.LocalCacheBindPath != "" {
+				docker.AppendArgs("--mount", "type=bind,source="+options.Global.Deploy.Docker.LocalCacheBindPath+",target=/usr/local/apisix/conf/apisix.data")
+			}
+
 			// TODO support customization of the HTTP and HTTPS ports.
 			docker.AppendArgs("-p", fmt.Sprintf("%d:9080", options.Global.Deploy.Docker.HTTPHostPort))
 			docker.AppendArgs("-p", fmt.Sprintf("%d:9443", options.Global.Deploy.Docker.HTTPSHostPort))
@@ -151,6 +155,7 @@ cloud-cli deploy docker \
 	cmd.PersistentFlags().IntVar(&options.Global.Deploy.Docker.HTTPSHostPort, "https-host-port", 9443, "Specify the host port for HTTPS")
 	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.DockerCLIPath, "docker-cli-path", "", "Specify the filepath of the docker command")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Deploy.Docker.DockerRunArgs, "docker-run-arg", []string{}, "Specify the arguments (in the format of name=value, e.g. --mount=type=bind,source=/etc/hosts,target=/etc/hosts,readonly) for the docker run command")
+	cmd.PersistentFlags().StringVar(&options.Global.Deploy.Docker.LocalCacheBindPath, "local-cache-bind-path", "", "Specify the path to bind to the local cache directory in the container")
 
 	return cmd
 }

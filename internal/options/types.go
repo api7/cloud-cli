@@ -77,6 +77,9 @@ type DockerDeployOptions struct {
 	HTTPHostPort int
 	// Specify the host port for HTTPS
 	HTTPSHostPort int
+	// Specify the filesystem path of the host directory to mount into the container for
+	// saving the APISIX local configuration cache.
+	LocalCacheBindPath string
 }
 
 // Validate validates the docker deploy options.
