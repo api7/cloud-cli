@@ -100,6 +100,24 @@ to check the status of your APISIX cluster.
 Besides, you can go into the Kubernetes and access APISIX cluster through by
 service or pods.
 
+### Persistent APISIX Local Cache
+
+Apache APISIX will save the configuration to the local file (`/usr/local/apisix/conf/apisix.data`), however, this
+file will disappear if the container is removed. To avoid this, you can mount the cache file to a persistent volume with
+the `--local-cache-pvc` option.
+
+```shell
+cloud-cli deploy kubernetes \
+  --name my-apisix \
+  --namespace apisix \
+  --replica-count 1 \
+  --apisix-image apache/apisix:2.15.0-centos \
+  --local-cache-pvc apisix-cache-pvc \
+  --helm-install-arg --output=table
+```
+
+Note you need to create the persistent volume claim `apisix-cache-pvc` before you run the command.
+
 ### Cloud Lua Module Mirror
 
 During the deployment, Cloud CLI has to download the [Cloud Lua Module](https://api7.cloud/docs/overview/how-apisix-connects-to-api7-cloud#the-api7-cloud-lua-module)

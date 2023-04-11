@@ -582,7 +582,7 @@ etcd:
 				Verbose: true,
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
-						NameSpace:    "apisix",
+						Namespace:    "apisix",
 						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},
@@ -622,7 +622,7 @@ etcd:
 				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
-					NameSpace:    "apisix",
+					Namespace:    "apisix",
 					APISIXImage:  "apache/apisix:2.15.0-centos",
 					ReplicaCount: 1,
 				},
@@ -632,7 +632,7 @@ etcd:
 				Verbose: true,
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
-						NameSpace:    "apisix",
+						Namespace:    "apisix",
 						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},
@@ -667,7 +667,7 @@ etcd:
 				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
-					NameSpace:    "apisix",
+					Namespace:    "apisix",
 					APISIXImage:  "apache/apisix:2.15.0-centos",
 					ReplicaCount: 1,
 				},
@@ -677,7 +677,7 @@ etcd:
 				Verbose: true,
 				Deploy: options.DeployOptions{
 					Kubernetes: options.KubernetesDeployOptions{
-						NameSpace:    "apisix",
+						Namespace:    "apisix",
 						APISIXImage:  "apache/apisix:2.15.0-centos",
 						ReplicaCount: 1,
 					},

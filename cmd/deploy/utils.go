@@ -59,6 +59,7 @@ type helmConfig struct {
 	ImageRepository string
 	ImageTag        string
 	ReplicaCount    uint
+	LocalCachePVC   string
 }
 
 func getEssentialConfigTpl(ctx *deployContext, configType cloud.StartupConfigType) (*template.Template, error) {
@@ -205,6 +206,7 @@ func deployPreRunForKubernetes(ctx *deployContext, kubectl commands.Cmd) error {
 		ImageRepository: ctx.KubernetesOpts.APISIXImageRepo,
 		ImageTag:        ctx.KubernetesOpts.APISIXImageTag,
 		ReplicaCount:    ctx.KubernetesOpts.ReplicaCount,
+		LocalCachePVC:   ctx.KubernetesOpts.LocalCachePVC,
 	}); err != nil {
 		return fmt.Errorf("Failed to execute helm essential config template: %s", err.Error())
 	}
@@ -236,7 +238,7 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.crt=%s", filepath.Join(ctx.tlsDir, "tls.crt")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("tls.key=%s", filepath.Join(ctx.tlsDir, "tls.key")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("ca.crt=%s", filepath.Join(ctx.tlsDir, "ca.crt")))
-		kubectl.AppendArgs("--namespace", opts.NameSpace)
+		kubectl.AppendArgs("--namespace", opts.Namespace)
 	case types.ConfigMap:
 		kubectl.AppendArgs("create", "configmap", consts.DefaultConfigMapName)
 		// TODO: dynamic list files in cloud lua module instead of hard code maybe better
@@ -249,9 +251,9 @@ func createOnKubernetes(ctx *deployContext, k types.K8sResourceKind, kubectl com
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("apisix-core-config-etcd.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "apisix/core/config_etcd.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("apisix-cli-etcd.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "apisix/cli/etcd.ljbc")))
 		kubectl.AppendArgs("--from-file", fmt.Sprintf("apisix-cli-local-storage.ljbc=%s", filepath.Join(ctx.cloudLuaModuleDir, "apisix/cli/local_storage.ljbc")))
-		kubectl.AppendArgs("--namespace", opts.NameSpace)
+		kubectl.AppendArgs("--namespace", opts.Namespace)
 	case types.Namespace:
-		kubectl.AppendArgs("create", "ns", opts.NameSpace)
+		kubectl.AppendArgs("create", "ns", opts.Namespace)
 	default:
 		panic(fmt.Sprintf("invaild kind: %d", k))
 	}

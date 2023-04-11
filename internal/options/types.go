@@ -97,8 +97,8 @@ func (o *DockerDeployOptions) Validate() error {
 
 // KubernetesDeployOptions contains options for the kubectl or helm command.
 type KubernetesDeployOptions struct {
-	// NameSpace is the name space of kubernetes
-	NameSpace string
+	// Namespace is the name space of kubernetes
+	Namespace string
 	// APISIXImage is the name of the APISIX image to deploy.
 	APISIXImage string `validate:"image"`
 	// APISIXImageRepo is the APISIXImage name
@@ -113,6 +113,8 @@ type KubernetesDeployOptions struct {
 	KubectlCLIPath string
 	// HelmCLIPath is the filepath of the helm command.
 	HelmCLIPath string
+	// LocalCachePVC is the PVC for saving the local configuration cache.
+	LocalCachePVC string
 }
 
 // StopOptions contains options for the stop command.

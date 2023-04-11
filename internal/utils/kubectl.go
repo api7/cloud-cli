@@ -28,7 +28,7 @@ import (
 // GetDeploymentName get the deploy name for APISIX instance
 func GetDeploymentName(kubectl commands.Cmd) (string, error) {
 	deployOpts := options.Global.Deploy
-	kubectl.AppendArgs("get", "deployment", "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("get", "deployment", "-n", deployOpts.Kubernetes.Namespace)
 	kubectl.AppendArgs("-l", fmt.Sprintf("app.kubernetes.io/instance=%s", deployOpts.Name))
 	kubectl.AppendArgs("-o", "jsonpath=\"{.items[0].metadata.name}\"")
 
@@ -43,7 +43,7 @@ func GetDeploymentName(kubectl commands.Cmd) (string, error) {
 // GetPodsNames get the pod names for APISIX instance
 func GetPodsNames(kubectl commands.Cmd) ([]string, error) {
 	deployOpts := options.Global.Deploy
-	kubectl.AppendArgs("get", "pods", "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("get", "pods", "-n", deployOpts.Kubernetes.Namespace)
 	kubectl.AppendArgs("-l", fmt.Sprintf("app.kubernetes.io/instance=%s", deployOpts.Name))
 	kubectl.AppendArgs("-o", "jsonpath=\"{.items[*].metadata.name}\"")
 	stdout, err := runKubectl(kubectl)
@@ -61,12 +61,12 @@ func GetAPISIXID(kubectl commands.Cmd, podName string) (string, error) {
 	deployOpts := options.Global.Deploy
 
 	kubectl.AppendArgs("wait", "--for", "condition=Ready", "--timeout", "60s")
-	kubectl.AppendArgs(fmt.Sprintf("pod/%s", podName), "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs(fmt.Sprintf("pod/%s", podName), "-n", deployOpts.Kubernetes.Namespace)
 	if _, err := runKubectl(kubectl); err != nil {
 		return "", err
 	}
 
-	kubectl.AppendArgs("exec", podName, "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("exec", podName, "-n", deployOpts.Kubernetes.Namespace)
 	kubectl.AppendArgs("--", "cat", "/usr/local/apisix/conf/apisix.uid")
 
 	stdout, err := runKubectl(kubectl)
@@ -80,7 +80,7 @@ func GetAPISIXID(kubectl commands.Cmd, podName string) (string, error) {
 // GetServiceName get the service name for APISIX instance
 func GetServiceName(kubectl commands.Cmd) (string, error) {
 	deployOpts := options.Global.Deploy
-	kubectl.AppendArgs("get", "service", "-n", deployOpts.Kubernetes.NameSpace)
+	kubectl.AppendArgs("get", "service", "-n", deployOpts.Kubernetes.Namespace)
 	kubectl.AppendArgs("-l", fmt.Sprintf("app.kubernetes.io/instance=%s", deployOpts.Name))
 	kubectl.AppendArgs("-o", "jsonpath=\"{.items[0].metadata.name}\"")
 
