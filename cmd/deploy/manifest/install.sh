@@ -34,6 +34,8 @@ fi
 # copy certs to apisix directory to avoid permission issue
 rm -rf ${apisix_home}/conf/ssl
 cp -prf {{ .TLSDir }} ${apisix_home}/conf/ssl
+cp -prf {{ .CloudModuleDir }}/apisix/cli/etcd.ljbc ${apisix_home}/apisix/cli/etcd.lua
+cp -prf {{ .CloudModuleDir }}/apisix/cli/local_storage.ljbc ${apisix_home}/apisix/cli/local_storage.lua
 
 if [[ -n ${instance_id} ]]; then
   echo "${instance_id}" > ${apisix_home}/conf/apisix.uid

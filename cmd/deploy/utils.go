@@ -141,15 +141,6 @@ func deployPreRunForBare(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
-
-	// Copy apisix/cli/*.lua to /usr/local/apisix/apisix/cli, as the /usr/local/apisix/apisix/cli/apisix.lua
-	// adds the /usr/local/apisix to the package.path, which has a higher priority then ~/.api7cloud/cloud_lua_module.
-	if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "etcd.ljbc"), _targetApisixCliEtcdPath); err != nil {
-		return err
-	}
-	if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "local_storage.ljbc"), _targetApisixCliLocalStoragePath); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -360,12 +351,13 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *options.BareDeployOptions, configFile string) {
 	buf := bytes.NewBuffer(nil)
 	err := _installer.Execute(buf, &installContext{
-		Upgrade:       options.Global.Deploy.Bare.Upgrade,
-		APISIXRepoURL: _apisixRepoURL,
-		TLSDir:        deployCtx.tlsDir,
-		ConfigFile:    configFile,
-		Version:       opts.APISIXVersion,
-		InstanceID:    options.Global.Deploy.APISIXInstanceID,
+		Upgrade:        options.Global.Deploy.Bare.Upgrade,
+		APISIXRepoURL:  _apisixRepoURL,
+		TLSDir:         deployCtx.tlsDir,
+		CloudModuleDir: deployCtx.cloudLuaModuleDir,
+		ConfigFile:     configFile,
+		Version:        opts.APISIXVersion,
+		InstanceID:     options.Global.Deploy.APISIXInstanceID,
 	})
 	if err != nil {
 		output.Errorf(err.Error())
