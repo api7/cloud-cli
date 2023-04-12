@@ -38,12 +38,13 @@ var (
 )
 
 type installContext struct {
-	Upgrade       bool
-	APISIXRepoURL string
-	TLSDir        string
-	ConfigFile    string
-	Version       string
-	InstanceID    string
+	Upgrade        bool
+	APISIXRepoURL  string
+	TLSDir         string
+	CloudModuleDir string
+	ConfigFile     string
+	Version        string
+	InstanceID     string
 }
 
 func init() {
@@ -103,6 +104,16 @@ cloud-cli deploy bare \
 			}
 
 			if options.Global.Deploy.Bare.Reload {
+				// Copy apisix/cli/*.lua to /usr/local/apisix/apisix/cli, as the /usr/local/apisix/apisix/cli/apisix.lua
+				// adds the /usr/local/apisix to the package.path, which has a higher priority then ~/.api7cloud/cloud_lua_module.
+				if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "etcd.ljbc"), _targetApisixCliEtcdPath); err != nil {
+					output.Errorf(err.Error())
+					return
+				}
+				if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "local_storage.ljbc"), _targetApisixCliLocalStoragePath); err != nil {
+					output.Errorf(err.Error())
+					return
+				}
 				if err = apisix.Reload(context, ctx.tlsDir); err != nil {
 					output.Errorf(err.Error())
 				}

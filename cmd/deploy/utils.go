@@ -19,6 +19,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,6 +37,11 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
+)
+
+var (
+	_targetApisixCliEtcdPath         = "/usr/local/apisix/apisix/cli/etcd.lua"
+	_targetApisixCliLocalStoragePath = "/usr/local/apisix/apisix/cli/local_storage.lua"
 )
 
 type deployContext struct {
@@ -345,12 +351,13 @@ func getDockerContainerIDByName(ctx context.Context, docker commands.Cmd, name s
 func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *options.BareDeployOptions, configFile string) {
 	buf := bytes.NewBuffer(nil)
 	err := _installer.Execute(buf, &installContext{
-		Upgrade:       options.Global.Deploy.Bare.Upgrade,
-		APISIXRepoURL: _apisixRepoURL,
-		TLSDir:        deployCtx.tlsDir,
-		ConfigFile:    configFile,
-		Version:       opts.APISIXVersion,
-		InstanceID:    options.Global.Deploy.APISIXInstanceID,
+		Upgrade:        options.Global.Deploy.Bare.Upgrade,
+		APISIXRepoURL:  _apisixRepoURL,
+		TLSDir:         deployCtx.tlsDir,
+		CloudModuleDir: deployCtx.cloudLuaModuleDir,
+		ConfigFile:     configFile,
+		Version:        opts.APISIXVersion,
+		InstanceID:     options.Global.Deploy.APISIXInstanceID,
 	})
 	if err != nil {
 		output.Errorf(err.Error())
@@ -380,4 +387,23 @@ func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *opti
 		output.Errorf(err.Error())
 		return
 	}
+}
+
+func copyFileTo(source, target string) error {
+	s, err := os.Open(source)
+	if err != nil {
+		return errors.Wrap(err, "open source file")
+	}
+	defer s.Close()
+	t, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return errors.Wrap(err, "open target file")
+	}
+	defer t.Close()
+
+	_, err = io.Copy(t, s)
+	if err != nil {
+		return errors.Wrap(err, "copy file")
+	}
+	return nil
 }

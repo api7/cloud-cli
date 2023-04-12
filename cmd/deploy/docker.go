@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -96,6 +97,17 @@ cloud-cli deploy docker \
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.cloudLuaModuleDir+",target=/cloud_lua_module,readonly")
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.tlsDir+",target=/cloud/tls,readonly")
 			docker.AppendArgs("--mount", "type=bind,source="+ctx.apisixIDFile+",target=/usr/local/apisix/conf/apisix.uid,readonly")
+			// For cloud_lua_module/apisix/cli/*.lua, we have to mount them to the /usr/local/apisix/apisix/cli/ directory. Or
+			// they cannot be loaded as the /usr/local/apisix/apisix/cli/apisix.lua puts /usr/local/apisix as the first item
+			// in package.path.
+			{
+				sourcePath := filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "etcd.ljbc")
+				docker.AppendArgs("--mount", "type=bind,source="+sourcePath+",target=/usr/local/apisix/apisix/cli/etcd.lua,readonly")
+			}
+			{
+				sourcePath := filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "local_storage.ljbc")
+				docker.AppendArgs("--mount", "type=bind,source="+sourcePath+",target=/usr/local/apisix/apisix/cli/local_storage.lua,readonly")
+			}
 
 			if options.Global.Deploy.Docker.LocalCacheBindPath != "" {
 				docker.AppendArgs("--mount", "type=bind,source="+options.Global.Deploy.Docker.LocalCacheBindPath+",target=/usr/local/apisix/conf/apisix.data")
