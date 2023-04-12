@@ -19,6 +19,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,6 +37,11 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 	"github.com/api7/cloud-cli/internal/types"
 	"github.com/api7/cloud-cli/internal/utils"
+)
+
+var (
+	_targetApisixCliEtcdPath         = "/usr/local/apisix/apisix/cli/etcd.lua"
+	_targetApisixCliLocalStoragePath = "/usr/local/apisix/apisix/cli/local_storage.lua"
 )
 
 type deployContext struct {
@@ -135,6 +141,15 @@ func deployPreRunForBare(ctx *deployContext) error {
 	}
 
 	ctx.essentialConfig = buf.Bytes()
+
+	// Copy apisix/cli/*.lua to /usr/local/apisix/apisix/cli, as the /usr/local/apisix/apisix/cli/apisix.lua
+	// adds the /usr/local/apisix to the package.path, which has a higher priority then ~/.api7cloud/cloud_lua_module.
+	if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "etcd.ljbc"), _targetApisixCliEtcdPath); err != nil {
+		return err
+	}
+	if err := copyFileTo(filepath.Join(ctx.cloudLuaModuleDir, "apisix", "cli", "local_storage.ljbc"), _targetApisixCliLocalStoragePath); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -380,4 +395,23 @@ func deployOnBareMetal(ctx context.Context, deployCtx *deployContext, opts *opti
 		output.Errorf(err.Error())
 		return
 	}
+}
+
+func copyFileTo(source, target string) error {
+	s, err := os.Open(source)
+	if err != nil {
+		return errors.Wrap(err, "open source file")
+	}
+	defer s.Close()
+	t, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return errors.Wrap(err, "open target file")
+	}
+	defer t.Close()
+
+	_, err = io.Copy(t, s)
+	if err != nil {
+		return errors.Wrap(err, "copy file")
+	}
+	return nil
 }

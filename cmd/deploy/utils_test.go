@@ -19,14 +19,13 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"os"
-	"path/filepath"
-	"testing"
-
 	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"path/filepath"
+	"testing"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/commands"
@@ -105,16 +104,48 @@ func mockCloudModule(t *testing.T) []byte {
 	buffer := bytes.NewBuffer(nil)
 	gzipWriter, err := gzip.NewWriterLevel(buffer, gzip.BestCompression)
 	assert.NoError(t, err, "create gzip writer")
-	tarWriter := tar.NewWriter(gzipWriter)
-	body := "hello world"
-	hdr := &tar.Header{
-		Name: "foo.txt",
-		Size: int64(len(body)),
+	files := []struct {
+		Name, Body string
+	}{
+		{
+			Name: "cloud_lua_module_beta",
+		},
+		{
+			Name: "foo.txt",
+			Body: "hello world",
+		},
+		{
+			Name: "cloud_lua_module_beta/apisix",
+		},
+		{
+			Name: "cloud_lua_module_beta/apisix/cli",
+		},
+		{
+			Name: "cloud_lua_module_beta/apisix/cli/etcd.ljbc",
+			Body: "this is apisix.cli.etcd",
+		},
+		{
+			Name: "cloud_lua_module_beta/apisix/cli/local_storage.ljbc",
+			Body: "this is apisix.cli.local_storage",
+		},
 	}
-	err = tarWriter.WriteHeader(hdr)
-	assert.NoError(t, err, "write tar header")
-	_, err = tarWriter.Write([]byte(body))
-	assert.NoError(t, err, "write tar body")
+	tarWriter := tar.NewWriter(gzipWriter)
+	for _, file := range files {
+		hdr := &tar.Header{
+			Name: file.Name,
+			Size: int64(len(file.Body)),
+		}
+		if len(file.Body) == 0 {
+			hdr.Typeflag = tar.TypeDir
+		} else {
+			hdr.Typeflag = tar.TypeReg
+		}
+
+		err = tarWriter.WriteHeader(hdr)
+		assert.NoError(t, err, "write tar header")
+		_, err = tarWriter.Write([]byte(file.Body))
+		assert.NoError(t, err, "write tar body")
+	}
 	err = tarWriter.Flush()
 	assert.NoError(t, err, "flush tar body")
 	err = tarWriter.Close()
@@ -222,7 +253,7 @@ func TestDeployPreRunForDocker(t *testing.T) {
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud", "cloud_lua_module_beta"),
 				essentialConfig: []byte(`apisix:
   enable_admin: false
   ssl:
@@ -376,16 +407,27 @@ func TestDeployPreRunForBare(t *testing.T) {
 
 				mockClient.EXPECT().GetStartupConfig(sdk.ID(3), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-etcd-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/etcd.lua")
+					_targetApisixCliEtcdPath = file.Name()
+				}
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-local-storage-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/local_storage.lua")
+					_targetApisixCliLocalStoragePath = file.Name()
+				}
+
 				cloud.DefaultClient = mockClient
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud", "cloud_lua_module_beta"),
 				essentialConfig: []byte(`apisix:
   enable_admin: false
   ssl:
     ssl_trusted_certificate: /usr/local/apisix/conf/ssl/ca\.crt
   lua_module_hook: cloud
-  extra_lua_path: .*/.api7cloud/\?\.ljbc;
+  extra_lua_path: .*/.api7cloud/cloud_lua_module_beta/\?\.ljbc;
 nginx_config:
   http:
     custom_lua_shared_dict:
@@ -619,7 +661,7 @@ etcd:
 				test.kubectl = mockCmd
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud", "cloud_lua_module_beta"),
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
 					Namespace:    "apisix",
@@ -664,7 +706,7 @@ etcd:
 				test.kubectl = commands.New("kubectl", test.globalOptions.DryRun)
 			},
 			filledContext: deployContext{
-				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud"),
+				cloudLuaModuleDir: filepath.Join(os.TempDir(), ".api7cloud", "cloud_lua_module_beta"),
 				essentialConfig:   essentialConfig,
 				KubernetesOpts: &options.KubernetesDeployOptions{
 					Namespace:    "apisix",

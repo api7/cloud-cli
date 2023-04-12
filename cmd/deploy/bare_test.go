@@ -99,6 +99,17 @@ fi
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-etcd-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/etcd.lua")
+					_targetApisixCliEtcdPath = file.Name()
+				}
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-local-storage-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/local_storage.lua")
+					_targetApisixCliLocalStoragePath = file.Name()
+				}
+
 				cloud.DefaultClient = api
 			},
 		},
@@ -161,6 +172,18 @@ fi
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
 
+				{
+
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-etcd-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/etcd.lua")
+					_targetApisixCliEtcdPath = file.Name()
+				}
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-local-storage-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/local_storage.lua")
+					_targetApisixCliLocalStoragePath = file.Name()
+				}
+
 				cloud.DefaultClient = api
 			},
 		},
@@ -222,6 +245,18 @@ fi
 
 				api.EXPECT().GetCloudLuaModule().Return(mockCloudModule(t), nil)
 				api.EXPECT().GetStartupConfig(sdk.ID(12345), cloud.APISIX).Return(_apisixStartupConfigTpl, nil)
+
+				{
+
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-etcd-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/etcd.lua")
+					_targetApisixCliEtcdPath = file.Name()
+				}
+				{
+					file, err := os.CreateTemp(os.TempDir(), "apisix-cli-local-storage-*.lua")
+					assert.Nil(t, err, "create temp file path for /usr/local/apisix/apisix/cli/local_storage.lua")
+					_targetApisixCliLocalStoragePath = file.Name()
+				}
 
 				cloud.DefaultClient = api
 			},
