@@ -44,7 +44,7 @@ cloud-cli debug show-config api \
 			}
 
 			id := options.Global.Debug.ShowConfig.ID
-			if id == 0 {
+			if id == 0 && args[0] != "cluster_settings" {
 				output.Errorf("Empty resource ID, please specify --id option")
 			}
 

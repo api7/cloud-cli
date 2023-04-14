@@ -22,10 +22,11 @@ import (
 
 var (
 	_validResources = map[string]struct{}{
-		"application": {},
-		"api":         {},
-		"consumer":    {},
-		"certificate": {},
+		"application":      {},
+		"api":              {},
+		"consumer":         {},
+		"certificate":      {},
+		"cluster_settings": {},
 	}
 )
 
@@ -64,7 +65,14 @@ func (a *api) DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) 
 				ID: clusterID,
 			},
 		})
+	case "cluster_settings":
+		data, err = a.sdk.DebugClusterSettings(context.TODO(), &cloud.ResourceGetOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
 	}
+
 	if err != nil {
 		return "", err
 	}
