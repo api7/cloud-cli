@@ -395,7 +395,7 @@ func copyFileTo(source, target string) error {
 		return errors.Wrap(err, "open source file")
 	}
 	defer s.Close()
-	t, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY, 0644)
+	t, err := os.OpenFile(target, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return errors.Wrap(err, "open target file")
 	}
