@@ -161,18 +161,18 @@ func (a *api) GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error) {
 }
 
 func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error) {
-	pageSize := 25
-	startPage := skip / pageSize
-	startPageSkip := pageSize - skip%pageSize
-
 	var services []*cloud.Application
+	pageSize := limit
+	page := int(math.Floor(float64(skip)/float64(limit))) + 1
+	start := skip % limit
+	end := skip%limit + limit
 
 	iter, err := a.sdk.ListApplications(context.TODO(), &cloud.ResourceListOptions{
 		Cluster: &cloud.Cluster{
 			ID: clusterID,
 		},
 		Pagination: &cloud.Pagination{
-			Page:     startPage,
+			Page:     page,
 			PageSize: pageSize,
 		},
 	})
@@ -183,14 +183,15 @@ func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Ap
 	for {
 		service, err := iter.Next()
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to get next service")
 		}
-		if service == nil || len(services) == limit {
-			if len(services) > startPageSkip {
-				return services[startPageSkip:limit], nil
+		if service == nil || len(services) == end {
+			if len(services) <= start {
+				return services, nil
 			}
-			return services[:limit], nil
+			return services[start:], nil
 		}
+
 		services = append(services, service)
 	}
 
@@ -217,18 +218,4 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	output.Verbosef("Sending request:\n%s", requestDump)
 
 	return request, nil
-}
-
-func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error) {
-
-	service, err := a.sdk.GetApplication(context.TODO(), appID, &cloud.ResourceGetOptions{
-		Cluster: &cloud.Cluster{
-			ID: clusterID,
-		},
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get service iterator")
-	}
-
-	return service, nil
 }
