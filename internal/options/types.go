@@ -43,6 +43,8 @@ type Options struct {
 	Resource ResourceOptions
 	// Configure contains the options for the configure command.
 	Configure ConfigureOptions
+	// Service contains the options for the service command.
+	Service ServiceOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -193,6 +195,18 @@ type ResourceOptions struct {
 	// Get specifies resource.
 	Get GetOption
 }
+type ServiceOptions struct {
+	//List specifies that list the service.
+	List ListOption
+
+	Get GetOption
+
+	Delete DeleteOption
+
+	Update UpdateOption
+
+	Create CreateOption
+}
 
 // ListOption contains options for `cloud-cli resource list` command.
 type ListOption struct {
@@ -209,6 +223,27 @@ type GetOption struct {
 	Kind string
 	// Specify the ID of resource
 	ID string
+}
+
+type DeleteOption struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the ID of resource
+	ID string
+}
+
+type UpdateOption struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the config path of resource
+	Config string
+}
+
+type CreateOption struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the config path of resource
+	Config string
 }
 
 // Validate validates the docker deploy options.

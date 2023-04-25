@@ -80,6 +80,8 @@ type API interface {
 	GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
+	// ListServices return the list of services in application
+	ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error)
 }
 
 type api struct {
