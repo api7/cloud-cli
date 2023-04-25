@@ -123,6 +123,21 @@ func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultOrganization", reflect.TypeOf((*MockAPI)(nil).GetDefaultOrganization))
 }
 
+// GetService mocks base method.
+func (m *MockAPI) GetService(clusterID, appID cloud_go_sdk.ID) (*cloud_go_sdk.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetService", clusterID, appID)
+	ret0, _ := ret[0].(*cloud_go_sdk.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetService indicates an expected call of GetService.
+func (mr *MockAPIMockRecorder) GetService(clusterID, appID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetService", reflect.TypeOf((*MockAPI)(nil).GetService), clusterID, appID)
+}
+
 // GetStartupConfig mocks base method.
 func (m *MockAPI) GetStartupConfig(clusterID cloud_go_sdk.ID, configType StartupConfigType) (string, error) {
 	m.ctrl.T.Helper()

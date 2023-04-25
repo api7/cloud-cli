@@ -43,8 +43,6 @@ type Options struct {
 	Resource ResourceOptions
 	// Configure contains the options for the configure command.
 	Configure ConfigureOptions
-	// Service contains the options for the service command.
-	Service ServiceOptions
 }
 
 // DeployOptions contains options for the deploy command.
@@ -193,12 +191,6 @@ type ResourceOptions struct {
 	// List specifies that list the resource.
 	List ListOption
 	// Get specifies resource.
-	Get GetOption
-}
-type ServiceOptions struct {
-	//List specifies that list the service.
-	List ListOption
-
 	Get GetOption
 
 	Delete DeleteOption
