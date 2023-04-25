@@ -160,6 +160,19 @@ func (a *api) GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error) {
 	return cluster, nil
 }
 
+func (a *api) GetSSL(sslID cloud.ID) (*cloud.CertificateDetails, error) {
+	cluster, err := a.GetDefaultCluster()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get default cluster")
+	}
+
+	return a.sdk.GetCertificate(context.TODO(), sslID, &cloud.ResourceGetOptions{
+		Cluster: &cloud.Cluster{
+			ID: cluster.ID,
+		},
+	})
+}
+
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {

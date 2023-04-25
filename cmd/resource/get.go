@@ -28,11 +28,30 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
+var (
+	_resourceFetchHandler = map[string]func(id sdk.ID) interface{}{
+		"cluster": func(id sdk.ID) interface{} {
+			cluster, err := cloud.DefaultClient.GetClusterDetail(id)
+			if err != nil {
+				output.Errorf("Failed to get cluster detail: %s", err.Error())
+			}
+			return cluster
+		},
+		"ssl": func(id sdk.ID) interface{} {
+			ssl, err := cloud.DefaultClient.GetSSL(id)
+			if err != nil {
+				output.Errorf("Failed to get ssl detail: %s", err.Error())
+			}
+			return ssl
+		},
+	}
+)
+
 func newGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "get",
 		Short:   "get the resource detail by the Cloud CLI",
-		Example: `cloud-cli resource get [RESOURCE] [ARGS...]`,
+		Example: `cloud-cli resource get --kind ssl --id 12345`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := options.Global.Resource.List.Validate(); err != nil {
 				output.Errorf(err.Error())
@@ -46,22 +65,19 @@ func newGetCommand() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			kind := options.Global.Resource.Get.Kind
-			ID := options.Global.Resource.Get.ID
-			if kind == "cluster" {
-				uint64ID, _ := strconv.ParseUint(ID, 10, 64)
-				cluster, err := cloud.DefaultClient.GetClusterDetail(sdk.ID(uint64ID))
-				if err != nil {
-					output.Errorf("Failed to get cluster detail: %s", err.Error())
-				}
-
-				clusterDetail, _ := json.MarshalIndent(cluster, "", "\t")
-				fmt.Println(string(clusterDetail))
-				return
+			id := options.Global.Resource.Get.ID
+			handler, ok := _resourceFetchHandler[kind]
+			if !ok {
+				output.Errorf("This kind of resource is not supported")
+			} else {
+				uint64ID, _ := strconv.ParseUint(id, 10, 64)
+				resource := handler(sdk.ID(uint64ID))
+				text, _ := json.MarshalIndent(resource, "", "\t")
+				fmt.Println(string(text))
 			}
-			output.Errorf("This kind of resource is not supported")
 		},
 	}
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind (optional values can be \"cluster\", \"ssl\"")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ID, "id", "", "Specify the id of resource")
 	return cmd
 }
