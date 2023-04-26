@@ -97,3 +97,71 @@ func TestResourceGet(t *testing.T) {
 		})
 	}
 }
+func TestServiceGet(t *testing.T) {
+	testCases := []struct {
+		name      string
+		config    *persistence.CloudConfiguration
+		args      []string
+		mockCloud func(api *cloud.MockAPI)
+		outputs   []string
+	}{
+		{
+			name: "get service",
+			config: &persistence.CloudConfiguration{
+				DefaultProfile: "prod",
+				Profiles: []persistence.Profile{
+					{
+						Name:    "prod",
+						Address: "https://prod.api7.ai",
+						User: persistence.User{
+							AccessToken: "prod-token",
+						},
+					},
+				},
+			},
+			args: []string{"get", "--kind", "service", "--id", "123"},
+			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 123,
+				}, nil)
+				api.EXPECT().GetService(sdk.ID(123), sdk.ID(123)).Return(&sdk.Application{
+					ID:        123,
+					ClusterID: 123,
+				}, nil)
+			},
+			outputs: []string{"{\n\t\"name\": \"\",\n\t\"description\": \"\",\n\t\"path_prefix\": \"\",\n\t\"hosts\": null,\n\t\"upstreams\": null,\n\t\"active\": 0,\n\t\"id\": \"123\",\n\t\"cluster_id\": \"123\",\n\t\"status\": 0,\n\t\"created_at\": \"0001-01-01T00:00:00Z\",\n\t\"updated_at\": \"0001-01-01T00:00:00Z\",\n\t\"available_cert_ids\": null,\n\t\"canary_release_id\": null,\n\t\"canary_upstream_version_list\": null\n}"},
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			err := persistence.SaveConfiguration(tc.config)
+			assert.NoError(t, err, "prepare fake cloud configuration")
+
+			ctrl := gomock.NewController(t)
+			api := cloud.NewMockAPI(ctrl)
+			cloud.NewClient = func(_ string, _ string, _ bool) (cloud.API, error) {
+				return api, nil
+			}
+			if os.Getenv("GO_TEST_SUBPROCESS") == "1" {
+				if tc.mockCloud != nil {
+					tc.mockCloud(api)
+				}
+				cloud.DefaultClient = api
+				cmd := NewCommand()
+				cmd.SetArgs(tc.args)
+				err := cmd.Execute()
+				assert.NoError(t, err, "check if the command executed successfully")
+				return
+			}
+
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
+
+			output, _ := cmd.CombinedOutput()
+			for _, o := range tc.outputs {
+				assert.Contains(t, string(output), string(o), "check output")
+			}
+		})
+	}
+}
