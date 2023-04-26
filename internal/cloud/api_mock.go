@@ -1,4 +1,4 @@
-// Copyright 2023 API7.ai, Inc
+// Copyright 2022 API7.ai, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -255,4 +255,19 @@ func (m *MockAPI) Me() (*cloud_go_sdk.User, error) {
 func (mr *MockAPIMockRecorder) Me() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Me", reflect.TypeOf((*MockAPI)(nil).Me))
+}
+
+// UpdateService mocks base method.
+func (m *MockAPI) UpdateService(clusterID cloud_go_sdk.ID, config string) (*cloud_go_sdk.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateService", clusterID, config)
+	ret0, _ := ret[0].(*cloud_go_sdk.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateService indicates an expected call of UpdateService.
+func (mr *MockAPIMockRecorder) UpdateService(clusterID, config interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateService", reflect.TypeOf((*MockAPI)(nil).UpdateService), clusterID, config)
 }
