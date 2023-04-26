@@ -309,7 +309,6 @@ func (a *api) UpdateService(clusterID cloud.ID, config string) (*cloud.Applicati
 }
 
 func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error) {
-
 	service, err := a.sdk.GetApplication(context.TODO(), appID, &cloud.ResourceGetOptions{
 		Cluster: &cloud.Cluster{
 			ID: clusterID,

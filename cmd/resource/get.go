@@ -55,7 +55,7 @@ var (
 			}
 			service, err := cloud.DefaultClient.GetService(cluster.ID, id)
 			if err != nil {
-				output.Errorf("Failed to get ssl detail: %s", err.Error())
+				output.Errorf("Failed to get service: %s", err.Error())
 			}
 			return service
 		},
