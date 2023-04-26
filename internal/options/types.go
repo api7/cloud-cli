@@ -187,15 +187,15 @@ type ConfigureOptions struct {
 	AccessToken string
 }
 
+// ResourceOptions indicates the options for the resource operation.
 type ResourceOptions struct {
-	// List specifies that list the resource.
-	List ListOption
-	// Get specifies resource.
-	Get GetOption
+	List   ResourceListOptions
+	Get    ResourceGetOptions
+	Delete ResourceDeleteOption
 }
 
-// ListOption contains options for `cloud-cli resource list` command.
-type ListOption struct {
+// ResourceListOptions contains options for `cloud-cli resource list` command.
+type ResourceListOptions struct {
 	// Specify the kind of resource
 	Kind string
 	// Specify the amount of data to be listed
@@ -204,7 +204,14 @@ type ListOption struct {
 	Skip int
 }
 
-type GetOption struct {
+// ResourceDeleteOption contains options for `cloud-cli resource delete` command.
+type ResourceDeleteOption struct {
+	Kind string
+	ID   string
+}
+
+// ResourceGetOptions contains options for `cloud-cli resource get` command.
+type ResourceGetOptions struct {
 	// Specify the kind of resource
 	Kind string
 	// Specify the ID of resource
@@ -212,7 +219,7 @@ type GetOption struct {
 }
 
 // Validate validates the docker deploy options.
-func (o *ListOption) Validate() error {
+func (o *ResourceListOptions) Validate() error {
 	if o.Limit <= 0 {
 		return errors.New("invalid limit number")
 	}

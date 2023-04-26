@@ -25,7 +25,7 @@ import (
 func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "resource [COMMAND] [ARGS...]",
-		Short: "Resource management",
+		Short: "Resource management. Resource can be \"cluster\", \"ssl\"",
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			if err := persistence.CheckConfigurationAndInitCloudClient(); err != nil {
 				output.Errorf(err.Error())
@@ -36,6 +36,7 @@ func NewCommand() *cobra.Command {
 	cmd.AddCommand(newOrgInfoCommand())
 	cmd.AddCommand(newListCommand())
 	cmd.AddCommand(newGetCommand())
+	cmd.AddCommand(newDeleteCommand())
 
 	return cmd
 }

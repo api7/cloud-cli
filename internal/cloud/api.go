@@ -160,15 +160,18 @@ func (a *api) GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error) {
 	return cluster, nil
 }
 
-func (a *api) GetSSL(sslID cloud.ID) (*cloud.CertificateDetails, error) {
-	cluster, err := a.GetDefaultCluster()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get default cluster")
-	}
-
+func (a *api) GetSSL(clusterID, sslID cloud.ID) (*cloud.CertificateDetails, error) {
 	return a.sdk.GetCertificate(context.TODO(), sslID, &cloud.ResourceGetOptions{
 		Cluster: &cloud.Cluster{
-			ID: cluster.ID,
+			ID: clusterID,
+		},
+	})
+}
+
+func (a *api) DeleteSSL(clusterID, sslID cloud.ID) error {
+	return a.sdk.DeleteCertificate(context.TODO(), sslID, &cloud.ResourceDeleteOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
 		},
 	})
 }

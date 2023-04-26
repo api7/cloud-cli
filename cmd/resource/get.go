@@ -38,7 +38,11 @@ var (
 			return cluster
 		},
 		"ssl": func(id sdk.ID) interface{} {
-			ssl, err := cloud.DefaultClient.GetSSL(id)
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			ssl, err := cloud.DefaultClient.GetSSL(cluster.ID, id)
 			if err != nil {
 				output.Errorf("Failed to get ssl detail: %s", err.Error())
 			}
@@ -50,14 +54,13 @@ var (
 func newGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "get",
-		Short:   "get the resource detail by the Cloud CLI",
+		Short:   "get the resource detail by the Cloud CLI.",
 		Example: `cloud-cli resource get --kind ssl --id 12345`,
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if err := options.Global.Resource.List.Validate(); err != nil {
 				output.Errorf(err.Error())
 				return
 			}
-
 			if err := persistence.Init(); err != nil {
 				output.Errorf(err.Error())
 				return
@@ -77,7 +80,7 @@ func newGetCommand() *cobra.Command {
 			}
 		},
 	}
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind (optional values can be \"cluster\", \"ssl\"")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ID, "id", "", "Specify the id of resource")
 	return cmd
 }
