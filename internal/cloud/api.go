@@ -176,6 +176,42 @@ func (a *api) DeleteSSL(clusterID, sslID cloud.ID) error {
 	})
 }
 
+func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error) {
+	var services []*cloud.Application
+	pageSize := limit
+	page := int(math.Floor(float64(skip)/float64(limit))) + 1
+	start := skip % limit
+	end := skip%limit + limit
+
+	iter, err := a.sdk.ListApplications(context.TODO(), &cloud.ResourceListOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     page,
+			PageSize: pageSize,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list service iterator")
+	}
+
+	for {
+		service, err := iter.Next()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get next service")
+		}
+		if service == nil || len(services) == end {
+			if len(services) <= start {
+				return services, nil
+			}
+			return services[start:], nil
+		}
+
+		services = append(services, service)
+	}
+}
+
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {

@@ -51,12 +51,25 @@ func newListCommand() *cobra.Command {
 			if err != nil {
 				output.Errorf(err.Error())
 			}
+
 			if kind == "cluster" {
 				clustersList, err := cloud.DefaultClient.ListClusters(user.OrgIDs[0], limit, skip)
 				if err != nil {
 					output.Errorf("Failed to list clusters: %s", err.Error())
 				}
 				json, _ := json.MarshalIndent(clustersList, "", "\t")
+				fmt.Println(string(json))
+				return
+			} else if kind == "service" {
+				cluster, err := cloud.Client().GetDefaultCluster()
+				if err != nil {
+					output.Errorf("Failed to list services: %s", err.Error())
+				}
+				servicesList, err := cloud.DefaultClient.ListServices(cluster.ID, limit, skip)
+				if err != nil {
+					output.Errorf("Failed to list services: %s", err.Error())
+				}
+				json, _ := json.MarshalIndent(servicesList, "", "\t")
 				fmt.Println(string(json))
 				return
 			}
