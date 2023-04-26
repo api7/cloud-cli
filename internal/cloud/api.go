@@ -16,11 +16,14 @@ package cloud
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
+	"path"
 
 	"github.com/api7/cloud-go-sdk"
 	"github.com/pkg/errors"
@@ -262,6 +265,47 @@ func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Ap
 
 		services = append(services, service)
 	}
+}
+
+func (a *api) UpdateService(clusterID cloud.ID, config string) (*cloud.Application, error) {
+
+	if path.Ext(config) != ".json" {
+		return nil, errors.Errorf("failed to create,because the configuration file must be of type json")
+	}
+	file, err := os.ReadFile(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update,because config file not exist")
+	}
+
+	service := &cloud.Application{}
+	err = json.Unmarshal(file, service)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update service")
+	}
+	// This is a configuration item that must exist
+	if service.ApplicationSpec.Name == "" {
+		return nil, errors.Errorf("failed to update,because name is a must")
+	}
+	if service.ApplicationSpec.PathPrefix == "" {
+		return nil, errors.Errorf("failed to update,because path_prefix is a must")
+	}
+	if service.ApplicationSpec.Hosts == nil {
+		return nil, errors.Errorf("failed to update,because hosts is a must")
+	}
+	if service.ApplicationSpec.Upstreams == nil {
+		return nil, errors.Errorf("failed to update,because upstream is a must")
+	}
+	service, err = a.sdk.UpdateApplication(context.TODO(), service,
+		&cloud.ResourceUpdateOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update service")
+	}
+
+	return service, nil
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {

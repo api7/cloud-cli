@@ -193,6 +193,7 @@ type ResourceOptions struct {
 	Get    ResourceGetOptions
 	Delete ResourceDeleteOptions
 	Create ResourceCreateOptions
+	Update ResourceUpdateOptions
 }
 
 // ResourceCreateOptions contains options for the resource creation.
@@ -203,6 +204,14 @@ type ResourceCreateOptions struct {
 	SSL SSLCreateOptions
 	// Labels indicates a series of resource labels.
 	Labels []string
+}
+
+// ResourceUpdateOptions contains options for the resource creation.
+type ResourceUpdateOptions struct {
+	// Specify the kind of resource
+	Kind string
+	// Specify the update config.json of resource
+	Config string
 }
 
 // Validate validates the ResourceCreateOptions.
