@@ -192,12 +192,6 @@ type ResourceOptions struct {
 	List ListOption
 	// Get specifies resource.
 	Get GetOption
-
-	Delete DeleteOption
-
-	Update UpdateOption
-
-	Create CreateOption
 }
 
 // ListOption contains options for `cloud-cli resource list` command.
