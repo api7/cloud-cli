@@ -82,6 +82,8 @@ type API interface {
 	GetSSL(clusterID, sslID cloud.ID) (*cloud.CertificateDetails, error)
 	// DeleteSSL deletes the specified SSL object.
 	DeleteSSL(clusterID, sslID cloud.ID) error
+	// CreateSSL creates an SSL object according to the given spec.
+	CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 	// ListServices return the list of services in application
