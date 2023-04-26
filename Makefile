@@ -53,7 +53,7 @@ lint: codegen ## Apply go lint check
 	@golangci-lint run --timeout 10m ./...
 .PHONY: lint
 
-test: codegen ## Run the unit tests
+test: ## Run the unit tests
 	# go test run cases in different package parallel by default, but cloud cli config file is referenced by multi test cases, so we need to run them in sequence with -p=1
 	@mkdir -p /tmp/cloud-cli-unit-test
 	@HOME=/tmp/cloud-cli-unit-test go test -count 1 -p 1 ./...
