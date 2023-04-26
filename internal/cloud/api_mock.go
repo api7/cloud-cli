@@ -123,19 +123,19 @@ func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultOrganization", reflect.TypeOf((*MockAPI)(nil).GetDefaultOrganization))
 }
 
-// GetService mocks base method.
-func (m *MockAPI) GetService(clusterID, appID cloud_go_sdk.ID) (*cloud_go_sdk.Application, error) {
+// GetSSL mocks base method.
+func (m *MockAPI) GetSSL(sslID cloud_go_sdk.ID) (*cloud_go_sdk.CertificateDetails, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetService", clusterID, appID)
-	ret0, _ := ret[0].(*cloud_go_sdk.Application)
+	ret := m.ctrl.Call(m, "GetSSL", sslID)
+	ret0, _ := ret[0].(*cloud_go_sdk.CertificateDetails)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetService indicates an expected call of GetService.
-func (mr *MockAPIMockRecorder) GetService(clusterID, appID interface{}) *gomock.Call {
+// GetSSL indicates an expected call of GetSSL.
+func (mr *MockAPIMockRecorder) GetSSL(sslID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetService", reflect.TypeOf((*MockAPI)(nil).GetService), clusterID, appID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSSL", reflect.TypeOf((*MockAPI)(nil).GetSSL), sslID)
 }
 
 // GetStartupConfig mocks base method.

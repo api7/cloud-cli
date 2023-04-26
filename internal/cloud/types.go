@@ -78,6 +78,8 @@ type API interface {
 	GetDefaultCluster() (*cloud.Cluster, error)
 	// GetClusterDetail returns the detail cluster for the specify cluster.
 	GetClusterDetail(clusterID cloud.ID) (*cloud.Cluster, error)
+	// GetSSL returns the detail of the Certificate (SSL) object.
+	GetSSL(sslID cloud.ID) (*cloud.CertificateDetails, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 	// ListServices return the list of services in application

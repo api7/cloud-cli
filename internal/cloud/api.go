@@ -194,7 +194,18 @@ func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Ap
 
 		services = append(services, service)
 	}
+}
+func (a *api) GetSSL(sslID cloud.ID) (*cloud.CertificateDetails, error) {
+	cluster, err := a.GetDefaultCluster()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get default cluster")
+	}
 
+	return a.sdk.GetCertificate(context.TODO(), sslID, &cloud.ResourceGetOptions{
+		Cluster: &cloud.Cluster{
+			ID: cluster.ID,
+		},
+	})
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
