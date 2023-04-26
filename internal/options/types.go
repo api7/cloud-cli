@@ -211,27 +211,6 @@ type GetOption struct {
 	ID string
 }
 
-type DeleteOption struct {
-	// Specify the kind of resource
-	Kind string
-	// Specify the ID of resource
-	ID string
-}
-
-type UpdateOption struct {
-	// Specify the kind of resource
-	Kind string
-	// Specify the config path of resource
-	Config string
-}
-
-type CreateOption struct {
-	// Specify the kind of resource
-	Kind string
-	// Specify the config path of resource
-	Config string
-}
-
 // Validate validates the docker deploy options.
 func (o *ListOption) Validate() error {
 	if o.Limit <= 0 {
