@@ -228,6 +228,14 @@ func (a *api) CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.Cert
 	})
 }
 
+func (a *api) UpdateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error) {
+	return a.sdk.UpdateCertificate(context.TODO(), ssl, &cloud.ResourceUpdateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+}
+
 func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error) {
 	var services []*cloud.Application
 	pageSize := limit

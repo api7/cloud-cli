@@ -193,6 +193,7 @@ type ResourceOptions struct {
 	Get    ResourceGetOptions
 	Delete ResourceDeleteOptions
 	Create ResourceCreateOptions
+	Update ResourceUpdateOptions
 }
 
 // ResourceCreateOptions contains options for the resource creation.
@@ -200,7 +201,19 @@ type ResourceCreateOptions struct {
 	// Specify the kind of resource.
 	Kind string
 	// Specify the SSL create options.
-	SSL SSLCreateOptions
+	SSL SSLModifyOptions
+	// Labels indicates a series of resource labels.
+	Labels []string
+}
+
+// ResourceUpdateOptions contains options for the resource update.
+type ResourceUpdateOptions struct {
+	// ID specifies the resource ID.
+	ID string
+	// Kind specifies the kind of resource.
+	Kind string
+	// SSL specifies the SSL create options.
+	SSL SSLModifyOptions
 	// Labels indicates a series of resource labels.
 	Labels []string
 }
@@ -211,25 +224,45 @@ func (o *ResourceCreateOptions) Validate() error {
 		return errors.New("--kind is required")
 	}
 	if o.Kind == "ssl" {
-		if o.SSL.CertFile == "" {
-			return errors.New("cert file is required")
-		}
-		if o.SSL.PKeyFile == "" {
-			return errors.New("private key file is required")
-		}
-		if o.SSL.Type != cloud.ServerCertificate && o.SSL.Type != cloud.ClientCertificate {
-			return errors.New("invalid SSL type, should either be \"Server\" or \"Client\"")
+		if err := (&o.SSL).Validate(); err != nil {
+			return err
 		}
 	}
 	return nil
 }
 
-// SSLCreateOptions create options for ssl.
-type SSLCreateOptions struct {
+// Validate validates the ResourceCreateOptions.
+func (o *ResourceUpdateOptions) Validate() error {
+	if o.Kind == "" {
+		return errors.New("--kind is required")
+	}
+	if o.Kind == "ssl" {
+		if err := (&o.SSL).Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SSLModifyOptions contains the modify options for ssl.
+type SSLModifyOptions struct {
 	CertFile   string
 	PKeyFile   string
 	CACertFile string
 	Type       cloud.CertificateType
+}
+
+func (o *SSLModifyOptions) Validate() error {
+	if o.CertFile == "" {
+		return errors.New("cert file is required")
+	}
+	if o.PKeyFile == "" {
+		return errors.New("private key file is required")
+	}
+	if o.Type != cloud.ServerCertificate && o.Type != cloud.ClientCertificate {
+		return errors.New("invalid SSL type, should either be \"Server\" or \"Client\"")
+	}
+	return nil
 }
 
 // ResourceListOptions contains options for `cloud-cli resource list` command.

@@ -38,22 +38,22 @@ help:  ## Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 .PHONY: build
-build: create-bin-dir ## Build the binary
+build: codegen create-bin-dir ## Build the binary
 	go build -ldflags $(GO_LDFLAGS) -o bin/cloud-cli github.com/api7/cloud-cli
 
 create-bin-dir:
 	@mkdir -p $(BINDIR)
 .PHONY: create-bin-dir
 
-gofmt: ## Format the source code
+gofmt: codegen ## Format the source code
 	@find . -type f -name "*.go" | xargs gofmt -w -s
 .PHONY: gofmt
 
-lint: ## Apply go lint check
+lint: codegen ## Apply go lint check
 	@golangci-lint run --timeout 10m ./...
 .PHONY: lint
 
-test: ## Run the unit tests
+test: codegen ## Run the unit tests
 	# go test run cases in different package parallel by default, but cloud cli config file is referenced by multi test cases, so we need to run them in sequence with -p=1
 	@mkdir -p /tmp/cloud-cli-unit-test
 	@HOME=/tmp/cloud-cli-unit-test go test -count 1 -p 1 ./...
@@ -78,7 +78,7 @@ build-all: clean create-bin-dir ## Build binary packages
 	@gzip -f -S -$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH).gz $(BINDIR)/*
 	
 .PHONY: license-check
-license-check:
+license-check: codegen
 	docker run -it --rm -v $(PWD):/github/workspace apache/skywalking-eyes header check
 
 .PHONY: clean
