@@ -1,4 +1,4 @@
-// Copyright 2022 API7.ai, Inc
+// Copyright 2023 API7.ai, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -174,6 +174,50 @@ func (a *api) DeleteSSL(clusterID, sslID cloud.ID) error {
 			ID: clusterID,
 		},
 	})
+}
+
+func (a *api) ListSSL(clusterID cloud.ID, limit int, skip int) ([]*cloud.CertificateDetails, error) {
+	var (
+		ssl []*cloud.CertificateDetails
+	)
+
+	pageSize := 25
+	firstPage := skip/pageSize + 1
+	skipOnFirstPage := skip % pageSize
+
+	iter, err := a.sdk.ListCertificates(context.TODO(), &cloud.ResourceListOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     firstPage,
+			PageSize: pageSize,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get certificate iterator")
+	}
+
+	for {
+		cert, err := iter.Next()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get next cert")
+		}
+		if cert == nil {
+			// end
+			break
+		}
+
+		if skipOnFirstPage > 0 {
+			skipOnFirstPage--
+			continue
+		}
+		ssl = append(ssl, cert)
+		if len(ssl) >= limit {
+			break
+		}
+	}
+	return ssl, nil
 }
 
 func (a *api) CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error) {

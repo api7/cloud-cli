@@ -1,4 +1,4 @@
-// Copyright 2022 API7.ai, Inc
+// Copyright 2023 API7.ai, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,6 +82,9 @@ type API interface {
 	GetSSL(clusterID, sslID cloud.ID) (*cloud.CertificateDetails, error)
 	// DeleteSSL deletes the specified SSL object.
 	DeleteSSL(clusterID, sslID cloud.ID) error
+	// ListSSL lists up to *limits* SSL objects in the specified cluster, and it'll
+	// skip the first *skip* objects.
+	ListSSL(clusterID cloud.ID, limit int, skip int) ([]*cloud.CertificateDetails, error)
 	// CreateSSL creates an SSL object according to the given spec.
 	CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
