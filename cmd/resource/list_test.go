@@ -57,9 +57,7 @@ func TestResourceList(t *testing.T) {
 					Email:  "demo@api7.cloud",
 					OrgIDs: []sdk.ID{123},
 				}, nil)
-
 				api.EXPECT().ListClusters(sdk.ID(123), gomock.Any(), gomock.Any()).Return([]*sdk.Cluster{
-
 					{
 						ID:   123,
 						Name: "API7.AI",
