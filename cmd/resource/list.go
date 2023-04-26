@@ -26,6 +26,60 @@ import (
 	"github.com/api7/cloud-cli/internal/persistence"
 )
 
+var (
+	_resourceListHandler = map[string]func() interface{}{
+		"cluster": func() interface{} {
+			user, err := cloud.Client().Me()
+			if err != nil {
+				output.Errorf(err.Error())
+			}
+			limit := options.Global.Resource.List.Limit
+			skip := options.Global.Resource.List.Skip
+			clusters, err := cloud.DefaultClient.ListClusters(user.OrgIDs[0], limit, skip)
+			if err != nil {
+				output.Errorf("Failed to list clusters: %s", err.Error())
+			}
+			if clusters == nil {
+				return nil
+			}
+			return clusters
+		},
+		"service": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get default cluster: %s", err.Error())
+			}
+			limit := options.Global.Resource.List.Limit
+			skip := options.Global.Resource.List.Skip
+			services, err := cloud.DefaultClient.ListServices(cluster.ID, limit, skip)
+			if err != nil {
+				output.Errorf("Failed to list services: %s", err.Error())
+			}
+			if services == nil {
+				return nil
+			}
+			return services
+		},
+		"ssl": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get default cluster: %s", err.Error())
+			}
+			limit := options.Global.Resource.List.Limit
+			skip := options.Global.Resource.List.Skip
+
+			ssl, err := cloud.DefaultClient.ListSSL(cluster.ID, limit, skip)
+			if err != nil {
+				output.Errorf("Failed to list ssl: %s", err.Error())
+			}
+			if ssl == nil {
+				return nil
+			}
+			return ssl
+		},
+	}
+)
+
 func newListCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",
@@ -44,36 +98,16 @@ func newListCommand() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			kind := options.Global.Resource.List.Kind
-			limit := options.Global.Resource.List.Limit
-			skip := options.Global.Resource.List.Skip
-
-			user, err := cloud.Client().Me()
-			if err != nil {
-				output.Errorf(err.Error())
+			handler, ok := _resourceListHandler[kind]
+			if !ok {
+				output.Errorf("This kind of resource is not supported")
+			} else {
+				resource := handler()
+				if resource != nil {
+					text, _ := json.MarshalIndent(resource, "", "\t")
+					fmt.Println(string(text))
+				}
 			}
-
-			if kind == "cluster" {
-				clustersList, err := cloud.DefaultClient.ListClusters(user.OrgIDs[0], limit, skip)
-				if err != nil {
-					output.Errorf("Failed to list clusters: %s", err.Error())
-				}
-				json, _ := json.MarshalIndent(clustersList, "", "\t")
-				fmt.Println(string(json))
-				return
-			} else if kind == "service" {
-				cluster, err := cloud.Client().GetDefaultCluster()
-				if err != nil {
-					output.Errorf("Failed to list services: %s", err.Error())
-				}
-				servicesList, err := cloud.DefaultClient.ListServices(cluster.ID, limit, skip)
-				if err != nil {
-					output.Errorf("Failed to list services: %s", err.Error())
-				}
-				json, _ := json.MarshalIndent(servicesList, "", "\t")
-				fmt.Println(string(json))
-				return
-			}
-			output.Errorf("This kind of resource is not supported")
 		},
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.List.Kind, "kind", "cluster", "Specify the resource kind")

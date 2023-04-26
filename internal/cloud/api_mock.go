@@ -197,6 +197,21 @@ func (mr *MockAPIMockRecorder) ListClusters(orgID, limit, skip interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockAPI)(nil).ListClusters), orgID, limit, skip)
 }
 
+// ListSSL mocks base method.
+func (m *MockAPI) ListSSL(clusterID cloud_go_sdk.ID, limit, skip int) ([]*cloud_go_sdk.CertificateDetails, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSSL", clusterID, limit, skip)
+	ret0, _ := ret[0].([]*cloud_go_sdk.CertificateDetails)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSSL indicates an expected call of ListSSL.
+func (mr *MockAPIMockRecorder) ListSSL(clusterID, limit, skip interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSSL", reflect.TypeOf((*MockAPI)(nil).ListSSL), clusterID, limit, skip)
+}
+
 // ListServices mocks base method.
 func (m *MockAPI) ListServices(clusterID cloud_go_sdk.ID, limit, skip int) ([]*cloud_go_sdk.Application, error) {
 	m.ctrl.T.Helper()
