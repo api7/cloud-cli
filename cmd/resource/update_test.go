@@ -52,13 +52,13 @@ func TestServiceUpdate(t *testing.T) {
 					},
 				},
 			},
-			args:       []string{"update", "--kind", "service", "--config", os.TempDir() + "config.json"},
+			args:       []string{"update", "--kind", "service", "--from-file", os.TempDir() + "config.json"},
 			testConfig: os.TempDir() + "config.json",
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 123,
 				}, nil)
-				api.EXPECT().UpdateService(sdk.ID(123), os.TempDir()+"config.json").Return(&sdk.Application{
+				api.EXPECT().UpdateService(sdk.ID(123), gomock.Any()).Return(&sdk.Application{
 					ID:        sdk.ID(123),
 					ClusterID: sdk.ID(123),
 					ApplicationSpec: sdk.ApplicationSpec{
