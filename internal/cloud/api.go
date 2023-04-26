@@ -176,6 +176,14 @@ func (a *api) DeleteSSL(clusterID, sslID cloud.ID) error {
 	})
 }
 
+func (a *api) CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error) {
+	return a.sdk.CreateCertificate(context.TODO(), ssl, &cloud.ResourceCreateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+}
+
 func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error) {
 	var services []*cloud.Application
 	pageSize := limit
