@@ -63,6 +63,20 @@ func (mr *MockAPIMockRecorder) DebugShowConfig(clusterID, resource, id interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), clusterID, resource, id)
 }
 
+// DeleteSSL mocks base method.
+func (m *MockAPI) DeleteSSL(clusterID, sslID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSSL", clusterID, sslID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSSL indicates an expected call of DeleteSSL.
+func (mr *MockAPIMockRecorder) DeleteSSL(clusterID, sslID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSSL", reflect.TypeOf((*MockAPI)(nil).DeleteSSL), clusterID, sslID)
+}
+
 // GetCloudLuaModule mocks base method.
 func (m *MockAPI) GetCloudLuaModule() ([]byte, error) {
 	m.ctrl.T.Helper()
@@ -124,18 +138,18 @@ func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 }
 
 // GetSSL mocks base method.
-func (m *MockAPI) GetSSL(sslID cloud_go_sdk.ID) (*cloud_go_sdk.CertificateDetails, error) {
+func (m *MockAPI) GetSSL(clusterID, sslID cloud_go_sdk.ID) (*cloud_go_sdk.CertificateDetails, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSSL", sslID)
+	ret := m.ctrl.Call(m, "GetSSL", clusterID, sslID)
 	ret0, _ := ret[0].(*cloud_go_sdk.CertificateDetails)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSSL indicates an expected call of GetSSL.
-func (mr *MockAPIMockRecorder) GetSSL(sslID interface{}) *gomock.Call {
+func (mr *MockAPIMockRecorder) GetSSL(clusterID, sslID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSSL", reflect.TypeOf((*MockAPI)(nil).GetSSL), sslID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSSL", reflect.TypeOf((*MockAPI)(nil).GetSSL), clusterID, sslID)
 }
 
 // GetStartupConfig mocks base method.
