@@ -272,3 +272,18 @@ func (mr *MockAPIMockRecorder) UpdateSSL(clusterID, ssl interface{}) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSSL", reflect.TypeOf((*MockAPI)(nil).UpdateSSL), clusterID, ssl)
 }
+
+// UpdateService mocks base method.
+func (m *MockAPI) UpdateService(clusterID cloud_go_sdk.ID, svc *cloud_go_sdk.Application) (*cloud_go_sdk.Application, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateService", clusterID, svc)
+	ret0, _ := ret[0].(*cloud_go_sdk.Application)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateService indicates an expected call of UpdateService.
+func (mr *MockAPIMockRecorder) UpdateService(clusterID, svc interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateService", reflect.TypeOf((*MockAPI)(nil).UpdateService), clusterID, svc)
+}

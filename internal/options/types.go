@@ -216,6 +216,8 @@ type ResourceUpdateOptions struct {
 	SSL SSLModifyOptions
 	// Labels indicates a series of resource labels.
 	Labels []string
+	// FromFile indicates a filepath which contains the resource definition.
+	FromFile string
 }
 
 // Validate validates the ResourceCreateOptions.

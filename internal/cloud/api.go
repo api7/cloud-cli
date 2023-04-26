@@ -16,14 +16,13 @@ package cloud
 
 import (
 	"context"
+	"github.com/api7/cloud-go-sdk"
+	"github.com/pkg/errors"
 	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-
-	"github.com/api7/cloud-go-sdk"
-	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/output"
 )
@@ -270,6 +269,20 @@ func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Ap
 
 		services = append(services, service)
 	}
+}
+
+func (a *api) UpdateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error) {
+	newSvc, err := a.sdk.UpdateApplication(context.TODO(), svc,
+		&cloud.ResourceUpdateOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update service")
+	}
+
+	return newSvc, nil
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {

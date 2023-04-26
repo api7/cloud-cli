@@ -93,6 +93,8 @@ type API interface {
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 	// ListServices return the list of services in application
 	ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error)
+	// UpdateService return the configuration after the service update
+	UpdateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error)
 }
 
 type api struct {
