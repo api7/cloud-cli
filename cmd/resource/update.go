@@ -17,11 +17,13 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/spf13/cobra"
 )
 
 var (
