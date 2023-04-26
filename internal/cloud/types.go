@@ -85,6 +85,8 @@ type API interface {
 	// ListSSL lists up to *limits* SSL objects in the specified cluster, and it'll
 	// skip the first *skip* objects.
 	ListSSL(clusterID cloud.ID, limit int, skip int) ([]*cloud.CertificateDetails, error)
+	// CreateSSL creates an SSL object according to the given spec.
+	CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
 	// ListServices return the list of services in application

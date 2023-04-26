@@ -191,7 +191,45 @@ type ConfigureOptions struct {
 type ResourceOptions struct {
 	List   ResourceListOptions
 	Get    ResourceGetOptions
-	Delete ResourceDeleteOption
+	Delete ResourceDeleteOptions
+	Create ResourceCreateOptions
+}
+
+// ResourceCreateOptions contains options for the resource creation.
+type ResourceCreateOptions struct {
+	// Specify the kind of resource.
+	Kind string
+	// Specify the SSL create options.
+	SSL SSLCreateOptions
+	// Labels indicates a series of resource labels.
+	Labels []string
+}
+
+// Validate validates the ResourceCreateOptions.
+func (o *ResourceCreateOptions) Validate() error {
+	if o.Kind == "" {
+		return errors.New("--kind is required")
+	}
+	if o.Kind == "ssl" {
+		if o.SSL.CertFile == "" {
+			return errors.New("cert file is required")
+		}
+		if o.SSL.PKeyFile == "" {
+			return errors.New("private key file is required")
+		}
+		if o.SSL.Type != cloud.ServerCertificate && o.SSL.Type != cloud.ClientCertificate {
+			return errors.New("invalid SSL type, should either be \"Server\" or \"Client\"")
+		}
+	}
+	return nil
+}
+
+// SSLCreateOptions create options for ssl.
+type SSLCreateOptions struct {
+	CertFile   string
+	PKeyFile   string
+	CACertFile string
+	Type       cloud.CertificateType
 }
 
 // ResourceListOptions contains options for `cloud-cli resource list` command.
@@ -204,8 +242,8 @@ type ResourceListOptions struct {
 	Skip int
 }
 
-// ResourceDeleteOption contains options for `cloud-cli resource delete` command.
-type ResourceDeleteOption struct {
+// ResourceDeleteOptions contains options for `cloud-cli resource delete` command.
+type ResourceDeleteOptions struct {
 	Kind string
 	ID   string
 }

@@ -48,6 +48,21 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 	return m.recorder
 }
 
+// CreateSSL mocks base method.
+func (m *MockAPI) CreateSSL(clusterID cloud_go_sdk.ID, ssl *cloud_go_sdk.Certificate) (*cloud_go_sdk.CertificateDetails, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSSL", clusterID, ssl)
+	ret0, _ := ret[0].(*cloud_go_sdk.CertificateDetails)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateSSL indicates an expected call of CreateSSL.
+func (mr *MockAPIMockRecorder) CreateSSL(clusterID, ssl interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSSL", reflect.TypeOf((*MockAPI)(nil).CreateSSL), clusterID, ssl)
+}
+
 // DebugShowConfig mocks base method.
 func (m *MockAPI) DebugShowConfig(clusterID cloud_go_sdk.ID, resource string, id cloud_go_sdk.ID) (string, error) {
 	m.ctrl.T.Helper()
