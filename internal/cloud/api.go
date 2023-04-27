@@ -308,6 +308,19 @@ func (a *api) UpdateService(clusterID cloud.ID, config string) (*cloud.Applicati
 	return service, nil
 }
 
+func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error) {
+	service, err := a.sdk.GetApplication(context.TODO(), appID, &cloud.ResourceGetOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get service iterator")
+	}
+
+	return service, nil
+}
+
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {
