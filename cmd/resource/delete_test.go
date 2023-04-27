@@ -119,7 +119,7 @@ func TestSAPIDelete(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"delete", "--kind", "api", "--id", "123", "--service-id", "456"},
+			args: []string{"delete", "--kind", "route", "--id", "123", "--service-id", "456"},
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
@@ -142,7 +142,7 @@ func TestSAPIDelete(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"delete", "--kind", "api", "--id", "a", "--service-id", "456"},
+			args: []string{"delete", "--kind", "route", "--id", "a", "--service-id", "456"},
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
@@ -165,7 +165,7 @@ func TestSAPIDelete(t *testing.T) {
 					},
 				},
 			},
-			args: []string{"delete", "--kind", "api", "--id", "123", "--service-id", "456"},
+			args: []string{"delete", "--kind", "route", "--id", "123", "--service-id", "456"},
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
