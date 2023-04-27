@@ -61,7 +61,7 @@ var (
 			consumer.ID = id
 			newConsumer, err := cloud.DefaultClient.UpdateConsumer(cluster.ID, consumer)
 			if err != nil {
-				output.Errorf("Failed to list consumers: %s", err.Error())
+				output.Errorf("Failed to update consumers: %s", err.Error())
 			}
 			return newConsumer
 		},
