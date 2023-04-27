@@ -1,5 +1,7 @@
 github.com/api7/cloud-go-sdk v0.0.0-20230426063711-ff62a8b889d7 h1:dASr/q6pR543jJ9xnJE8c46YIUlPHKxYDsZ2srcH1MQ=
 github.com/api7/cloud-go-sdk v0.0.0-20230426063711-ff62a8b889d7/go.mod h1:FK4iu2QDjpXGjBvBuvOmeBEuSx6L+OVnWGNh/i/Y8CE=
+github.com/api7/cloud-go-sdk v0.0.0-20230426082534-e99f8854ef3b h1:MF/bhJCUJVMRlrRik3DAHdk0j4/a+4mxVf5rWyHIBTU=
+github.com/api7/cloud-go-sdk v0.0.0-20230426082534-e99f8854ef3b/go.mod h1:FK4iu2QDjpXGjBvBuvOmeBEuSx6L+OVnWGNh/i/Y8CE=
 github.com/bitly/go-simplejson v0.5.0 h1:6IH+V8/tVMab511d5bn4M7EwGXZf9Hj6i2xSwkNEM+Y=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4YnC6+E63dPcxHo2sUxDIu8g3QgEJdRY=
