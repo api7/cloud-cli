@@ -101,6 +101,8 @@ type API interface {
 	GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, error)
 	// ListConsumers returns the list of consumers in the given cluster.
 	ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error)
+	// DeleteService return the service delete success or fail
+	DeleteService(clusterID cloud.ID, appID cloud.ID) error
 }
 
 type api struct {

@@ -310,6 +310,18 @@ func (a *api) GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, erro
 	return consumer, nil
 }
 
+func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
+	err := a.sdk.DeleteApplication(context.TODO(), appID, &cloud.ResourceDeleteOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to delete service")
+	}
+	return nil
+}
+
 func (a *api) ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error) {
 	var (
 		consumers []*cloud.Consumer
