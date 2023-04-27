@@ -46,11 +46,21 @@ var (
 				output.Errorf("Failed to delete service: %s", err.Error())
 			}
 		},
+		"consumer": func(id sdk.ID, args ...any) {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			if err := cloud.DefaultClient.DeleteConsumer(cluster.ID, id); err != nil {
+				output.Errorf("Failed to delete consumer: %s", err.Error())
+			}
+		},
 		"route": func(id sdk.ID, args ...any) {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
 			}
+
 			if len(args) == 0 {
 				output.Errorf("Please specify the service id")
 			}
