@@ -85,7 +85,7 @@ var (
 			}
 			newSvc, err := cloud.DefaultClient.CreateService(cluster.ID, svc)
 			if err != nil {
-				output.Errorf("Failed to create services: %s", err.Error())
+				output.Errorf("Failed to create service: %s", err.Error())
 			}
 			return newSvc
 		},
