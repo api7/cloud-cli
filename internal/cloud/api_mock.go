@@ -123,6 +123,21 @@ func (mr *MockAPIMockRecorder) GetClusterDetail(clusterID interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClusterDetail", reflect.TypeOf((*MockAPI)(nil).GetClusterDetail), clusterID)
 }
 
+// GetConsumer mocks base method.
+func (m *MockAPI) GetConsumer(clusterID, consumerID cloud_go_sdk.ID) (*cloud_go_sdk.Consumer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetConsumer", clusterID, consumerID)
+	ret0, _ := ret[0].(*cloud_go_sdk.Consumer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetConsumer indicates an expected call of GetConsumer.
+func (mr *MockAPIMockRecorder) GetConsumer(clusterID, consumerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConsumer", reflect.TypeOf((*MockAPI)(nil).GetConsumer), clusterID, consumerID)
+}
+
 // GetDefaultCluster mocks base method.
 func (m *MockAPI) GetDefaultCluster() (*cloud_go_sdk.Cluster, error) {
 	m.ctrl.T.Helper()
@@ -226,6 +241,21 @@ func (m *MockAPI) ListClusters(orgID cloud_go_sdk.ID, limit, skip int) ([]*cloud
 func (mr *MockAPIMockRecorder) ListClusters(orgID, limit, skip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListClusters", reflect.TypeOf((*MockAPI)(nil).ListClusters), orgID, limit, skip)
+}
+
+// ListConsumers mocks base method.
+func (m *MockAPI) ListConsumers(clusterID cloud_go_sdk.ID, limit, skip int) ([]*cloud_go_sdk.Consumer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListConsumers", clusterID, limit, skip)
+	ret0, _ := ret[0].([]*cloud_go_sdk.Consumer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListConsumers indicates an expected call of ListConsumers.
+func (mr *MockAPIMockRecorder) ListConsumers(clusterID, limit, skip interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListConsumers", reflect.TypeOf((*MockAPI)(nil).ListConsumers), clusterID, limit, skip)
 }
 
 // ListSSL mocks base method.

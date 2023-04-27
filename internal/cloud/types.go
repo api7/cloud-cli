@@ -89,12 +89,16 @@ type API interface {
 	CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error)
 	// DebugShowConfig returns the translated Apache APISIX object with the given API7 Cloud resource type and id.
 	DebugShowConfig(clusterID cloud.ID, resource string, id cloud.ID) (string, error)
-	// ListServices return the list of services in application
+	// ListServices returns the list of services in application
 	ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error)
-	// UpdateService return the configuration after the service update
+	// UpdateService returns the configuration after the service update
 	UpdateService(clusterID cloud.ID, config string) (*cloud.Application, error)
-	// GetService return the service in line with id in application
+	// GetService returns the service in line with id in application
 	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
+	// GetConsumer returns the consumer with the given consumer and cluster.
+	GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, error)
+	// ListConsumers returns the list of consumers in the given cluster.
+	ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error)
 }
 
 type api struct {
