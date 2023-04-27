@@ -141,6 +141,5 @@ func newCreateCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.SSL.PKeyFile, "pkey", "", "Specify the private key file (this option is only useful when kind is ssl)")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.SSL.CACertFile, "cacert", "", "Specify the CA certificate key file (this option is only useful when kind is ssl)")
 	cmd.PersistentFlags().StringVar((*string)(&options.Global.Resource.Create.SSL.Type), "ssl-type", "", "Specify the SSL type (optional value can be \"server\", \"client\"")
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.FromFile, "from-file", "", "Specify the resource definition file")
 	return cmd
 }
