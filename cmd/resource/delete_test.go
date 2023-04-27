@@ -58,7 +58,7 @@ func TestServiceDelete(t *testing.T) {
 				}, nil)
 				api.EXPECT().DeleteService(sdk.ID(123), sdk.ID(123)).Return(nil)
 			},
-			outputs: []string{"Delete service success , ID:  123"},
+			outputs: []string{""},
 		},
 	}
 	for _, tc := range testCases {

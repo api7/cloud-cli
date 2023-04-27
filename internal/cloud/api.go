@@ -305,7 +305,7 @@ func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
 		},
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to delete service iterator")
+		return errors.Wrap(err, "failed to delete service")
 	}
 	return nil
 }

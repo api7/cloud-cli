@@ -15,7 +15,6 @@
 package resource
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -46,7 +45,6 @@ var (
 			if err := cloud.DefaultClient.DeleteService(cluster.ID, id); err != nil {
 				output.Errorf("Failed to delete service: %s", err.Error())
 			}
-			fmt.Println("Delete service success , ID: ", id)
 		},
 	}
 )
