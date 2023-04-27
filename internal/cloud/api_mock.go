@@ -94,6 +94,20 @@ func (mr *MockAPIMockRecorder) DebugShowConfig(clusterID, resource, id interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), clusterID, resource, id)
 }
 
+// DeleteAPI mocks base method.
+func (m *MockAPI) DeleteAPI(clusterID, appID, apiID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAPI", clusterID, appID, apiID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAPI indicates an expected call of DeleteAPI.
+func (mr *MockAPIMockRecorder) DeleteAPI(clusterID, appID, apiID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAPI", reflect.TypeOf((*MockAPI)(nil).DeleteAPI), clusterID, appID, apiID)
+}
+
 // DeleteConsumer mocks base method.
 func (m *MockAPI) DeleteConsumer(clusterID, consumerID cloud_go_sdk.ID) error {
 	m.ctrl.T.Helper()

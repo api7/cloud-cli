@@ -418,3 +418,16 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 
 	return request, nil
 }
+
+func (a *api) DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error {
+	err := a.sdk.DeleteAPI(context.TODO(), apiID, &cloud.ResourceDeleteOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Application: &cloud.Application{ID: appID},
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to delete route")
+	}
+	return nil
+}
