@@ -172,7 +172,7 @@ func TestSAPIDelete(t *testing.T) {
 				}, nil)
 				api.EXPECT().DeleteAPI(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(errors.New("error"))
 			},
-			outputs: []string{"Failed to delete api"},
+			outputs: []string{"Failed to delete route"},
 		},
 	}
 	for _, tc := range testCases {
