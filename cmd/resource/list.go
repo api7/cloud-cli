@@ -77,6 +77,23 @@ var (
 			}
 			return ssl
 		},
+		"consumer": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get default cluster: %s", err.Error())
+			}
+			limit := options.Global.Resource.List.Limit
+			skip := options.Global.Resource.List.Skip
+
+			ssl, err := cloud.DefaultClient.ListConsumers(cluster.ID, limit, skip)
+			if err != nil {
+				output.Errorf("Failed to list ssl: %s", err.Error())
+			}
+			if ssl == nil {
+				return nil
+			}
+			return ssl
+		},
 	}
 )
 

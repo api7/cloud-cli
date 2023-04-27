@@ -292,10 +292,22 @@ func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application
 		},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get service iterator")
+		return nil, errors.Wrap(err, "failed to get service")
 	}
 
 	return service, nil
+}
+
+func (a *api) GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, error) {
+	consumer, err := a.sdk.GetConsumer(context.TODO(), consumerID, &cloud.ResourceGetOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get consumer")
+	}
+	return consumer, nil
 }
 
 func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
@@ -308,6 +320,50 @@ func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
 		return errors.Wrap(err, "failed to delete service")
 	}
 	return nil
+}
+
+func (a *api) ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error) {
+	var (
+		consumers []*cloud.Consumer
+	)
+
+	pageSize := 25
+	firstPage := skip/pageSize + 1
+	skipOnFirstPage := skip % pageSize
+
+	iter, err := a.sdk.ListConsumers(context.TODO(), &cloud.ResourceListOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     firstPage,
+			PageSize: pageSize,
+		},
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get consumer iterator")
+	}
+
+	for {
+		consumer, err := iter.Next()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get next consumer")
+		}
+		if consumer == nil {
+			// end
+			break
+		}
+
+		if skipOnFirstPage > 0 {
+			skipOnFirstPage--
+			continue
+		}
+		consumers = append(consumers, consumer)
+		if len(consumers) >= limit {
+			break
+		}
+	}
+	return consumers, nil
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
