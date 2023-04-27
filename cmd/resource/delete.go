@@ -93,7 +93,11 @@ func newDeleteCommand() *cobra.Command {
 					return
 				}
 
-				uint64ServiceID, _ := strconv.ParseUint(serviceID, 10, 64)
+				uint64ServiceID, err := strconv.ParseUint(serviceID, 10, 64)
+				if err != nil {
+					output.Errorf("Failed to parse service id: %s", serviceID)
+					return
+				}
 				handler(sdk.ID(uint64ID), sdk.ID(uint64ServiceID))
 			}
 		},
