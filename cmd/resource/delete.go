@@ -27,8 +27,8 @@ import (
 )
 
 var (
-	_resourceDeleteHandler = map[string]func(id sdk.ID){
-		"ssl": func(id sdk.ID) {
+	_resourceDeleteHandler = map[string]func(id sdk.ID, args ...any){
+		"ssl": func(id sdk.ID, args ...any) {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
@@ -37,13 +37,33 @@ var (
 				output.Errorf("Failed to delete ssl: %s", err.Error())
 			}
 		},
-		"service": func(id sdk.ID) {
+		"service": func(id sdk.ID, args ...any) {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
 			}
 			if err := cloud.DefaultClient.DeleteService(cluster.ID, id); err != nil {
 				output.Errorf("Failed to delete service: %s", err.Error())
+			}
+		},
+		"route": func(id sdk.ID, args ...any) {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			if len(args) == 0 {
+				output.Errorf("Please specify the service id")
+			}
+			serviceID, ok := args[0].(sdk.ID)
+			if !ok {
+				output.Errorf("Please specify the correct service id")
+			}
+			if serviceID == 0 {
+				output.Errorf("Please specify the correct service id")
+			}
+
+			if err := cloud.DefaultClient.DeleteAPI(cluster.ID, serviceID, id); err != nil {
+				output.Errorf("Failed to delete route: %s", err.Error())
 			}
 		},
 	}
@@ -62,18 +82,30 @@ func newDeleteCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			kind := options.Global.Resource.Delete.Kind
 			id := options.Global.Resource.Delete.ID
+			serviceID := options.Global.Resource.Delete.ServiceID
 			handler, ok := _resourceDeleteHandler[kind]
 			if !ok {
 				output.Errorf("This kind of resource is not supported")
 			} else {
-				uint64ID, _ := strconv.ParseUint(id, 10, 64)
-				handler(sdk.ID(uint64ID))
+				uint64ID, err := strconv.ParseUint(id, 10, 64)
+				if err != nil {
+					output.Errorf("Failed to parse id: %s", id)
+					return
+				}
+
+				uint64ServiceID, err := strconv.ParseUint(serviceID, 10, 64)
+				if err != nil {
+					output.Errorf("Failed to parse service id: %s", serviceID)
+					return
+				}
+				handler(sdk.ID(uint64ID), sdk.ID(uint64ServiceID))
 			}
 		},
 	}
 
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ID, "id", "", "Specify the id of resource")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
 
 	return cmd
 }

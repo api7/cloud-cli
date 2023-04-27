@@ -103,6 +103,8 @@ type API interface {
 	ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error)
 	// DeleteService return the service delete success or fail
 	DeleteService(clusterID cloud.ID, appID cloud.ID) error
+	// DeleteAPI return the route delete success or fail
+	DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error
 }
 
 type api struct {
