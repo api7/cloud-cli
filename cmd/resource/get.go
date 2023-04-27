@@ -48,6 +48,17 @@ var (
 			}
 			return ssl
 		},
+		"service": func(id sdk.ID) interface{} {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			service, err := cloud.DefaultClient.GetService(cluster.ID, id)
+			if err != nil {
+				output.Errorf("Failed to get service: %s", err.Error())
+			}
+			return service
+		},
 	}
 )
 

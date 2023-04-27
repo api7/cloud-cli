@@ -95,6 +95,8 @@ type API interface {
 	ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error)
 	// UpdateService return the configuration after the service update
 	UpdateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error)
+	// GetService return the service in line with id in application
+	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
 }
 
 type api struct {
