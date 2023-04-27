@@ -79,7 +79,7 @@ var (
 			if err != nil {
 				output.Errorf("Failed to get default cluster: %s", err.Error())
 			}
-			svc, err := readServiceFromFile(options.Global.Resource.Update.FromFile)
+			svc, err := readServiceFromFile(options.Global.Resource.Create.FromFile)
 			if err != nil {
 				output.Errorf("Failed to read service from file: %s", err.Error())
 			}

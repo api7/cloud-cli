@@ -40,7 +40,7 @@ func TestServiceCreate(t *testing.T) {
 		testConfig string
 	}{
 		{
-			name: "update service",
+			name: "create service",
 			config: &persistence.CloudConfiguration{
 				DefaultProfile: "prod",
 				Profiles: []persistence.Profile{
@@ -53,7 +53,7 @@ func TestServiceCreate(t *testing.T) {
 					},
 				},
 			},
-			args:       []string{"create", "--kind", "service", "--from-file", path.Join(os.TempDir(), "config.json")},
+			args:       []string{"create", "--from-file", path.Join(os.TempDir(), "config.json"), "--kind", "service"},
 			testConfig: path.Join(os.TempDir(), "config.json"),
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
