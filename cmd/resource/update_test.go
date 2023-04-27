@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -52,7 +53,7 @@ func TestServiceUpdate(t *testing.T) {
 					},
 				},
 			},
-			args:       []string{"update", "--kind", "service", "--from-file", os.TempDir() + "config.json"},
+			args:       []string{"update", "--kind", "service", "--from-file", path.Join(os.TempDir(), "config.json")},
 			testConfig: os.TempDir() + "config.json",
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
