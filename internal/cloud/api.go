@@ -397,7 +397,7 @@ func (a *api) DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error {
 		Application: &cloud.Application{ID: appID},
 	})
 	if err != nil {
-		return errors.Wrap(err, "failed to delete api")
+		return errors.Wrap(err, "failed to delete route")
 	}
 	return nil
 }

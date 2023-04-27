@@ -46,7 +46,7 @@ var (
 				output.Errorf("Failed to delete service: %s", err.Error())
 			}
 		},
-		"api": func(id sdk.ID, args ...any) {
+		"route": func(id sdk.ID, args ...any) {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
@@ -60,7 +60,7 @@ var (
 			}
 
 			if err := cloud.DefaultClient.DeleteAPI(cluster.ID, serviceID, id); err != nil {
-				output.Errorf("Failed to delete api: %s", err.Error())
+				output.Errorf("Failed to delete route: %s", err.Error())
 			}
 		},
 	}
