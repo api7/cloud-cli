@@ -66,7 +66,7 @@ var (
 			}
 			service, err := cloud.DefaultClient.GetConsumer(cluster.ID, id)
 			if err != nil {
-				output.Errorf("Failed to get service: %s", err.Error())
+				output.Errorf("Failed to get consumer: %s", err.Error())
 			}
 			return service
 		},

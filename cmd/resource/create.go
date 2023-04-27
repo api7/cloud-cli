@@ -74,6 +74,22 @@ var (
 			}
 			return details
 		},
+		"consumer": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to list consumer: %s", err.Error())
+			}
+			spec, err := readConsumerFromFile(options.Global.Resource.Create.FromFile)
+			if err != nil {
+				output.Errorf("Failed to read consumer spec from file: %s", err.Error())
+			}
+			consumer, err := cloud.DefaultClient.CreateConsumer(cluster.ID, spec)
+			if err != nil {
+				output.Errorf("Failed to create consumer: %s", err.Error())
+			}
+			return consumer
+
+		},
 	}
 )
 
@@ -104,6 +120,7 @@ func newCreateCommand() *cobra.Command {
 		},
 	}
 
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.FromFile, "from-file", "", "Specify the resource definition file")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.Kind, "kind", "", "Specify the resource kind")
 	cmd.PersistentFlags().StringSliceVar(&options.Global.Resource.Create.Labels, "label", nil, "Add label for this resource")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.SSL.CertFile, "cert", "", "Specify the certificate file (this option is only useful when kind is ssl)")

@@ -310,6 +310,14 @@ func (a *api) GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, erro
 	return consumer, nil
 }
 
+func (a *api) DeleteConsumer(clusterID, consumer cloud.ID) error {
+	return a.sdk.DeleteConsumer(context.TODO(), consumer, &cloud.ResourceDeleteOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+}
+
 func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
 	err := a.sdk.DeleteApplication(context.TODO(), appID, &cloud.ResourceDeleteOptions{
 		Cluster: &cloud.Cluster{
@@ -364,6 +372,28 @@ func (a *api) ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.C
 		}
 	}
 	return consumers, nil
+}
+
+func (a *api) UpdateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error) {
+	newConsumer, err := a.sdk.UpdateConsumer(context.TODO(), consumer,
+		&cloud.ResourceUpdateOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update consumer")
+	}
+
+	return newConsumer, nil
+}
+
+func (a *api) CreateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error) {
+	return a.sdk.CreateConsumer(context.TODO(), consumer, &cloud.ResourceCreateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
 }
 
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {

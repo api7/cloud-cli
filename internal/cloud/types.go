@@ -97,12 +97,18 @@ type API interface {
 	UpdateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error)
 	// GetService return the service in line with id in application
 	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
+	// DeleteService return the service delete success or fail
+	DeleteService(clusterID cloud.ID, appID cloud.ID) error
 	// GetConsumer returns the consumer with the given consumer and cluster.
 	GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, error)
 	// ListConsumers returns the list of consumers in the given cluster.
 	ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error)
-	// DeleteService return the service delete success or fail
-	DeleteService(clusterID cloud.ID, appID cloud.ID) error
+	// DeleteConsumer deletes the specified consumer.
+	DeleteConsumer(clusterID, consumerID cloud.ID) error
+	// CreateConsumer creates the consumer with the given spec.
+	CreateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
+	// UpdateConsumer updates the consumer with the given spec.
+	UpdateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
 }
 
 type api struct {
