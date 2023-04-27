@@ -58,6 +58,9 @@ var (
 			if !ok {
 				output.Errorf("Please specify the correct service id")
 			}
+			if serviceID == 0 {
+				output.Errorf("Please specify the correct service id")
+			}
 
 			if err := cloud.DefaultClient.DeleteAPI(cluster.ID, serviceID, id); err != nil {
 				output.Errorf("Failed to delete route: %s", err.Error())
@@ -90,12 +93,7 @@ func newDeleteCommand() *cobra.Command {
 					return
 				}
 
-				uint64ServiceID, err := strconv.ParseUint(serviceID, 10, 64)
-				if err != nil {
-					output.Errorf("Failed to parse service-id: %s", serviceID)
-					return
-				}
-
+				uint64ServiceID, _ := strconv.ParseUint(serviceID, 10, 64)
 				handler(sdk.ID(uint64ID), sdk.ID(uint64ServiceID))
 			}
 		},
@@ -103,7 +101,7 @@ func newDeleteCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ID, "id", "", "Specify the id of resource")
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ServiceID, "service-id", "", "Specify the id of service resource, when delete API this value should be set")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
 
 	return cmd
 }
