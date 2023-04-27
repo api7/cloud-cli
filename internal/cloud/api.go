@@ -16,14 +16,16 @@ package cloud
 
 import (
 	"context"
-	"github.com/api7/cloud-cli/internal/output"
-	"github.com/api7/cloud-go-sdk"
-	"github.com/pkg/errors"
 	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/pkg/errors"
+
+	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-go-sdk"
 )
 
 func (a *api) Me() (*cloud.User, error) {
