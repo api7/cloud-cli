@@ -93,6 +93,20 @@ func (mr *MockAPIMockRecorder) DeleteSSL(clusterID, sslID interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSSL", reflect.TypeOf((*MockAPI)(nil).DeleteSSL), clusterID, sslID)
 }
 
+// DeleteService mocks base method.
+func (m *MockAPI) DeleteService(clusterID, appID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteService", clusterID, appID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteService indicates an expected call of DeleteService.
+func (mr *MockAPIMockRecorder) DeleteService(clusterID, appID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteService", reflect.TypeOf((*MockAPI)(nil).DeleteService), clusterID, appID)
+}
+
 // GetCloudLuaModule mocks base method.
 func (m *MockAPI) GetCloudLuaModule() ([]byte, error) {
 	m.ctrl.T.Helper()
