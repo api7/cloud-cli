@@ -321,6 +321,18 @@ func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application
 	return service, nil
 }
 
+func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
+	err := a.sdk.DeleteApplication(context.TODO(), appID, &cloud.ResourceDeleteOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to delete service iterator")
+	}
+	return nil
+}
+
 func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Request, error) {
 	// Respect users' settings if host and scheme are not empty.
 	if url.Host == "" {

@@ -15,6 +15,7 @@
 package resource
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -36,6 +37,16 @@ var (
 			if err := cloud.DefaultClient.DeleteSSL(cluster.ID, id); err != nil {
 				output.Errorf("Failed to delete ssl: %s", err.Error())
 			}
+		},
+		"service": func(id sdk.ID) {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			if err := cloud.DefaultClient.DeleteService(cluster.ID, id); err != nil {
+				output.Errorf("Failed to delete service: %s", err.Error())
+			}
+			fmt.Println("Delete service success , ID: ", id)
 		},
 	}
 )

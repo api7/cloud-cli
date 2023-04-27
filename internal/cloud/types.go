@@ -95,6 +95,8 @@ type API interface {
 	UpdateService(clusterID cloud.ID, config string) (*cloud.Application, error)
 	// GetService return the service in line with id in application
 	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
+	// DeleteService return the service delete success or fail
+	DeleteService(clusterID cloud.ID, appID cloud.ID) error
 }
 
 type api struct {
