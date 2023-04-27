@@ -16,17 +16,13 @@ package cloud
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/api7/cloud-go-sdk"
+	"github.com/pkg/errors"
 	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
-	"path"
-
-	"github.com/api7/cloud-go-sdk"
-	"github.com/pkg/errors"
 
 	"github.com/api7/cloud-cli/internal/output"
 )
@@ -231,6 +227,14 @@ func (a *api) CreateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.Cert
 	})
 }
 
+func (a *api) UpdateSSL(clusterID cloud.ID, ssl *cloud.Certificate) (*cloud.CertificateDetails, error) {
+	return a.sdk.UpdateCertificate(context.TODO(), ssl, &cloud.ResourceUpdateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+	})
+}
+
 func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Application, error) {
 	var services []*cloud.Application
 	pageSize := limit
@@ -267,35 +271,8 @@ func (a *api) ListServices(clusterID cloud.ID, limit int, skip int) ([]*cloud.Ap
 	}
 }
 
-func (a *api) UpdateService(clusterID cloud.ID, config string) (*cloud.Application, error) {
-
-	if path.Ext(config) != ".json" {
-		return nil, errors.Errorf("failed to create,because the configuration file must be of type json")
-	}
-	file, err := os.ReadFile(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to update,because config file not exist")
-	}
-
-	service := &cloud.Application{}
-	err = json.Unmarshal(file, service)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to update service")
-	}
-	// This is a configuration item that must exist
-	if service.ApplicationSpec.Name == "" {
-		return nil, errors.Errorf("failed to update,because name is a must")
-	}
-	if service.ApplicationSpec.PathPrefix == "" {
-		return nil, errors.Errorf("failed to update,because path_prefix is a must")
-	}
-	if service.ApplicationSpec.Hosts == nil {
-		return nil, errors.Errorf("failed to update,because hosts is a must")
-	}
-	if service.ApplicationSpec.Upstreams == nil {
-		return nil, errors.Errorf("failed to update,because upstream is a must")
-	}
-	service, err = a.sdk.UpdateApplication(context.TODO(), service,
+func (a *api) UpdateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error) {
+	newSvc, err := a.sdk.UpdateApplication(context.TODO(), svc,
 		&cloud.ResourceUpdateOptions{
 			Cluster: &cloud.Cluster{
 				ID: clusterID,
@@ -305,7 +282,7 @@ func (a *api) UpdateService(clusterID cloud.ID, config string) (*cloud.Applicati
 		return nil, errors.Wrap(err, "failed to update service")
 	}
 
-	return service, nil
+	return newSvc, nil
 }
 
 func (a *api) GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error) {

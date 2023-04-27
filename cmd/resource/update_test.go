@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -52,13 +53,13 @@ func TestServiceUpdate(t *testing.T) {
 					},
 				},
 			},
-			args:       []string{"update", "--kind", "service", "--config", os.TempDir() + "config.json"},
-			testConfig: os.TempDir() + "config.json",
+			args:       []string{"update", "--kind", "service", "--from-file", path.Join(os.TempDir(), "config.json")},
+			testConfig: path.Join(os.TempDir(), "config.json"),
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 123,
 				}, nil)
-				api.EXPECT().UpdateService(sdk.ID(123), os.TempDir()+"config.json").Return(&sdk.Application{
+				api.EXPECT().UpdateService(sdk.ID(123), gomock.Any()).Return(&sdk.Application{
 					ID:        sdk.ID(123),
 					ClusterID: sdk.ID(123),
 					ApplicationSpec: sdk.ApplicationSpec{
@@ -80,9 +81,11 @@ func TestServiceUpdate(t *testing.T) {
 			cloud.NewClient = func(_ string, _ string, _ bool) (cloud.API, error) {
 				return api, nil
 			}
-			testFile, _ := os.Create(tc.testConfig)
-			defer testFile.Close()
-			_, _ = testFile.Write([]byte(tc.outputs))
+			testFile, err := os.Create(tc.testConfig)
+			assert.Nil(t, err, "create test file")
+			_, err = testFile.Write([]byte(tc.outputs))
+			assert.Nil(t, err, "write test file")
+			assert.Nil(t, testFile.Close(), "close test file")
 
 			if os.Getenv("GO_TEST_SUBPROCESS") == "1" {
 				if tc.mockCloud != nil {
@@ -99,8 +102,6 @@ func TestServiceUpdate(t *testing.T) {
 			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			output, _ := cmd.CombinedOutput()
-			fmt.Println(string(output))
-
 			assert.Contains(t, string(output), tc.outputs, "check output")
 
 			os.Remove(tc.testConfig)
