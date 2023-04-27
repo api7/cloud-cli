@@ -49,6 +49,21 @@ func (m *MockAPI) EXPECT() *MockAPIMockRecorder {
 	return m.recorder
 }
 
+// CreateConsumer mocks base method.
+func (m *MockAPI) CreateConsumer(clusterID cloud_go_sdk.ID, consumer *cloud_go_sdk.Consumer) (*cloud_go_sdk.Consumer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateConsumer", clusterID, consumer)
+	ret0, _ := ret[0].(*cloud_go_sdk.Consumer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateConsumer indicates an expected call of CreateConsumer.
+func (mr *MockAPIMockRecorder) CreateConsumer(clusterID, consumer interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConsumer", reflect.TypeOf((*MockAPI)(nil).CreateConsumer), clusterID, consumer)
+}
+
 // CreateSSL mocks base method.
 func (m *MockAPI) CreateSSL(clusterID cloud_go_sdk.ID, ssl *cloud_go_sdk.Certificate) (*cloud_go_sdk.CertificateDetails, error) {
 	m.ctrl.T.Helper()
@@ -92,6 +107,34 @@ func (m *MockAPI) DebugShowConfig(clusterID cloud_go_sdk.ID, resource string, id
 func (mr *MockAPIMockRecorder) DebugShowConfig(clusterID, resource, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), clusterID, resource, id)
+}
+
+// DeleteAPI mocks base method.
+func (m *MockAPI) DeleteAPI(clusterID, appID, apiID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAPI", clusterID, appID, apiID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAPI indicates an expected call of DeleteAPI.
+func (mr *MockAPIMockRecorder) DeleteAPI(clusterID, appID, apiID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAPI", reflect.TypeOf((*MockAPI)(nil).DeleteAPI), clusterID, appID, apiID)
+}
+
+// DeleteConsumer mocks base method.
+func (m *MockAPI) DeleteConsumer(clusterID, consumerID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteConsumer", clusterID, consumerID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteConsumer indicates an expected call of DeleteConsumer.
+func (mr *MockAPIMockRecorder) DeleteConsumer(clusterID, consumerID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConsumer", reflect.TypeOf((*MockAPI)(nil).DeleteConsumer), clusterID, consumerID)
 }
 
 // DeleteSSL mocks base method.
@@ -330,6 +373,21 @@ func (m *MockAPI) Me() (*cloud_go_sdk.User, error) {
 func (mr *MockAPIMockRecorder) Me() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Me", reflect.TypeOf((*MockAPI)(nil).Me))
+}
+
+// UpdateConsumer mocks base method.
+func (m *MockAPI) UpdateConsumer(clusterID cloud_go_sdk.ID, consumer *cloud_go_sdk.Consumer) (*cloud_go_sdk.Consumer, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateConsumer", clusterID, consumer)
+	ret0, _ := ret[0].(*cloud_go_sdk.Consumer)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateConsumer indicates an expected call of UpdateConsumer.
+func (mr *MockAPIMockRecorder) UpdateConsumer(clusterID, consumer interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConsumer", reflect.TypeOf((*MockAPI)(nil).UpdateConsumer), clusterID, consumer)
 }
 
 // UpdateSSL mocks base method.

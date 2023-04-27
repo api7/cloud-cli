@@ -281,8 +281,9 @@ type ResourceListOptions struct {
 
 // ResourceDeleteOptions contains options for `cloud-cli resource delete` command.
 type ResourceDeleteOptions struct {
-	Kind string
-	ID   string
+	Kind      string
+	ID        string
+	ServiceID string
 }
 
 // ResourceGetOptions contains options for `cloud-cli resource get` command.

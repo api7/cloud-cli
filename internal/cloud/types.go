@@ -105,6 +105,14 @@ type API interface {
 	DeleteService(clusterID cloud.ID, appID cloud.ID) error
 	// CreateService return the configuration after the service create
 	CreateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error)
+	// DeleteConsumer deletes the specified consumer.
+	DeleteConsumer(clusterID, consumerID cloud.ID) error
+	// CreateConsumer creates the consumer with the given spec.
+	CreateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
+	// UpdateConsumer updates the consumer with the given spec.
+	UpdateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
+	// DeleteAPI return the route delete success or fail
+	DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error
 }
 
 type api struct {

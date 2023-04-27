@@ -49,6 +49,22 @@ var (
 			}
 			return newSvc
 		},
+		"consumer": func(id sdk.ID) interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to list consumer: %s", err.Error())
+			}
+			consumer, err := readConsumerFromFile(options.Global.Resource.Update.FromFile)
+			if err != nil {
+				output.Errorf("Failed to read consumer from file: %s", err.Error())
+			}
+			consumer.ID = id
+			newConsumer, err := cloud.DefaultClient.UpdateConsumer(cluster.ID, consumer)
+			if err != nil {
+				output.Errorf("Failed to update consumers: %s", err.Error())
+			}
+			return newConsumer
+		},
 		"ssl": func(id sdk.ID) interface{} {
 			var (
 				caCert []byte
@@ -118,6 +134,29 @@ func readServiceFromFile(filename string) (*sdk.Application, error) {
 	}
 
 	return app, nil
+}
+
+func readConsumerFromFile(filename string) (*sdk.Consumer, error) {
+	var (
+		consumer *sdk.Consumer
+		err      error
+	)
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %s", err)
+	}
+
+	switch filepath.Ext(filename) {
+	case ".json":
+		err = json.Unmarshal(data, &consumer)
+	case ".yml", ".yaml":
+		err = yaml.Unmarshal(data, &consumer)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal consumer: %s", err)
+	}
+
+	return consumer, nil
 }
 
 func newUpdateCommand() *cobra.Command {
