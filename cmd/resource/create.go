@@ -74,6 +74,21 @@ var (
 			}
 			return details
 		},
+		"service": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get default cluster: %s", err.Error())
+			}
+			svc, err := readServiceFromFile(options.Global.Resource.Update.FromFile)
+			if err != nil {
+				output.Errorf("Failed to read service from file: %s", err.Error())
+			}
+			newSvc, err := cloud.DefaultClient.CreateService(cluster.ID, svc)
+			if err != nil {
+				output.Errorf("Failed to create services: %s", err.Error())
+			}
+			return newSvc
+		},
 	}
 )
 
@@ -110,6 +125,6 @@ func newCreateCommand() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.SSL.PKeyFile, "pkey", "", "Specify the private key file (this option is only useful when kind is ssl)")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.SSL.CACertFile, "cacert", "", "Specify the CA certificate key file (this option is only useful when kind is ssl)")
 	cmd.PersistentFlags().StringVar((*string)(&options.Global.Resource.Create.SSL.Type), "ssl-type", "", "Specify the SSL type (optional value can be \"server\", \"client\"")
-
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Create.FromFile, "from-file", "", "Specify the resource definition file")
 	return cmd
 }

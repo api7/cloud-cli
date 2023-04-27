@@ -99,6 +99,8 @@ type API interface {
 	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
 	// DeleteService return the service delete success or fail
 	DeleteService(clusterID cloud.ID, appID cloud.ID) error
+	// CreateService return the configuration after the service create
+	CreateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error)
 }
 
 type api struct {
