@@ -97,7 +97,7 @@ func TestServiceDelete(t *testing.T) {
 	}
 }
 
-func TestSAPIDelete(t *testing.T) {
+func TestDeleteRoute(t *testing.T) {
 	testCases := []struct {
 		name      string
 		config    *persistence.CloudConfiguration
