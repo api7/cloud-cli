@@ -29,7 +29,7 @@ import (
 	sdk "github.com/api7/cloud-go-sdk"
 )
 
-func TestServiceUpdate(t *testing.T) {
+func TestServiceCreate(t *testing.T) {
 
 	testCases := []struct {
 		name       string
@@ -40,7 +40,7 @@ func TestServiceUpdate(t *testing.T) {
 		testConfig string
 	}{
 		{
-			name: "update service",
+			name: "create service",
 			config: &persistence.CloudConfiguration{
 				DefaultProfile: "prod",
 				Profiles: []persistence.Profile{
@@ -53,13 +53,13 @@ func TestServiceUpdate(t *testing.T) {
 					},
 				},
 			},
-			args:       []string{"update", "--kind", "service", "--from-file", path.Join(os.TempDir(), "config.json"), "--id", "123"},
+			args:       []string{"create", "--from-file", path.Join(os.TempDir(), "config.json"), "--kind", "service"},
 			testConfig: path.Join(os.TempDir(), "config.json"),
 			mockCloud: func(api *cloud.MockAPI) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 123,
 				}, nil)
-				api.EXPECT().UpdateService(sdk.ID(123), gomock.Any()).Return(&sdk.Application{
+				api.EXPECT().CreateService(sdk.ID(123), gomock.Any()).Return(&sdk.Application{
 					ID:        sdk.ID(123),
 					ClusterID: sdk.ID(123),
 					ApplicationSpec: sdk.ApplicationSpec{

@@ -36,7 +36,7 @@ var (
 		"service": func(id sdk.ID) interface{} {
 			cluster, err := cloud.Client().GetDefaultCluster()
 			if err != nil {
-				output.Errorf("Failed to list services: %s", err.Error())
+				output.Errorf("Failed to get default cluster: %s", err.Error())
 			}
 			svc, err := readServiceFromFile(options.Global.Resource.Update.FromFile)
 			if err != nil {
@@ -45,7 +45,7 @@ var (
 			svc.ID = id
 			newSvc, err := cloud.DefaultClient.UpdateService(cluster.ID, svc)
 			if err != nil {
-				output.Errorf("Failed to list services: %s", err.Error())
+				output.Errorf("Failed to update services: %s", err.Error())
 			}
 			return newSvc
 		},

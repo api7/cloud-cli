@@ -16,15 +16,16 @@ package cloud
 
 import (
 	"context"
-	"github.com/api7/cloud-go-sdk"
-	"github.com/pkg/errors"
 	"io"
 	"math"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/pkg/errors"
+
 	"github.com/api7/cloud-cli/internal/output"
+	"github.com/api7/cloud-go-sdk"
 )
 
 func (a *api) Me() (*cloud.User, error) {
@@ -328,6 +329,20 @@ func (a *api) DeleteService(clusterID cloud.ID, appID cloud.ID) error {
 		return errors.Wrap(err, "failed to delete service")
 	}
 	return nil
+}
+
+func (a *api) CreateService(clusterID cloud.ID, svc *cloud.Application) (*cloud.Application, error) {
+	newSvc, err := a.sdk.CreateApplication(context.TODO(), svc,
+		&cloud.ResourceCreateOptions{
+			Cluster: &cloud.Cluster{
+				ID: clusterID,
+			},
+		})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create service")
+	}
+
+	return newSvc, nil
 }
 
 func (a *api) ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error) {

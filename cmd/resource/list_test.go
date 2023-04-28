@@ -128,10 +128,6 @@ func TestServiceList(t *testing.T) {
 			},
 			args: []string{"list", "--kind", "service"},
 			mockCloud: func(api *cloud.MockAPI) {
-				api.EXPECT().Me().Return(&sdk.User{
-					Email:  "demo@api7.cloud",
-					OrgIDs: []sdk.ID{123},
-				}, nil)
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID:   123,
 					Name: "API7.AI",
@@ -173,7 +169,6 @@ func TestServiceList(t *testing.T) {
 			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
 
 			output, _ := cmd.CombinedOutput()
-			fmt.Println(string(output))
 			for _, o := range tc.outputs {
 				assert.Contains(t, string(output), strings.TrimSpace(o), "check output")
 			}
