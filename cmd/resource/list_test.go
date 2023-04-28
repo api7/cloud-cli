@@ -23,11 +23,11 @@ import (
 
 	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
 	"github.com/api7/cloud-cli/internal/persistence"
-	"github.com/pkg/errors"
 )
 
 func TestResourceList(t *testing.T) {

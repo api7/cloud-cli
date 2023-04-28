@@ -17,6 +17,7 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -25,7 +26,6 @@ import (
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
 	sdk "github.com/api7/cloud-go-sdk"
-	"strconv"
 )
 
 var (
@@ -110,7 +110,7 @@ var (
 				output.Errorf("Failed to parse service-id: %s", err.Error())
 			}
 			if uint64ServiceID == 0 {
-				output.Errorf("service-id is required")
+				output.Errorf("--service-id is required")
 			}
 
 			routes, err := cloud.DefaultClient.ListRoutes(cluster.ID, sdk.ID(uint64ServiceID), limit, skip)
