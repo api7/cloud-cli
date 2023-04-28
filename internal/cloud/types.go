@@ -99,6 +99,8 @@ type API interface {
 	GetService(clusterID cloud.ID, appID cloud.ID) (*cloud.Application, error)
 	// GetConsumer returns the consumer with the given consumer and cluster.
 	GetConsumer(clusterID, consumerID cloud.ID) (*cloud.Consumer, error)
+	// GetRoute returns the route with the given app and api.
+	GetRoute(clusterID, appID cloud.ID, apiID cloud.ID) (*cloud.API, error)
 	// ListConsumers returns the list of consumers in the given cluster.
 	ListConsumers(clusterID cloud.ID, limit int, skip int) ([]*cloud.Consumer, error)
 	// DeleteService return the service delete success or fail
@@ -111,8 +113,8 @@ type API interface {
 	CreateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
 	// UpdateConsumer updates the consumer with the given spec.
 	UpdateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
-	// DeleteAPI return the route delete success or fail
-	DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error
+	// DeleteRoute return the route delete success or fail
+	DeleteRoute(clusterID, appID cloud.ID, apiID cloud.ID) error
 }
 
 type api struct {

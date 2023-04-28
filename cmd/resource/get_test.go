@@ -18,10 +18,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	sdk "github.com/api7/cloud-go-sdk"
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/api7/cloud-cli/internal/cloud"
@@ -162,6 +164,123 @@ func TestServiceGet(t *testing.T) {
 			for _, o := range tc.outputs {
 				assert.Contains(t, string(output), string(o), "check output")
 			}
+		})
+	}
+}
+func TestGetRoute(t *testing.T) {
+	testCases := []struct {
+		name      string
+		config    *persistence.CloudConfiguration
+		args      []string
+		mockCloud func(api *cloud.MockAPI)
+		outputs   []string
+	}{
+		{
+			name: "get api",
+			config: &persistence.CloudConfiguration{
+				DefaultProfile: "prod",
+				Profiles: []persistence.Profile{
+					{
+						Name:    "prod",
+						Address: "https://prod.api7.ai",
+						User: persistence.User{
+							AccessToken: "prod-token",
+						},
+					},
+				},
+			},
+			args: []string{"get", "--kind", "route", "--id", "123", "--service-id", "456"},
+			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 100,
+				}, nil)
+				api.EXPECT().GetRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(&sdk.API{}, nil)
+			},
+			outputs: []string{},
+		},
+		{
+			name: "get api with invalid id",
+			config: &persistence.CloudConfiguration{
+				DefaultProfile: "prod",
+				Profiles: []persistence.Profile{
+					{
+						Name:    "prod",
+						Address: "https://prod.api7.ai",
+						User: persistence.User{
+							AccessToken: "prod-token",
+						},
+					},
+				},
+			},
+			args: []string{"get", "--kind", "route", "--id", "123", "--service-id", "abc"},
+			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 100,
+				}, nil)
+				api.EXPECT().GetRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(&sdk.API{}, nil)
+			},
+			outputs: []string{"ERROR: service-id is required"},
+		},
+		{
+			name: "get api with error",
+			config: &persistence.CloudConfiguration{
+				DefaultProfile: "prod",
+				Profiles: []persistence.Profile{
+					{
+						Name:    "prod",
+						Address: "https://prod.api7.ai",
+						User: persistence.User{
+							AccessToken: "prod-token",
+						},
+					},
+				},
+			},
+			args: []string{"get", "--kind", "route", "--id", "123", "--service-id", "456"},
+			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 100,
+				}, nil)
+				api.EXPECT().GetRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(nil, errors.New("error"))
+			},
+			outputs: []string{"Failed to get route: error"},
+		},
+	}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			err := persistence.SaveConfiguration(tc.config)
+			assert.NoError(t, err, "prepare fake cloud configuration")
+
+			ctrl := gomock.NewController(t)
+			api := cloud.NewMockAPI(ctrl)
+			cloud.NewClient = func(_ string, _ string, _ bool) (cloud.API, error) {
+				return api, nil
+			}
+			if os.Getenv("GO_TEST_SUBPROCESS") == "1" {
+				if tc.mockCloud != nil {
+					tc.mockCloud(api)
+				}
+				cloud.DefaultClient = api
+				cmd := NewCommand()
+				cmd.SetArgs(tc.args)
+				err := cmd.Execute()
+				assert.NoError(t, err, "check if the command executed successfully")
+				return
+			}
+
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
+
+			output, _ := cmd.CombinedOutput()
+			for _, expectedOutput := range tc.outputs {
+				trimmedOutput := strings.TrimSpace(expectedOutput)
+				if trimmedOutput == "" {
+					assert.Empty(t, string(output), "output should be empty")
+					return
+				}
+				assert.Contains(t, string(output), trimmedOutput, "check output")
+			}
+
 		})
 	}
 }

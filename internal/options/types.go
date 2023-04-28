@@ -292,6 +292,8 @@ type ResourceGetOptions struct {
 	Kind string
 	// Specify the ID of resource
 	ID string
+	// Specify the service ID of resource
+	ServiceID string
 }
 
 // Validate validates the docker deploy options.

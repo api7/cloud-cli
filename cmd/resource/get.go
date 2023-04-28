@@ -29,15 +29,15 @@ import (
 )
 
 var (
-	_resourceFetchHandler = map[string]func(id sdk.ID) interface{}{
-		"cluster": func(id sdk.ID) interface{} {
+	_resourceFetchHandler = map[string]func(id sdk.ID, options map[string]any) interface{}{
+		"cluster": func(id sdk.ID, options map[string]any) interface{} {
 			cluster, err := cloud.DefaultClient.GetClusterDetail(id)
 			if err != nil {
 				output.Errorf("Failed to get cluster detail: %s", err.Error())
 			}
 			return cluster
 		},
-		"ssl": func(id sdk.ID) interface{} {
+		"ssl": func(id sdk.ID, options map[string]any) interface{} {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
@@ -48,7 +48,7 @@ var (
 			}
 			return ssl
 		},
-		"service": func(id sdk.ID) interface{} {
+		"service": func(id sdk.ID, options map[string]any) interface{} {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
@@ -59,7 +59,7 @@ var (
 			}
 			return service
 		},
-		"consumer": func(id sdk.ID) interface{} {
+		"consumer": func(id sdk.ID, options map[string]any) interface{} {
 			cluster, err := cloud.DefaultClient.GetDefaultCluster()
 			if err != nil {
 				output.Errorf("Failed to get the default cluster: %s", err.Error())
@@ -67,6 +67,25 @@ var (
 			service, err := cloud.DefaultClient.GetConsumer(cluster.ID, id)
 			if err != nil {
 				output.Errorf("Failed to get consumer: %s", err.Error())
+			}
+			return service
+		},
+		"route": func(id sdk.ID, options map[string]any) interface{} {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			serviceID, ok := options["service-id"].(uint64)
+			if !ok {
+				output.Errorf("service-id is required")
+			}
+			if serviceID == 0 {
+				output.Errorf("service-id is required")
+			}
+
+			service, err := cloud.DefaultClient.GetRoute(cluster.ID, sdk.ID(serviceID), id)
+			if err != nil {
+				output.Errorf("Failed to get route: %s", err.Error())
 			}
 			return service
 		},
@@ -91,12 +110,19 @@ func newGetCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			kind := options.Global.Resource.Get.Kind
 			id := options.Global.Resource.Get.ID
+			serviceID := options.Global.Resource.Get.ServiceID
 			handler, ok := _resourceFetchHandler[kind]
 			if !ok {
 				output.Errorf("This kind of resource is not supported")
 			} else {
 				uint64ID, _ := strconv.ParseUint(id, 10, 64)
-				resource := handler(sdk.ID(uint64ID))
+				uint64ServiceID, _ := strconv.ParseUint(serviceID, 10, 64)
+				opts := make(map[string]any)
+				switch kind {
+				case "route":
+					opts["service-id"] = uint64ServiceID
+				}
+				resource := handler(sdk.ID(uint64ID), opts)
 				text, _ := json.MarshalIndent(resource, "", "\t")
 				fmt.Println(string(text))
 			}
@@ -104,5 +130,6 @@ func newGetCommand() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ID, "id", "", "Specify the id of resource")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
 	return cmd
 }
