@@ -81,7 +81,7 @@ var (
 				output.Errorf("Failed to parse service-id: %s", err.Error())
 			}
 			if uint64ServiceID == 0 {
-				output.Errorf("service-id is required")
+				output.Errorf("--service-id option is required")
 			}
 
 			service, err := cloud.DefaultClient.GetRoute(cluster.ID, sdk.ID(uint64ServiceID), id)
