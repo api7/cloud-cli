@@ -113,6 +113,8 @@ type API interface {
 	CreateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
 	// UpdateConsumer updates the consumer with the given spec.
 	UpdateConsumer(clusterID cloud.ID, consumer *cloud.Consumer) (*cloud.Consumer, error)
+	// ListAPIs returns the list of APIs in application
+	ListRoutes(clusterID cloud.ID, appID cloud.ID, limit int, skip int) ([]*cloud.API, error)
 	// DeleteRoute return the route delete success or fail
 	DeleteRoute(clusterID, appID cloud.ID, apiID cloud.ID) error
 }
