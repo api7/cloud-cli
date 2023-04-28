@@ -219,7 +219,7 @@ func TestGetRoute(t *testing.T) {
 				}, nil)
 				api.EXPECT().GetRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(&sdk.API{}, nil)
 			},
-			outputs: []string{"ERROR: service-id is required"},
+			outputs: []string{"ERROR: Failed to parse service-id"},
 		},
 		{
 			name: "get api with error",
