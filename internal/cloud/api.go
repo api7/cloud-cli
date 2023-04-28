@@ -434,7 +434,7 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	return request, nil
 }
 
-func (a *api) DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error {
+func (a *api) DeleteRoute(clusterID, appID cloud.ID, apiID cloud.ID) error {
 	err := a.sdk.DeleteAPI(context.TODO(), apiID, &cloud.ResourceDeleteOptions{
 		Cluster: &cloud.Cluster{
 			ID: clusterID,
@@ -445,4 +445,13 @@ func (a *api) DeleteAPI(clusterID, appID cloud.ID, apiID cloud.ID) error {
 		return errors.Wrap(err, "failed to delete route")
 	}
 	return nil
+}
+
+func (a *api) GetRoute(clusterID, appID cloud.ID, apiID cloud.ID) (*cloud.API, error) {
+	return a.sdk.GetAPI(context.TODO(), apiID, &cloud.ResourceGetOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Application: &cloud.Application{ID: appID},
+	})
 }

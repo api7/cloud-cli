@@ -109,20 +109,6 @@ func (mr *MockAPIMockRecorder) DebugShowConfig(clusterID, resource, id interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DebugShowConfig", reflect.TypeOf((*MockAPI)(nil).DebugShowConfig), clusterID, resource, id)
 }
 
-// DeleteAPI mocks base method.
-func (m *MockAPI) DeleteAPI(clusterID, appID, apiID cloud_go_sdk.ID) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteAPI", clusterID, appID, apiID)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteAPI indicates an expected call of DeleteAPI.
-func (mr *MockAPIMockRecorder) DeleteAPI(clusterID, appID, apiID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAPI", reflect.TypeOf((*MockAPI)(nil).DeleteAPI), clusterID, appID, apiID)
-}
-
 // DeleteConsumer mocks base method.
 func (m *MockAPI) DeleteConsumer(clusterID, consumerID cloud_go_sdk.ID) error {
 	m.ctrl.T.Helper()
@@ -135,6 +121,20 @@ func (m *MockAPI) DeleteConsumer(clusterID, consumerID cloud_go_sdk.ID) error {
 func (mr *MockAPIMockRecorder) DeleteConsumer(clusterID, consumerID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteConsumer", reflect.TypeOf((*MockAPI)(nil).DeleteConsumer), clusterID, consumerID)
+}
+
+// DeleteRoute mocks base method.
+func (m *MockAPI) DeleteRoute(clusterID, appID, apiID cloud_go_sdk.ID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRoute", clusterID, appID, apiID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteRoute indicates an expected call of DeleteRoute.
+func (mr *MockAPIMockRecorder) DeleteRoute(clusterID, appID, apiID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRoute", reflect.TypeOf((*MockAPI)(nil).DeleteRoute), clusterID, appID, apiID)
 }
 
 // DeleteSSL mocks base method.
@@ -238,6 +238,21 @@ func (m *MockAPI) GetDefaultOrganization() (*cloud_go_sdk.Organization, error) {
 func (mr *MockAPIMockRecorder) GetDefaultOrganization() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultOrganization", reflect.TypeOf((*MockAPI)(nil).GetDefaultOrganization))
+}
+
+// GetRoute mocks base method.
+func (m *MockAPI) GetRoute(clusterID, appID, apiID cloud_go_sdk.ID) (*cloud_go_sdk.API, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRoute", clusterID, appID, apiID)
+	ret0, _ := ret[0].(*cloud_go_sdk.API)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRoute indicates an expected call of GetRoute.
+func (mr *MockAPIMockRecorder) GetRoute(clusterID, appID, apiID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRoute", reflect.TypeOf((*MockAPI)(nil).GetRoute), clusterID, appID, apiID)
 }
 
 // GetSSL mocks base method.

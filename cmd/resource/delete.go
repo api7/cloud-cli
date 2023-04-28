@@ -72,7 +72,7 @@ var (
 				output.Errorf("Please specify the correct service id")
 			}
 
-			if err := cloud.DefaultClient.DeleteAPI(cluster.ID, serviceID, id); err != nil {
+			if err := cloud.DefaultClient.DeleteRoute(cluster.ID, serviceID, id); err != nil {
 				output.Errorf("Failed to delete route: %s", err.Error())
 			}
 		},

@@ -70,6 +70,26 @@ var (
 			}
 			return service
 		},
+		"route": func(id sdk.ID) interface{} {
+			cluster, err := cloud.DefaultClient.GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get the default cluster: %s", err.Error())
+			}
+			serviceID := options.Global.Resource.Get.ServiceID
+			uint64ServiceID, err := strconv.ParseUint(serviceID, 10, 64)
+			if err != nil {
+				output.Errorf("Failed to parse service-id: %s", err.Error())
+			}
+			if uint64ServiceID == 0 {
+				output.Errorf("--service-id option is required")
+			}
+
+			service, err := cloud.DefaultClient.GetRoute(cluster.ID, sdk.ID(uint64ServiceID), id)
+			if err != nil {
+				output.Errorf("Failed to get route: %s", err.Error())
+			}
+			return service
+		},
 	}
 )
 
@@ -104,5 +124,6 @@ func newGetCommand() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ID, "id", "", "Specify the id of resource")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
 	return cmd
 }

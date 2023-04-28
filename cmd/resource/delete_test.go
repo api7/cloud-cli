@@ -124,7 +124,7 @@ func TestDeleteRoute(t *testing.T) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
 				}, nil)
-				api.EXPECT().DeleteAPI(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(nil)
+				api.EXPECT().DeleteRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(nil)
 			},
 			outputs: []string{},
 		},
@@ -147,7 +147,7 @@ func TestDeleteRoute(t *testing.T) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
 				}, nil)
-				api.EXPECT().DeleteAPI(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(nil)
+				api.EXPECT().DeleteRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(nil)
 			},
 			outputs: []string{"ERROR: Failed to parse id: a"},
 		},
@@ -170,7 +170,7 @@ func TestDeleteRoute(t *testing.T) {
 				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
 					ID: 100,
 				}, nil)
-				api.EXPECT().DeleteAPI(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(errors.New("error"))
+				api.EXPECT().DeleteRoute(sdk.ID(100), sdk.ID(456), sdk.ID(123)).Return(errors.New("error"))
 			},
 			outputs: []string{"Failed to delete route"},
 		},
