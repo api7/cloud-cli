@@ -64,6 +64,21 @@ func (mr *MockAPIMockRecorder) CreateConsumer(clusterID, consumer interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateConsumer", reflect.TypeOf((*MockAPI)(nil).CreateConsumer), clusterID, consumer)
 }
 
+// CreateRoute mocks base method.
+func (m *MockAPI) CreateRoute(clusterID cloud_go_sdk.ID, api *cloud_go_sdk.API) (*cloud_go_sdk.API, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateRoute", clusterID, api)
+	ret0, _ := ret[0].(*cloud_go_sdk.API)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateRoute indicates an expected call of CreateRoute.
+func (mr *MockAPIMockRecorder) CreateRoute(clusterID, api interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRoute", reflect.TypeOf((*MockAPI)(nil).CreateRoute), clusterID, api)
+}
+
 // CreateSSL mocks base method.
 func (m *MockAPI) CreateSSL(clusterID cloud_go_sdk.ID, ssl *cloud_go_sdk.Certificate) (*cloud_go_sdk.CertificateDetails, error) {
 	m.ctrl.T.Helper()
@@ -418,6 +433,21 @@ func (m *MockAPI) UpdateConsumer(clusterID cloud_go_sdk.ID, consumer *cloud_go_s
 func (mr *MockAPIMockRecorder) UpdateConsumer(clusterID, consumer interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateConsumer", reflect.TypeOf((*MockAPI)(nil).UpdateConsumer), clusterID, consumer)
+}
+
+// UpdateRoute mocks base method.
+func (m *MockAPI) UpdateRoute(clusterID cloud_go_sdk.ID, api *cloud_go_sdk.API) (*cloud_go_sdk.API, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateRoute", clusterID, api)
+	ret0, _ := ret[0].(*cloud_go_sdk.API)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateRoute indicates an expected call of UpdateRoute.
+func (mr *MockAPIMockRecorder) UpdateRoute(clusterID, api interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateRoute", reflect.TypeOf((*MockAPI)(nil).UpdateRoute), clusterID, api)
 }
 
 // UpdateSSL mocks base method.

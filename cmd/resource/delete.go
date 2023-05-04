@@ -115,7 +115,7 @@ func newDeleteCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ID, "id", "", "Specify the id of resource")
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Delete.ServiceID, "service-id", "0", "Specify the id of service resource, when delete route this value should be set")
 
 	return cmd
 }
