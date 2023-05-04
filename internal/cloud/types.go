@@ -117,6 +117,10 @@ type API interface {
 	ListRoutes(clusterID cloud.ID, appID cloud.ID, limit int, skip int) ([]*cloud.API, error)
 	// DeleteRoute return the route delete success or fail
 	DeleteRoute(clusterID, appID cloud.ID, apiID cloud.ID) error
+	// CreateRoute return the configuration after the route create
+	CreateRoute(clusterID cloud.ID, api *cloud.API) (*cloud.API, error)
+	// UpdateRoute return the configuration after the route update
+	UpdateRoute(clusterID cloud.ID, api *cloud.API) (*cloud.API, error)
 }
 
 type api struct {

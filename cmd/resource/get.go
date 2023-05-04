@@ -124,6 +124,6 @@ func newGetCommand() *cobra.Command {
 	}
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.Kind, "kind", "cluster", "Specify the resource kind")
 	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ID, "id", "", "Specify the id of resource")
-	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ServiceID, "service-id", "0", "Specify the id of service resource, when delete API this value should be set")
+	cmd.PersistentFlags().StringVar(&options.Global.Resource.Get.ServiceID, "service-id", "0", "Specify the id of service resource, when get route this value should be set")
 	return cmd
 }

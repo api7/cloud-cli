@@ -26,6 +26,7 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
@@ -79,7 +80,7 @@ var (
 			if err != nil {
 				output.Errorf("Failed to get default cluster: %s", err.Error())
 			}
-			svc, err := readServiceFromFile(options.Global.Resource.Create.FromFile)
+			svc, err := utils.ReadServiceFromFile(options.Global.Resource.Create.FromFile)
 			if err != nil {
 				output.Errorf("Failed to read service from file: %s", err.Error())
 			}
@@ -94,7 +95,7 @@ var (
 			if err != nil {
 				output.Errorf("Failed to list consumer: %s", err.Error())
 			}
-			spec, err := readConsumerFromFile(options.Global.Resource.Create.FromFile)
+			spec, err := utils.ReadConsumerFromFile(options.Global.Resource.Create.FromFile)
 			if err != nil {
 				output.Errorf("Failed to read consumer spec from file: %s", err.Error())
 			}
@@ -103,6 +104,21 @@ var (
 				output.Errorf("Failed to create consumer: %s", err.Error())
 			}
 			return consumer
+		},
+		"route": func() interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to list router: %s", err.Error())
+			}
+			spec, err := utils.ReadRouterFromFile(options.Global.Resource.Create.FromFile)
+			if err != nil {
+				output.Errorf("Failed to read router spec from file: %s", err.Error())
+			}
+			router, err := cloud.DefaultClient.CreateRoute(cluster.ID, spec)
+			if err != nil {
+				output.Errorf("Failed to create router: %s", err.Error())
+			}
+			return router
 		},
 	}
 )

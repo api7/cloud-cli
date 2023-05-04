@@ -17,9 +17,7 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	sdk "github.com/api7/cloud-go-sdk"
@@ -29,6 +27,7 @@ import (
 	"github.com/api7/cloud-cli/internal/options"
 	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/persistence"
+	"github.com/api7/cloud-cli/internal/utils"
 )
 
 var (
@@ -38,7 +37,7 @@ var (
 			if err != nil {
 				output.Errorf("Failed to get default cluster: %s", err.Error())
 			}
-			svc, err := readServiceFromFile(options.Global.Resource.Update.FromFile)
+			svc, err := utils.ReadServiceFromFile(options.Global.Resource.Update.FromFile)
 			if err != nil {
 				output.Errorf("Failed to read service from file: %s", err.Error())
 			}
@@ -54,7 +53,7 @@ var (
 			if err != nil {
 				output.Errorf("Failed to list consumer: %s", err.Error())
 			}
-			consumer, err := readConsumerFromFile(options.Global.Resource.Update.FromFile)
+			consumer, err := utils.ReadConsumerFromFile(options.Global.Resource.Update.FromFile)
 			if err != nil {
 				output.Errorf("Failed to read consumer from file: %s", err.Error())
 			}
@@ -110,54 +109,24 @@ var (
 			}
 			return details
 		},
+		"route": func(id sdk.ID) interface{} {
+			cluster, err := cloud.Client().GetDefaultCluster()
+			if err != nil {
+				output.Errorf("Failed to get default cluster: %s", err.Error())
+			}
+			route, err := utils.ReadRouterFromFile(options.Global.Resource.Update.FromFile)
+			if err != nil {
+				output.Errorf("Failed to read route from file: %s", err.Error())
+			}
+			route.ID = id
+			newRoute, err := cloud.DefaultClient.UpdateRoute(cluster.ID, route)
+			if err != nil {
+				output.Errorf("Failed to update routes: %s", err.Error())
+			}
+			return newRoute
+		},
 	}
 )
-
-func readServiceFromFile(filename string) (*sdk.Application, error) {
-	var (
-		app *sdk.Application
-		err error
-	)
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %s", err)
-	}
-
-	switch filepath.Ext(filename) {
-	case ".json":
-		err = json.Unmarshal(data, &app)
-	case ".yml", ".yaml":
-		err = yaml.Unmarshal(data, &app)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal service: %s", err)
-	}
-
-	return app, nil
-}
-
-func readConsumerFromFile(filename string) (*sdk.Consumer, error) {
-	var (
-		consumer *sdk.Consumer
-		err      error
-	)
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %s", err)
-	}
-
-	switch filepath.Ext(filename) {
-	case ".json":
-		err = json.Unmarshal(data, &consumer)
-	case ".yml", ".yaml":
-		err = yaml.Unmarshal(data, &consumer)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal consumer: %s", err)
-	}
-
-	return consumer, nil
-}
 
 func newUpdateCommand() *cobra.Command {
 	cmd := &cobra.Command{

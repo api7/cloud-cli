@@ -20,6 +20,7 @@ import (
 	"os/exec"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +104,88 @@ func TestServiceCreate(t *testing.T) {
 
 			output, _ := cmd.CombinedOutput()
 			assert.Contains(t, string(output), tc.outputs, "check output")
+
+			os.Remove(tc.testConfig)
+		})
+	}
+}
+
+func TestRouteCreate(t *testing.T) {
+	testCases := []struct {
+		name       string
+		config     *persistence.CloudConfiguration
+		args       []string
+		mockCloud  func(api *cloud.MockAPI)
+		input      string
+		output     string
+		testConfig string
+	}{
+		{
+			name: "create route",
+			config: &persistence.CloudConfiguration{
+				DefaultProfile: "prod",
+				Profiles: []persistence.Profile{
+					{
+						Name:    "prod",
+						Address: "https://prod.api7.ai",
+						User: persistence.User{
+							AccessToken: "prod-token",
+						},
+					},
+				},
+			},
+			args:       []string{"create", "--kind", "route", "--from-file", path.Join(os.TempDir(), "config.json")},
+			input:      "{\n        \"name\": \"all\",\n        \"description\": \"\",\n        \"methods\": [\n                \"GET\",\n                \"HEAD\",\n                \"POST\",\n                \"PUT\",\n                \"DELETE\",\n                \"CONNECT\",\n                \"OPTIONS\",\n                \"TRACE\",\n                \"PATCH\"\n        ],\n        \"paths\": [\n                {\n                        \"path\": \"*\",\n                        \"path_type\": \"Exact\"\n                }\n        ],\n        \"strip_path_prefix\": false,\n        \"active\": 0,\n        \"type\": \"Rest\",\n        \"id\": \"453750199534224179\",\n        \"app_id\": \"453750152658682675\",\n        \"status\": 50,\n        \"created_at\": \"2023-03-28T06:43:14.598333Z\",\n        \"updated_at\": \"2023-03-28T06:43:14.706465Z\"\n}\n",
+			testConfig: path.Join(os.TempDir(), "config.json"),
+			mockCloud: func(api *cloud.MockAPI) {
+				api.EXPECT().GetDefaultCluster().Return(&sdk.Cluster{
+					ID: 123,
+				}, nil)
+				api.EXPECT().CreateRoute(sdk.ID(123), gomock.Any()).Return(&sdk.API{
+					APISpec:   sdk.APISpec{},
+					ID:        sdk.ID(123),
+					AppID:     sdk.ID(123),
+					Status:    sdk.Normal,
+					CreatedAt: time.Time{},
+					UpdatedAt: time.Time{},
+				}, nil)
+			},
+			output: "{\n\t\"name\": \"\",\n\t\"description\": \"\",\n\t\"methods\": null,\n\t\"paths\": null,\n\t\"strip_path_prefix\": false,\n\t\"active\": 0,\n\t\"id\": \"123\",\n\t\"app_id\": \"123\",\n\t\"status\": 50,\n\t\"created_at\": \"0001-01-01T00:00:00Z\",\n\t\"updated_at\": \"0001-01-01T00:00:00Z\"\n}\n",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			err := persistence.SaveConfiguration(tc.config)
+			assert.NoError(t, err, "prepare fake cloud configuration")
+			ctrl := gomock.NewController(t)
+			api := cloud.NewMockAPI(ctrl)
+			cloud.NewClient = func(_ string, _ string, _ bool) (cloud.API, error) {
+				return api, nil
+			}
+			testFile, err := os.Create(tc.testConfig)
+			assert.Nil(t, err, "create test file")
+			_, err = testFile.Write([]byte(tc.input))
+			assert.Nil(t, err, "write test file")
+			assert.Nil(t, testFile.Close(), "close test file")
+
+			if os.Getenv("GO_TEST_SUBPROCESS") == "1" {
+				if tc.mockCloud != nil {
+					tc.mockCloud(api)
+				}
+				cloud.DefaultClient = api
+				cmd := NewCommand()
+				cmd.SetArgs(tc.args)
+				err := cmd.Execute()
+				assert.NoError(t, err, "check if the command executed successfully")
+				return
+			}
+			cmd := exec.Command(os.Args[0], fmt.Sprintf("-test.run=^%s$", t.Name()))
+			cmd.Env = append(os.Environ(), "GO_TEST_SUBPROCESS=1")
+
+			output, _ := cmd.CombinedOutput()
+			assert.Contains(t, string(output), tc.output, "check output")
 
 			os.Remove(tc.testConfig)
 		})

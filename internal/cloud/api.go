@@ -503,3 +503,21 @@ func (a *api) GetRoute(clusterID, appID cloud.ID, apiID cloud.ID) (*cloud.API, e
 		Application: &cloud.Application{ID: appID},
 	})
 }
+
+func (a *api) CreateRoute(clusterID cloud.ID, api *cloud.API) (*cloud.API, error) {
+	return a.sdk.CreateAPI(context.TODO(), api, &cloud.ResourceCreateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Application: &cloud.Application{ID: api.AppID},
+	})
+}
+
+func (a *api) UpdateRoute(clusterID cloud.ID, api *cloud.API) (*cloud.API, error) {
+	return a.sdk.UpdateAPI(context.TODO(), api, &cloud.ResourceUpdateOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Application: &cloud.Application{ID: api.AppID},
+	})
+}
