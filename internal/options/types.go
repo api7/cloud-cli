@@ -277,6 +277,8 @@ type ResourceListOptions struct {
 	Limit int
 	// Specifies how much data to skip ahead
 	Skip int
+	// Specify the ID of service
+	ServiceID string
 }
 
 // ResourceDeleteOptions contains options for `cloud-cli resource delete` command.

@@ -434,6 +434,54 @@ func (a *api) newRequest(method string, url *url.URL, body io.Reader) (*http.Req
 	return request, nil
 }
 
+func (a *api) ListRoutes(clusterID cloud.ID, appID cloud.ID, limit int, skip int) ([]*cloud.API, error) {
+	var (
+		routes []*cloud.API
+		err    error
+	)
+
+	pageSize := 25
+	firstPage := skip/pageSize + 1
+	skipOnFirstPage := skip % pageSize
+
+	iter, err := a.sdk.ListAPIs(context.TODO(), &cloud.ResourceListOptions{
+		Cluster: &cloud.Cluster{
+			ID: clusterID,
+		},
+		Pagination: &cloud.Pagination{
+			Page:     firstPage,
+			PageSize: pageSize,
+		},
+		Application: &cloud.Application{ID: appID},
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get route iterator")
+	}
+
+	for {
+		api, err := iter.Next()
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get next route")
+		}
+		if api == nil {
+			// end
+			break
+		}
+
+		if skipOnFirstPage > 0 {
+			skipOnFirstPage--
+			continue
+		}
+		routes = append(routes, api)
+		if len(routes) >= limit {
+			break
+		}
+	}
+
+	return routes, nil
+}
+
 func (a *api) DeleteRoute(clusterID, appID cloud.ID, apiID cloud.ID) error {
 	err := a.sdk.DeleteAPI(context.TODO(), apiID, &cloud.ResourceDeleteOptions{
 		Cluster: &cloud.Cluster{
