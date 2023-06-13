@@ -56,8 +56,10 @@ China Mirror
 
 You can also download Cloud CLI binaries through China mirror.
 
+See [Releases](https://github.com/api7/cloud-cli/releases) for the release version.
+
 ```shell
-export VERSION=0.19.2
+export VERSION=<CLOUD-CLI-VERSION>  # e.g. 0.30.2
 export OS=`uname -s | tr A-Z a-z`
 export ARCH=`uname -m | tr A-Z a-z`
 if [[ $ARCH = "x86_64" ]]; then ARCH=amd64; fi
