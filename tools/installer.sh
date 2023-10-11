@@ -57,6 +57,10 @@ if [ "$ARCH" = "x86_64" ]; then
   ARCH=amd64
 fi
 
+if [ "$ARCH" = "aarch64" ]; then
+  ARCH=arm64
+fi
+
 validate_arch $ARCH
 validate_os $OS
 install_cloud_cli $CLOUD_CLI_VER $OS $ARCH
