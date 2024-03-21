@@ -26,6 +26,7 @@ import (
 	"github.com/api7/cloud-cli/cmd/resource"
 	"github.com/api7/cloud-cli/cmd/stop"
 	"github.com/api7/cloud-cli/internal/options"
+	"github.com/api7/cloud-cli/internal/output"
 	"github.com/api7/cloud-cli/internal/utils"
 	"github.com/api7/cloud-cli/internal/version"
 )
@@ -58,6 +59,11 @@ func main() {
 		utils.TraceVerbose.Exit()
 		utils.TraceVerbose.Wg.Wait()
 	}()
+
+	home, exists := os.LookupEnv("HOME")
+	if !exists || home == "" {
+		output.Errorf("HOME environment variable is not set")
+	}
 
 	cmd := newCommand()
 	if err := cmd.Execute(); err != nil {
