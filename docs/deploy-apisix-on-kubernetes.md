@@ -60,7 +60,7 @@ cloud-cli deploy kubernetes \
   --namespace apisix \
   --replica-count 1 \
   --apisix-image apache/apisix:2.15.0-centos \
-  --helm-install-arg --output=table
+  --helm-install-arg --version=1.3.0
 
 Congratulations! Your APISIX cluster was deployed successfully on Kubernetes.
 The Helm release name is: my-apisix
@@ -113,7 +113,7 @@ cloud-cli deploy kubernetes \
   --replica-count 1 \
   --apisix-image apache/apisix:2.15.0-centos \
   --local-cache-pvc apisix-cache-pvc \
-  --helm-install-arg --output=table
+  --helm-install-arg --version=1.3.0
 ```
 
 Note you need to create the persistent volume claim `apisix-cache-pvc` before you run the command.
