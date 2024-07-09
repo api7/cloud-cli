@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/api7/cloud-go-sdk v0.0.0-20230426082534-e99f8854ef3b
-	github.com/docker/docker v20.10.22+incompatible
+	github.com/docker/docker v24.0.9+incompatible
 	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/golang/mock v1.6.0
